@@ -1,8 +1,6 @@
 "use client";
-import { useContext, useEffect, useState } from "react";
-import { ChartContext } from "./TChart";
-import { CandlestickData, ISeriesApi, Time } from "lightweight-charts";
-import { defaultCandleStickOptions } from "@/constants/seriesOptions";
+import { CandlestickData, Time } from "lightweight-charts";
+import { useSeries } from "@/hooks/useSeries";
 
 interface CandlestickSeriesProps {
   seriesData: CandlestickData<Time>[];
@@ -11,19 +9,7 @@ interface CandlestickSeriesProps {
 const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   seriesData,
 }) => {
-  const { chart } = useContext(ChartContext);
-  const [series, setSeries] = useState<ISeriesApi<"Candlestick", Time>>();
-
-  useEffect(() => {
-    if (!chart) return;
-    setSeries(chart.addCandlestickSeries(defaultCandleStickOptions));
-  }, [chart]);
-
-  useEffect(() => {
-    if (!series || !seriesData || !seriesData.length) return;
-
-    series.setData(seriesData);
-  }, [series, seriesData]);
+  const { series } = useSeries("Candlestick", seriesData);
 
   return null;
 };

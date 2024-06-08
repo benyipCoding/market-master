@@ -3,7 +3,7 @@ import CandlestickSeries from "@/components/CandlestickSeries";
 import TChart from "@/components/TChart";
 import { getDummyData } from "@/utils/apis/getDummyData";
 import { CandlestickData, Time } from "lightweight-charts";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 const Home = () => {
   const [candlestickData, setCandlestickData] = useState<
@@ -14,10 +14,7 @@ const Home = () => {
     const res = await getDummyData();
     setCandlestickData(res.data);
   };
-
-  useEffect(() => {
-    getCandlestickData();
-  }, []);
+  getCandlestickData();
 
   return (
     <div className="h-full flex">
