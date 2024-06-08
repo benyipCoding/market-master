@@ -2,9 +2,7 @@
 import CandlestickSeries from "@/components/CandlestickSeries";
 import TChart from "@/components/TChart";
 import { getDummyData } from "@/utils/apis/getDummyData";
-
 import { CandlestickData, Time } from "lightweight-charts";
-
 import React, { useEffect, useState } from "react";
 
 const Home = () => {

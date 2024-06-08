@@ -3,6 +3,7 @@ import {
   ColorType,
   CrosshairMode,
   DeepPartial,
+  TickMarkType,
   Time,
 } from "lightweight-charts";
 
@@ -30,14 +31,14 @@ export const defaultChartOptions: DeepPartial<ChartOptions> = {
     },
   },
   // priceScale: {
-  //   borderColor: 'rgba(197, 203, 206, 0.8)', // 价格刻度边框颜色
+  //   borderColor: "rgba(197, 203, 206, 0.8)", // 价格刻度边框颜色
   // },
   timeScale: {
     borderColor: "rgba(197, 203, 206, 0.8)", // 时间刻度边框颜色
     tickMarkFormatter: (
-      time: Time
-      // tickMarkType: TickMarkType,
-      // locale: string
+      time: Time,
+      tickMarkType: TickMarkType,
+      locale: string
     ) => {
       return time;
     },
