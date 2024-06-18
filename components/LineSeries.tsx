@@ -1,3 +1,4 @@
+"use client";
 import { LineData, Time } from "lightweight-charts";
 import React from "react";
 import { useSeries } from "@/hooks/useSeries";
