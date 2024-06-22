@@ -13,6 +13,10 @@ interface TChartProps {
   className: string;
   chart: IChartApi | undefined;
   setChart: React.Dispatch<React.SetStateAction<IChartApi | undefined>>;
+  onChartMouseDown: (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    dom: HTMLDivElement | null
+  ) => void;
 }
 
 export const ChartContext = createContext<{ chart?: IChartApi }>({});
@@ -22,6 +26,7 @@ const TChart: React.FC<PropsWithChildren<TChartProps>> = ({
   className,
   chart,
   setChart,
+  onChartMouseDown,
 }) => {
   const container = useRef<HTMLDivElement>(null);
 
@@ -31,7 +36,11 @@ const TChart: React.FC<PropsWithChildren<TChartProps>> = ({
   }, []);
 
   return (
-    <div className={clsx("relative", className)} ref={container}>
+    <div
+      className={clsx("relative", className)}
+      ref={container}
+      onMouseDown={(e) => onChartMouseDown(e, container.current)}
+    >
       <ChartContext.Provider value={{ chart }}>
         {children}
       </ChartContext.Provider>

@@ -19,7 +19,7 @@ type CombineSeriesDataType = OhlcData<Time>[] | SingleValueData<Time>[];
 
 export const useSeries = <T>(
   type: SeriesType,
-  seriesData: CombineSeriesDataType,
+  seriesData?: CombineSeriesDataType,
   customOptions?: SeriesPartialOptions<T>
 ) => {
   const { chart } = useContext(ChartContext);
