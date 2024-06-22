@@ -1,7 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
+import commonReducer from "./commonSlice";
+import TChartReducer from "./TChartSlice";
 
 export const store = configureStore({
-  reducer: {},
+  reducer: {
+    common: commonReducer,
+    // TChart: TChartReducer,
+  },
   middleware: (defaultMiddleware) =>
     defaultMiddleware({ serializableCheck: false }),
   devTools: true,

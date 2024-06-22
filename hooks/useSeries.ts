@@ -4,9 +4,7 @@ import {
   defaultLineOptions,
 } from "@/constants/seriesOptions";
 import {
-  CandlestickSeriesPartialOptions,
   ISeriesApi,
-  LineSeriesPartialOptions,
   OhlcData,
   SeriesPartialOptions,
   SeriesType,
@@ -22,7 +20,7 @@ export const useSeries = <T>(
   seriesData?: CombineSeriesDataType,
   customOptions?: SeriesPartialOptions<T>
 ) => {
-  const { chart } = useContext(ChartContext);
+  const { chart, setChildSeries } = useContext(ChartContext);
   const [series, setSeries] = useState<ISeriesApi<SeriesType, Time>>();
 
   // dispatch series
@@ -32,7 +30,8 @@ export const useSeries = <T>(
       case "Line":
         setSeries(
           chart.addLineSeries(
-            (customOptions as LineSeriesPartialOptions) || defaultLineOptions
+            Object.assign({}, defaultLineOptions, customOptions)
+            // (customOptions as LineSeriesPartialOptions) || defaultLineOptions
           )
         );
         break;
@@ -40,8 +39,9 @@ export const useSeries = <T>(
       case "Candlestick":
         setSeries(
           chart.addCandlestickSeries(
-            (customOptions as CandlestickSeriesPartialOptions) ||
-              defaultCandleStickOptions
+            Object.assign({}, defaultCandleStickOptions, customOptions)
+            // (customOptions as CandlestickSeriesPartialOptions) ||
+            //   defaultCandleStickOptions
           )
         );
         break;
@@ -49,14 +49,23 @@ export const useSeries = <T>(
       default:
         throw new Error("No series type matched");
     }
-  }, [chart, customOptions, type]);
+  }, [chart, type]);
 
   // set data
   useEffect(() => {
-    if (!series || !seriesData || !seriesData.length) return;
+    if (!series) return;
+    setChildSeries!((prev) => {
+      const title = series.options().title;
+      const isExisted = prev.some((s) => s.options().title === title);
+      if (isExisted) {
+        return [...prev];
+      }
+      return [...prev, series];
+    });
 
+    if (!seriesData || !seriesData.length) return;
     series.setData(seriesData);
-  }, [series, seriesData]);
+  }, [series, seriesData, setChildSeries]);
 
   return {
     series,
