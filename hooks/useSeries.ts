@@ -51,9 +51,12 @@ export const useSeries = <T>(
     }
   }, [chart, type]);
 
-  // set data
+  // record series instance and set data
   useEffect(() => {
     if (!series) return;
+    if (!series.options().title)
+      throw new Error("Newly added series must have a title");
+
     setChildSeries!((prev) => {
       const title = series.options().title;
       const isExisted = prev.some((s) => s.options().title === title);

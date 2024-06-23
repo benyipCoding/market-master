@@ -3,15 +3,11 @@ import CandlestickSeries from "@/components/CandlestickSeries";
 import LineSeries from "@/components/LineSeries";
 import TChart from "@/components/TChart";
 import { getDummyData } from "@/utils/apis/getDummyData";
-import { calcValue } from "@/utils/helpers";
 import { RootState, AppDispatch } from "@/store";
 import {
   CandlestickData,
-  IChartApi,
-  ISeriesApi,
-  LineData,
+  LineSeriesPartialOptions,
   Time,
-  UTCTimestamp,
 } from "lightweight-charts";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,53 +19,13 @@ const Home = () => {
   >([]);
   const { isDrawing } = useSelector((state: RootState) => state.common);
   const dispatch = useDispatch<AppDispatch>();
-  // const [chart, setChart] = useState<IChartApi>();
-  const [candlestickSeries, setCandlestickSeries] =
-    useState<ISeriesApi<"Candlestick", Time>>();
-  const [lineSeries, setLineSeries] = useState<ISeriesApi<"Line", Time>>();
+  const [drawedLineList, setDrawedLineList] = useState<
+    LineSeriesPartialOptions[]
+  >([]);
 
-  const toggleIsDrawing = () => {
+  const toggleDrawingState = () => {
     dispatch(toggleDrawing(!isDrawing));
   };
-
-  // const drawStart = (
-  //   e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-  //   dom: HTMLDivElement | null
-  // ) => {
-  //   if (!isDrawing) return;
-  //   if (!dom) throw new Error("Missing DOM");
-
-  //   const [time, value] = calcValue(e, dom, candlestickSeries!, chart!);
-  //   drawStartPoint = { value: value as number, time: time as UTCTimestamp };
-  //   lineSeries?.setData([drawStartPoint!]);
-
-  //   document.onmousemove = (event) => drawMove(event, dom);
-  //   document.onmouseup = drawEnd;
-  // };
-
-  // const drawMove = (e: MouseEvent, dom: HTMLDivElement | null) => {
-  //   console.log("draw move!");
-
-  //   try {
-  //     const [time, value] = calcValue(e, dom, candlestickSeries!, chart!);
-  //     drawEndPoint = { value: value as number, time: time as UTCTimestamp };
-
-  //     lineSeries?.setData(
-  //       [drawStartPoint!, drawEndPoint!].sort(
-  //         (a, b) =>
-  //           new Date(a.time as string).getTime() -
-  //           new Date(b.time as string).getTime()
-  //       )
-  //     );
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
-  // const drawEnd = () => {
-  //   dispatch(toggleDrawing(false));
-  //   document.onmousemove = null;
-  // };
 
   const getCandlestickData = async () => {
     const res = await getDummyData();
@@ -80,34 +36,27 @@ const Home = () => {
     getCandlestickData();
   }, []);
 
-  // useEffect(() => {
-  //   chart?.applyOptions({
-  //     handleScale: !isDrawing,
-  //     handleScroll: !isDrawing,
-  //     rightPriceScale: { autoScale: !isDrawing },
-  //   });
-  // }, [isDrawing, chart]);
-
   return (
     <div className="h-full flex bg-black">
       <div
         className="absolute left-0 top-0 p-2 bg-blue-500 z-10 flex justify-center items-center cursor-pointer"
-        onClick={toggleIsDrawing}
+        onClick={toggleDrawingState}
       >
         {isDrawing ? "Finish Draw" : "Start Draw"}
       </div>
 
-      <TChart className="w-4/5 h-4/5 m-auto">
+      <TChart
+        className="w-4/5 h-4/5 m-auto"
+        setDrawedLineList={setDrawedLineList}
+        drawedLineList={drawedLineList}
+      >
         <CandlestickSeries
           seriesData={candlestickData}
-          setSeries={setCandlestickSeries}
           customSeriesOptions={{ title: "XAU/USD" }}
         />
-        <LineSeries
-          setSeries={setLineSeries}
-          isDrawing={isDrawing}
-          customSeriesOptions={{ title: "drawLine_1" }}
-        />
+        {drawedLineList.map((lineOption) => (
+          <LineSeries customSeriesOptions={lineOption} key={lineOption.title} />
+        ))}
       </TChart>
     </div>
   );

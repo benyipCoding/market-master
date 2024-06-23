@@ -1,29 +1,35 @@
 "use client";
 import { defaultChartOptions } from "@/constants/chartOptions";
-import { AppDispatch, RootState } from "@/store";
-import { toggleDrawing } from "@/store/commonSlice";
-import { calcValue } from "@/utils/helpers";
+import { useEnableDrawingLine } from "@/hooks/useEnableDrawingLine";
+import { RootState } from "@/store";
 import clsx from "clsx";
 import {
   createChart,
+  DeepPartial,
   IChartApi,
   ISeriesApi,
-  LineData,
+  LineSeriesPartialOptions,
+  LineStyleOptions,
+  SeriesOptionsCommon,
   SeriesType,
   Time,
-  UTCTimestamp,
 } from "lightweight-charts";
 import React, {
   PropsWithChildren,
-  useEffect,
   useRef,
   createContext,
   useState,
+  useEffect,
 } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 interface TChartProps {
   className: string;
+  setDrawedLineList: React.Dispatch<
+    React.SetStateAction<DeepPartial<LineStyleOptions & SeriesOptionsCommon>[]>
+  >;
+  drawable?: boolean;
+  drawedLineList: LineSeriesPartialOptions[];
 }
 
 interface ChartContext {
@@ -38,62 +44,33 @@ export const ChartContext = createContext<ChartContext>({});
 const TChart: React.FC<PropsWithChildren<TChartProps>> = ({
   children,
   className,
+  setDrawedLineList,
+  drawable = true,
+  drawedLineList,
 }) => {
   const container = useRef<HTMLDivElement>(null);
   const { isDrawing } = useSelector((state: RootState) => state.common);
-
   const [chart, setChart] = useState<IChartApi>();
+
+  // Collection of series instances for all children components
   const [childSeries, setChildSeries] = useState<
     ISeriesApi<SeriesType, Time>[]
   >([]);
 
-  // const dispatch = useDispatch<AppDispatch>();
-
-  // const drawStart = (
-  //   mouseEvent: React.MouseEvent<HTMLDivElement, MouseEvent>,
-  //   chartContainer: HTMLDivElement | null
-  // ) => {
-  //   if (!isDrawing) return;
-  //   if (!chartContainer) throw new Error("Missing DOM");
-
-  //   const [time, value] = calcValue(
-  //     mouseEvent,
-  //     chartContainer,
-  //     candlestickSeries!,
-  //     chart!
-  //   );
-  //   drawStartPoint = { value: value as number, time: time as UTCTimestamp };
-  //   lineSeries?.setData([drawStartPoint!]);
-
-  //   document.onmousemove = (mouseEvent) => drawMove(mouseEvent, chartContainer);
-  //   document.onmouseup = drawEnd;
-  // };
-
-  // const drawMove = (e: MouseEvent, dom: HTMLDivElement | null) => {
-  //   try {
-  //     const [time, value] = calcValue(e, dom, candlestickSeries!, chart!);
-  //     drawEndPoint = { value: value as number, time: time as UTCTimestamp };
-
-  //     lineSeries?.setData(
-  //       [drawStartPoint!, drawEndPoint!].sort(
-  //         (a, b) =>
-  //           new Date(a.time as string).getTime() -
-  //           new Date(b.time as string).getTime()
-  //       )
-  //     );
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
-  // const drawEnd = () => {
-  //   dispatch(toggleDrawing(false));
-  //   document.onmousemove = null;
-  // };
+  const { drawStart, cleanUp } = useEnableDrawingLine({
+    chart: chart!,
+    childSeries,
+    drawedLineList,
+    setDrawedLineList,
+  });
 
   useEffect(() => {
     if (!container.current) return;
     setChart(createChart(container.current, defaultChartOptions));
+
+    return () => {
+      cleanUp();
+    };
   }, []);
 
   useEffect(() => {
@@ -104,15 +81,11 @@ const TChart: React.FC<PropsWithChildren<TChartProps>> = ({
     });
   }, [isDrawing, chart]);
 
-  useEffect(() => {
-    console.log(childSeries);
-  }, [childSeries]);
-
   return (
     <div
       className={clsx("relative", className)}
       ref={container}
-      // onMouseDown={(e) => drawStart(e, container.current)}
+      onMouseDown={(e) => (drawable ? drawStart(e, container.current) : null)}
     >
       <ChartContext.Provider
         value={{
