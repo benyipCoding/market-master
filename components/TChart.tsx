@@ -10,6 +10,7 @@ import {
   ISeriesApi,
   LineSeriesPartialOptions,
   LineStyleOptions,
+  MouseEventParams,
   SeriesOptionsCommon,
   SeriesType,
   Time,
@@ -79,7 +80,20 @@ const TChart: React.FC<PropsWithChildren<TChartProps>> = ({
       handleScroll: !isDrawing,
       rightPriceScale: { autoScale: !isDrawing },
     });
-  }, [isDrawing, chart]);
+  }, [isDrawing]);
+
+  const crosshairMoveHandler = (e: MouseEventParams<Time>) => {
+    childSeries.forEach((series, index) => {
+      const hoverData = e.seriesData.get(series);
+      console.log(index + 1, hoverData);
+    });
+  };
+
+  useEffect(() => {
+    if (!chart) return;
+    chart.unsubscribeCrosshairMove(crosshairMoveHandler);
+    chart.subscribeCrosshairMove(crosshairMoveHandler);
+  }, [chart, childSeries]);
 
   return (
     <div

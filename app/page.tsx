@@ -31,6 +31,7 @@ const Home = () => {
     const res = await getDummyData();
     setCandlestickData(res.data);
   };
+
   // get dummy candlestick data
   useEffect(() => {
     getCandlestickData();

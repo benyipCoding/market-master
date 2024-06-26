@@ -24,8 +24,9 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   const { series } = useSeries("Candlestick", seriesData, customSeriesOptions);
 
   // useEffect(() => {
-  //   setSeries(series as ISeriesApi<"Candlestick", Time>);
-  // }, [series, setSeries]);
+  //   if (!series) return;
+  //   console.log("candlestick series", series);
+  // }, [series]);
 
   return null;
 };

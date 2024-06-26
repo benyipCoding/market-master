@@ -13,7 +13,7 @@ const LineSeries: React.FC<LineSeriesProps> = ({
   seriesData,
   customSeriesOptions,
 }) => {
-  useSeries("Line", seriesData, customSeriesOptions);
+  const { series } = useSeries("Line", seriesData, customSeriesOptions);
 
   return null;
 };

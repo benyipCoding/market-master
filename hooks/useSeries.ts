@@ -31,7 +31,6 @@ export const useSeries = <T>(
         setSeries(
           chart.addLineSeries(
             Object.assign({}, defaultLineOptions, customOptions)
-            // (customOptions as LineSeriesPartialOptions) || defaultLineOptions
           )
         );
         break;
@@ -40,8 +39,6 @@ export const useSeries = <T>(
         setSeries(
           chart.addCandlestickSeries(
             Object.assign({}, defaultCandleStickOptions, customOptions)
-            // (customOptions as CandlestickSeriesPartialOptions) ||
-            //   defaultCandleStickOptions
           )
         );
         break;
