@@ -39,16 +39,17 @@ const Home = () => {
     console.log(chartRef.current?.childSeries);
   };
 
-  const bindChartEvent = () => {
-    chartRef.current?.chart.subscribeCrosshairMove(
-      throttle(crosshairMoveHandler, 1000)
-    );
-  };
-
   // get dummy candlestick data
   useEffect(() => {
     getCandlestickData();
   }, []);
+
+  useEffect(() => {
+    if (!chartRef.current?.chart) return;
+    chartRef.current?.chart.subscribeCrosshairMove(
+      throttle(crosshairMoveHandler, 1000)
+    );
+  }, [chartRef.current?.chart]);
 
   return (
     <div className="h-full flex bg-black">
@@ -57,12 +58,6 @@ const Home = () => {
         onClick={toggleDrawingState}
       >
         {isDrawing ? "Finish Draw" : "Start Draw"}
-      </div>
-      <div
-        className="absolute left-40 top-0 p-2 bg-blue-500 z-10 flex justify-center items-center cursor-pointer"
-        onClick={bindChartEvent}
-      >
-        Bind Chart Event
       </div>
 
       <TChart
