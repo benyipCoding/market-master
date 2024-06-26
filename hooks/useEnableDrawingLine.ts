@@ -95,11 +95,19 @@ export const useEnableDrawingLine = ({
     // draw the line
     if (!drawingSeries || !drawStartPoint || !drawEndPoint) return;
 
-    const lineData = [drawStartPoint, drawEndPoint].sort(
-      (a, b) =>
-        new Date(a.time as string).getTime() -
-        new Date(b.time as string).getTime()
-    );
+    const lineData = [drawStartPoint, drawEndPoint]
+      .sort(
+        (a, b) =>
+          new Date(a.time as string).getTime() -
+          new Date(b.time as string).getTime()
+      )
+      .map((point, index) => ({
+        ...point,
+        customValues: {
+          id: drawingLineTitle,
+          isStart: index === 0,
+        },
+      }));
     try {
       drawingSeries.setData(lineData);
     } catch (error) {}

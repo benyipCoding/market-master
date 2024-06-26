@@ -52,7 +52,7 @@ export const useSeries = <T>(
   useEffect(() => {
     if (!series) return;
     if (!series.options().title)
-      throw new Error("Newly added series must have a title");
+      throw new Error("Newly added series must have a title property");
 
     setChildSeries!((prev) => {
       const title = series.options().title;

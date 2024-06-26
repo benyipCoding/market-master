@@ -10,7 +10,6 @@ import {
   ISeriesApi,
   LineSeriesPartialOptions,
   LineStyleOptions,
-  MouseEventParams,
   SeriesOptionsCommon,
   SeriesType,
   Time,
@@ -21,6 +20,8 @@ import React, {
   createContext,
   useState,
   useEffect,
+  forwardRef,
+  useImperativeHandle,
 } from "react";
 import { useSelector } from "react-redux";
 
@@ -40,15 +41,20 @@ interface ChartContext {
   >;
 }
 
+export interface TChartRef {
+  chart: IChartApi;
+  childSeries: ISeriesApi<SeriesType, Time>[];
+}
+
 export const ChartContext = createContext<ChartContext>({});
 
-const TChart: React.FC<PropsWithChildren<TChartProps>> = ({
-  children,
-  className,
-  setDrawedLineList,
-  drawable = true,
-  drawedLineList,
-}) => {
+const TChart: React.ForwardRefRenderFunction<
+  TChartRef,
+  PropsWithChildren<TChartProps>
+> = (
+  { children, className, setDrawedLineList, drawable = true, drawedLineList },
+  ref
+) => {
   const container = useRef<HTMLDivElement>(null);
   const { isDrawing } = useSelector((state: RootState) => state.common);
   const [chart, setChart] = useState<IChartApi>();
@@ -82,18 +88,10 @@ const TChart: React.FC<PropsWithChildren<TChartProps>> = ({
     });
   }, [isDrawing]);
 
-  const crosshairMoveHandler = (e: MouseEventParams<Time>) => {
-    childSeries.forEach((series, index) => {
-      const hoverData = e.seriesData.get(series);
-      console.log(index + 1, hoverData);
-    });
-  };
-
-  useEffect(() => {
-    if (!chart) return;
-    chart.unsubscribeCrosshairMove(crosshairMoveHandler);
-    chart.subscribeCrosshairMove(crosshairMoveHandler);
-  }, [chart, childSeries]);
+  useImperativeHandle(ref, () => ({
+    chart: chart!,
+    childSeries: childSeries,
+  }));
 
   return (
     <div
@@ -113,4 +111,4 @@ const TChart: React.FC<PropsWithChildren<TChartProps>> = ({
   );
 };
 
-export default TChart;
+export default forwardRef(TChart);

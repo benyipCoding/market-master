@@ -5,7 +5,6 @@ import { useSeries } from "@/hooks/useSeries";
 
 interface LineSeriesProps {
   seriesData?: LineData<Time>[];
-
   customSeriesOptions?: LineSeriesPartialOptions;
 }
 
@@ -13,8 +12,7 @@ const LineSeries: React.FC<LineSeriesProps> = ({
   seriesData,
   customSeriesOptions,
 }) => {
-  const { series } = useSeries("Line", seriesData, customSeriesOptions);
-
+  useSeries("Line", seriesData, customSeriesOptions);
   return null;
 };
 
