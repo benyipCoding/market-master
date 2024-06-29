@@ -40,3 +40,30 @@ export function throttle<T extends AnyFunction>(func: T, wait: number): T {
     }
   } as T;
 }
+
+export function isWithinRange(num1: number, num2: number, num3?: number) {
+  const amount = num3 || num1 * 0.002;
+  return Math.abs(num1 - num2) <= amount;
+}
+
+export function debonce<T extends AnyFunction>(func: T, wait: number): T {
+  let timer: NodeJS.Timeout;
+
+  return function (this: ThisParameterType<T>, ...args: any[]) {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this, args);
+    }, wait);
+  } as T;
+}
+
+export type Point = { x: number; y: number };
+
+export function generateLinearEquation(point1: Point, point2: Point) {
+  // Point slope rate
+  const m = (point2.y - point1.y) / (point2.x - point2.x);
+
+  return function (x: number) {
+    return m * (x - point1.x) + point1.y;
+  };
+}

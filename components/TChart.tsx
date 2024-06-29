@@ -34,6 +34,9 @@ const TChart: React.ForwardRefRenderFunction<
   const container = useRef<HTMLDivElement>(null);
   const { isDrawing } = useSelector((state: RootState) => state.common);
   const [chart, setChart] = useState<IChartApi>();
+  const [lineId_equation, setLineId_equation] = useState<
+    Record<string, Function>
+  >({});
 
   // Collection of series instances for all children components
   const [childSeries, setChildSeries] = useState<
@@ -63,7 +66,7 @@ const TChart: React.ForwardRefRenderFunction<
     chart.applyOptions({
       // handleScale: !isDrawing,
       handleScroll: !isDrawing,
-      rightPriceScale: { autoScale: !isDrawing },
+      // rightPriceScale: { autoScale: !isDrawing },
     });
   }, [chart, isDrawing]);
 

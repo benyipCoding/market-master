@@ -1,5 +1,5 @@
 import { toggleDrawing } from "@/store/commonSlice";
-import { calcValue } from "@/utils/helpers";
+import { calcValue, debonce, generateLinearEquation } from "@/utils/helpers";
 import { AppDispatch, RootState } from "@/store";
 import {
   DeepPartial,
@@ -24,6 +24,11 @@ interface IEnableDrawingLine {
     React.SetStateAction<DeepPartial<LineStyleOptions & SeriesOptionsCommon>[]>
   >;
 }
+
+const recordEquation = debonce(function (point1, point2, lineSeriesId) {
+  const equation = generateLinearEquation(point1, point2);
+  console.log(equation);
+}, 500);
 
 // Use for activating the function of drawing straight lines
 export const useEnableDrawingLine = ({
@@ -53,8 +58,6 @@ export const useEnableDrawingLine = ({
       childSeries[0],
       chart!
     );
-
-    console.log("drawStart function");
 
     const lineId = `${childSeries[0].options().title}_line_${
       drawedLineList.length + 1
@@ -120,8 +123,10 @@ export const useEnableDrawingLine = ({
           isStartPoint: index === 0,
         },
       }));
+
     try {
       drawingSeries.setData(lineData);
+      recordEquation(drawStartPoint, drawEndPoint, drawingLineTitle);
     } catch (error) {}
   }, [childSeries, drawingLineTitle, drawStartPoint, drawEndPoint]);
 

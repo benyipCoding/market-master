@@ -16,7 +16,7 @@ import {
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleDrawing } from "@/store/commonSlice";
-import { throttle } from "@/utils/helpers";
+import { calcMouseCoordinate, isWithinRange, throttle } from "@/utils/helpers";
 import { TChartRef } from "@/components/interfaces/TChart";
 
 const Home = () => {
@@ -29,8 +29,6 @@ const Home = () => {
     LineSeriesPartialOptions[]
   >([]);
   const tChartRef = useRef<TChartRef>(null);
-  const [currentSeries, setCurrentSeries] =
-    useState<ISeriesApi<SeriesType, Time>>();
 
   const toggleDrawingState = useCallback(
     () => dispatch(toggleDrawing(!isDrawing)),
@@ -43,22 +41,57 @@ const Home = () => {
   };
 
   const crosshairMoveHandler = (param: MouseEventParams<Time>) => {
-    // console.log(param.point?.x);
+    // const { childSeries, chart } = tChartRef.current!;
+    // let hoverSeries = childSeries.filter(
+    //   (series, index) => param.seriesData.get(series) && index !== 0
+    // );
+    // if (!hoverSeries.length) return;
+    // hoverSeries = hoverSeries.filter((series) => {
+    //   const price = series.coordinateToPrice(param.point!.y);
+    //   const seriesData = series.data();
+    //   return seriesData.some((data) => {
+    //     return isWithinRange((data as LineData<Time>).value, price!);
+    //   });
+    // });
+    // if (!hoverSeries.length) return;
+    // hoverSeries.forEach((series) => {
+    //   console.log(series.options().title);
+    // });
   };
 
   const chartClickHandler = (param: MouseEventParams<Time>) => {
-    const { childSeries } = tChartRef.current!;
-    const hoverDatas = childSeries.filter((series) =>
-      param.seriesData.get(series)
-    );
+    console.log(param.point);
 
-    console.log(hoverDatas);
+    // const { childSeries, chart } = tChartRef.current!;
+    // let hoverSeries = childSeries.filter(
+    //   (series, index) => param.seriesData.get(series) && index !== 0
+    // );
+    // if (!hoverSeries.length) return;
+    // hoverSeries = hoverSeries.filter((series) => {
+    //   const price = series.coordinateToPrice(param.point!.y);
+    //   const seriesData = series.data();
+    //   return seriesData.some((data) => {
+    //     return isWithinRange((data as LineData<Time>).value, price!);
+    //   });
+    // });
+    // if (!hoverSeries.length) return;
+    // const marker = new Map<number, ISeriesApi<"Line">>();
+    // hoverSeries.forEach((series) => {
+    //   series.data().forEach((data) => {
+    //     const x = (data.customValues!.x as number) - param.point!.x;
+    //     const y = (data.customValues!.y as number) - param.point!.y;
+    //     const distance = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+    //     marker.set(distance, series as ISeriesApi<"Line">);
+    //   });
+    // });
+    // const keys = [...marker.keys()];
+    // const minKey = Math.min(...keys);
+    // const selectedSeries = marker.get(minKey);
+    // console.log("selectedSeries:", selectedSeries?.options().title);
   };
 
   const onDeleteSeries = () => {
     const { chart, childSeries } = tChartRef.current!;
-    chart.removeSeries(childSeries[1]);
-    // console.log(childSeries[1]);
   };
 
   // get dummy candlestick data
@@ -70,7 +103,7 @@ const Home = () => {
     if (!tChartRef.current?.chart) return;
     const { chart } = tChartRef.current!;
 
-    chart.subscribeCrosshairMove(throttle(crosshairMoveHandler, 500));
+    chart.subscribeCrosshairMove(throttle(crosshairMoveHandler, 100));
     chart.subscribeClick(chartClickHandler);
   }, [tChartRef.current?.chart]);
 
