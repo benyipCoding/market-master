@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { ChartContext } from "@/components/TChart";
 import {
   defaultCandleStickOptions,
@@ -51,11 +52,11 @@ export const useSeries = <T>(
   // record series instance and set data
   useEffect(() => {
     if (!series) return;
-    if (!series.options().title)
+    const title = series.options().title;
+    if (!title)
       throw new Error("Newly added series must have a title property");
 
     setChildSeries!((prev) => {
-      const title = series.options().title;
       const isExisted = prev.some((s) => s.options().title === title);
       if (isExisted) {
         return [...prev];
@@ -64,7 +65,12 @@ export const useSeries = <T>(
     });
 
     if (!seriesData || !seriesData.length) return;
-    series.setData(seriesData);
+    series.setData(
+      seriesData.map((item) => ({
+        ...item,
+        customValues: { id: `${title}_${type}` },
+      }))
+    );
   }, [series, seriesData, setChildSeries]);
 
   return {

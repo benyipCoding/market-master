@@ -1,7 +1,8 @@
 "use client";
 import { LineData, LineSeriesPartialOptions, Time } from "lightweight-charts";
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { useSeries } from "@/hooks/useSeries";
+import { ChartContext } from "./TChart";
 
 interface LineSeriesProps {
   seriesData?: LineData<Time>[];
@@ -12,7 +13,8 @@ const LineSeries: React.FC<LineSeriesProps> = ({
   seriesData,
   customSeriesOptions,
 }) => {
-  useSeries("Line", seriesData, customSeriesOptions);
+  const { series } = useSeries("Line", seriesData, customSeriesOptions);
+
   return null;
 };
 

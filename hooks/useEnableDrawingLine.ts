@@ -25,6 +25,7 @@ interface IEnableDrawingLine {
   >;
 }
 
+// Use for activating the function of drawing straight lines
 export const useEnableDrawingLine = ({
   childSeries,
   chart,
@@ -46,19 +47,25 @@ export const useEnableDrawingLine = ({
     if (!isDrawing) return;
     if (!chartContainer) throw new Error("Missing DOM");
 
-    const [time, value] = calcValue(
+    const [time, value, x, y] = calcValue(
       mouseEvent,
       chartContainer,
       childSeries[0],
       chart!
     );
 
+    console.log("drawStart function");
+
     const lineId = `${childSeries[0].options().title}_line_${
       drawedLineList.length + 1
     }`;
     setDrawingLineTitle(lineId);
     setDrawedLineList([...drawedLineList, { title: lineId }]);
-    setDrawStartPoint({ value: value as number, time: time as UTCTimestamp });
+    setDrawStartPoint({
+      value: value as number,
+      time: time as UTCTimestamp,
+      customValues: { x, y },
+    });
 
     document.onmousemove = (mouseEvent) => drawMove(mouseEvent, chartContainer);
     document.onmouseup = drawEnd;
@@ -66,8 +73,12 @@ export const useEnableDrawingLine = ({
 
   const drawMove = (e: MouseEvent, dom: HTMLDivElement | null) => {
     try {
-      const [time, value] = calcValue(e, dom, childSeries[0], chart!);
-      setDrawEndPoint({ value: value as number, time: time as UTCTimestamp });
+      const [time, value, x, y] = calcValue(e, dom, childSeries[0], chart!);
+      setDrawEndPoint({
+        value: value as number,
+        time: time as UTCTimestamp,
+        customValues: { x, y },
+      });
     } catch (error) {
       console.log(error);
     }
@@ -104,8 +115,9 @@ export const useEnableDrawingLine = ({
       .map((point, index) => ({
         ...point,
         customValues: {
+          ...point.customValues,
           id: drawingLineTitle,
-          isStart: index === 0,
+          isStartPoint: index === 0,
         },
       }));
     try {

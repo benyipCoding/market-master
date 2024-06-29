@@ -5,12 +5,8 @@ import { RootState } from "@/store";
 import clsx from "clsx";
 import {
   createChart,
-  DeepPartial,
   IChartApi,
   ISeriesApi,
-  LineSeriesPartialOptions,
-  LineStyleOptions,
-  SeriesOptionsCommon,
   SeriesType,
   Time,
 } from "lightweight-charts";
@@ -24,29 +20,9 @@ import React, {
   useImperativeHandle,
 } from "react";
 import { useSelector } from "react-redux";
+import { TChartRef, TChartProps, IChartContext } from "./interfaces/TChart";
 
-interface TChartProps {
-  className: string;
-  setDrawedLineList: React.Dispatch<
-    React.SetStateAction<DeepPartial<LineStyleOptions & SeriesOptionsCommon>[]>
-  >;
-  drawable?: boolean;
-  drawedLineList: LineSeriesPartialOptions[];
-}
-
-interface ChartContext {
-  chart?: IChartApi;
-  setChildSeries?: React.Dispatch<
-    React.SetStateAction<ISeriesApi<SeriesType, Time>[]>
-  >;
-}
-
-export interface TChartRef {
-  chart: IChartApi;
-  childSeries: ISeriesApi<SeriesType, Time>[];
-}
-
-export const ChartContext = createContext<ChartContext>({});
+export const ChartContext = createContext<IChartContext>({});
 
 const TChart: React.ForwardRefRenderFunction<
   TChartRef,
@@ -64,6 +40,7 @@ const TChart: React.ForwardRefRenderFunction<
     ISeriesApi<SeriesType, Time>[]
   >([]);
 
+  // Activate the function of drawing straight lines
   const { drawStart, cleanUp } = useEnableDrawingLine({
     chart: chart!,
     childSeries,
@@ -78,15 +55,17 @@ const TChart: React.ForwardRefRenderFunction<
     return () => {
       cleanUp();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    chart?.applyOptions({
-      handleScale: !isDrawing,
+    if (!chart) return;
+    chart.applyOptions({
+      // handleScale: !isDrawing,
       handleScroll: !isDrawing,
       rightPriceScale: { autoScale: !isDrawing },
     });
-  }, [isDrawing]);
+  }, [chart, isDrawing]);
 
   useImperativeHandle(ref, () => ({
     chart: chart!,

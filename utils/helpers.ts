@@ -18,7 +18,7 @@ export const calcValue = (
   const [x, y] = calcMouseCoordinate(mouseEvent, chartContainer);
   const valueY = series.coordinateToPrice(y);
   const valueX = chart.timeScale().coordinateToTime(x);
-  return [valueX, valueY];
+  return [valueX, valueY, x, y];
 };
 
 type AnyFunction = (...args: any[]) => any;
@@ -36,6 +36,7 @@ export function throttle<T extends AnyFunction>(func: T, wait: number): T {
       }, wait);
     } else {
       lastArgs = args;
+      return;
     }
   } as T;
 }
