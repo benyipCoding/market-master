@@ -1,5 +1,5 @@
 import { toggleDrawing } from "@/store/commonSlice";
-import { calcValue, debonce, generateLinearEquation } from "@/utils/helpers";
+import { Equation, Point, calcValue, recordEquation } from "@/utils/helpers";
 import { AppDispatch, RootState } from "@/store";
 import {
   DeepPartial,
@@ -8,6 +8,7 @@ import {
   LineData,
   LineSeriesPartialOptions,
   LineStyleOptions,
+  PriceLineSource,
   SeriesOptionsCommon,
   SeriesType,
   Time,
@@ -23,12 +24,10 @@ interface IEnableDrawingLine {
   setDrawedLineList: React.Dispatch<
     React.SetStateAction<DeepPartial<LineStyleOptions & SeriesOptionsCommon>[]>
   >;
+  setLineId_equation: React.Dispatch<
+    React.SetStateAction<Record<string, Equation>>
+  >;
 }
-
-const recordEquation = debonce(function (point1, point2, lineSeriesId) {
-  const equation = generateLinearEquation(point1, point2);
-  console.log(equation);
-}, 500);
 
 // Use for activating the function of drawing straight lines
 export const useEnableDrawingLine = ({
@@ -36,6 +35,7 @@ export const useEnableDrawingLine = ({
   chart,
   drawedLineList,
   setDrawedLineList,
+  setLineId_equation,
 }: IEnableDrawingLine) => {
   const [drawStartPoint, setDrawStartPoint] = useState<LineData<Time> | null>(
     null
@@ -63,7 +63,14 @@ export const useEnableDrawingLine = ({
       drawedLineList.length + 1
     }`;
     setDrawingLineTitle(lineId);
-    setDrawedLineList([...drawedLineList, { title: lineId }]);
+    setDrawedLineList([
+      ...drawedLineList,
+      {
+        title: lineId,
+        lastValueVisible: false,
+        baseLineVisible: false,
+      },
+    ]);
     setDrawStartPoint({
       value: value as number,
       time: time as UTCTimestamp,
@@ -126,7 +133,12 @@ export const useEnableDrawingLine = ({
 
     try {
       drawingSeries.setData(lineData);
-      recordEquation(drawStartPoint, drawEndPoint, drawingLineTitle);
+      recordEquation(
+        drawStartPoint.customValues! as Point,
+        drawEndPoint.customValues! as Point,
+        drawingLineTitle,
+        setLineId_equation
+      );
     } catch (error) {}
   }, [childSeries, drawingLineTitle, drawStartPoint, drawEndPoint]);
 

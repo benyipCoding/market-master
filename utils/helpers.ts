@@ -41,9 +41,13 @@ export function throttle<T extends AnyFunction>(func: T, wait: number): T {
   } as T;
 }
 
-export function isWithinRange(num1: number, num2: number, num3?: number) {
-  const amount = num3 || num1 * 0.002;
-  return Math.abs(num1 - num2) <= amount;
+export function isWithinRange(
+  reference: number,
+  actual: number,
+  rate: number = 0.03
+) {
+  const amount = reference * rate;
+  return Math.abs(reference - actual) <= amount;
 }
 
 export function debonce<T extends AnyFunction>(func: T, wait: number): T {
@@ -58,12 +62,26 @@ export function debonce<T extends AnyFunction>(func: T, wait: number): T {
 }
 
 export type Point = { x: number; y: number };
+export type Equation = (x: number) => number;
 
-export function generateLinearEquation(point1: Point, point2: Point) {
+export function generateLinearEquation(point1: Point, point2: Point): Equation {
   // Point slope rate
-  const m = (point2.y - point1.y) / (point2.x - point2.x);
+  const m = (point2.y - point1.y) / (point2.x - point1.x);
 
   return function (x: number) {
     return m * (x - point1.x) + point1.y;
   };
 }
+
+export const recordEquation = debonce(function (
+  point1: Point,
+  point2: Point,
+  lineSeriesId: string,
+  setLineId_equation: React.Dispatch<
+    React.SetStateAction<Record<string, Equation>>
+  >
+) {
+  const equation = generateLinearEquation(point1, point2);
+  setLineId_equation((prev) => ({ ...prev, [lineSeriesId]: equation }));
+},
+500);

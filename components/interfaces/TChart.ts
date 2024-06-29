@@ -1,3 +1,4 @@
+import { Equation } from "@/utils/helpers";
 import {
   DeepPartial,
   LineStyleOptions,
@@ -28,4 +29,5 @@ export interface IChartContext {
 export interface TChartRef {
   chart: IChartApi;
   childSeries: ISeriesApi<SeriesType, Time>[];
+  lineId_equation: Record<string, Equation>;
 }

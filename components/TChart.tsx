@@ -21,6 +21,7 @@ import React, {
 } from "react";
 import { useSelector } from "react-redux";
 import { TChartRef, TChartProps, IChartContext } from "./interfaces/TChart";
+import { Equation } from "@/utils/helpers";
 
 export const ChartContext = createContext<IChartContext>({});
 
@@ -35,7 +36,7 @@ const TChart: React.ForwardRefRenderFunction<
   const { isDrawing } = useSelector((state: RootState) => state.common);
   const [chart, setChart] = useState<IChartApi>();
   const [lineId_equation, setLineId_equation] = useState<
-    Record<string, Function>
+    Record<string, Equation>
   >({});
 
   // Collection of series instances for all children components
@@ -49,6 +50,7 @@ const TChart: React.ForwardRefRenderFunction<
     childSeries,
     drawedLineList,
     setDrawedLineList,
+    setLineId_equation,
   });
 
   useEffect(() => {
@@ -73,6 +75,7 @@ const TChart: React.ForwardRefRenderFunction<
   useImperativeHandle(ref, () => ({
     chart: chart!,
     childSeries: childSeries,
+    lineId_equation,
   }));
 
   return (

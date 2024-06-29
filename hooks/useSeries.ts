@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { ChartContext } from "@/components/TChart";
 import {
   defaultCandleStickOptions,

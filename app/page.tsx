@@ -6,17 +6,14 @@ import { getDummyData } from "@/utils/apis/getDummyData";
 import { RootState, AppDispatch } from "@/store";
 import {
   CandlestickData,
-  ISeriesApi,
-  LineData,
   LineSeriesPartialOptions,
   MouseEventParams,
-  SeriesType,
   Time,
 } from "lightweight-charts";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleDrawing } from "@/store/commonSlice";
-import { calcMouseCoordinate, isWithinRange, throttle } from "@/utils/helpers";
+import { isWithinRange, throttle } from "@/utils/helpers";
 import { TChartRef } from "@/components/interfaces/TChart";
 
 const Home = () => {
@@ -41,58 +38,32 @@ const Home = () => {
   };
 
   const crosshairMoveHandler = (param: MouseEventParams<Time>) => {
-    // const { childSeries, chart } = tChartRef.current!;
-    // let hoverSeries = childSeries.filter(
-    //   (series, index) => param.seriesData.get(series) && index !== 0
-    // );
-    // if (!hoverSeries.length) return;
-    // hoverSeries = hoverSeries.filter((series) => {
-    //   const price = series.coordinateToPrice(param.point!.y);
-    //   const seriesData = series.data();
-    //   return seriesData.some((data) => {
-    //     return isWithinRange((data as LineData<Time>).value, price!);
-    //   });
-    // });
-    // if (!hoverSeries.length) return;
-    // hoverSeries.forEach((series) => {
-    //   console.log(series.options().title);
-    // });
+    try {
+      if (!tChartRef.current) return;
+      const { lineId_equation, childSeries } = tChartRef.current;
+      if (!childSeries[1]) return;
+      const id = childSeries[1]?.options().title;
+      const setX = childSeries[1]
+        .data()
+        .map((d) => d.customValues!.x as number)
+        .sort((a, b) => a - b);
+      if (!lineId_equation[id]) return;
+      const equation = lineId_equation[id];
+      const isClickLine =
+        isWithinRange(equation(param.point!.x), param.point!.y) &&
+        param.point!.x >= setX[0] &&
+        param.point!.x <= setX[1];
+      if (isClickLine) {
+        console.log("hovering line" + id);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const chartClickHandler = (param: MouseEventParams<Time>) => {
-    console.log(param.point);
+  const chartClickHandler = (param: MouseEventParams<Time>) => {};
 
-    // const { childSeries, chart } = tChartRef.current!;
-    // let hoverSeries = childSeries.filter(
-    //   (series, index) => param.seriesData.get(series) && index !== 0
-    // );
-    // if (!hoverSeries.length) return;
-    // hoverSeries = hoverSeries.filter((series) => {
-    //   const price = series.coordinateToPrice(param.point!.y);
-    //   const seriesData = series.data();
-    //   return seriesData.some((data) => {
-    //     return isWithinRange((data as LineData<Time>).value, price!);
-    //   });
-    // });
-    // if (!hoverSeries.length) return;
-    // const marker = new Map<number, ISeriesApi<"Line">>();
-    // hoverSeries.forEach((series) => {
-    //   series.data().forEach((data) => {
-    //     const x = (data.customValues!.x as number) - param.point!.x;
-    //     const y = (data.customValues!.y as number) - param.point!.y;
-    //     const distance = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-    //     marker.set(distance, series as ISeriesApi<"Line">);
-    //   });
-    // });
-    // const keys = [...marker.keys()];
-    // const minKey = Math.min(...keys);
-    // const selectedSeries = marker.get(minKey);
-    // console.log("selectedSeries:", selectedSeries?.options().title);
-  };
-
-  const onDeleteSeries = () => {
-    const { chart, childSeries } = tChartRef.current!;
-  };
+  const onDeleteSeries = () => {};
 
   // get dummy candlestick data
   useEffect(() => {
@@ -103,7 +74,7 @@ const Home = () => {
     if (!tChartRef.current?.chart) return;
     const { chart } = tChartRef.current!;
 
-    chart.subscribeCrosshairMove(throttle(crosshairMoveHandler, 100));
+    chart.subscribeCrosshairMove(throttle(crosshairMoveHandler, 0));
     chart.subscribeClick(chartClickHandler);
   }, [tChartRef.current?.chart]);
 
