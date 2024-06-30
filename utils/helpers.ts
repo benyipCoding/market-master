@@ -44,7 +44,7 @@ export function throttle<T extends AnyFunction>(func: T, wait: number): T {
 export function isWithinRange(
   reference: number,
   actual: number,
-  rate: number = 0.003
+  rate: number = 0.005
 ) {
   const amount = reference * rate;
   return Math.abs(reference - actual) <= amount;
@@ -106,7 +106,7 @@ export const recordEquation = debonce(function (
   const equation = generateLinearEquation(point1, point2, chart, series);
   setLineId_equation((prev) => ({ ...prev, [lineSeriesId]: equation }));
 },
-500);
+10);
 
 export const findHoveringSeries = (
   childSeries: ISeriesApi<SeriesType, Time>[],

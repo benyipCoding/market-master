@@ -4,27 +4,27 @@ import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ButtonsProps } from "./interfaces/Buttons";
 
-const Buttons: React.FC<ButtonsProps> = ({
-  tChartRef,
-
-  setDrawedLineList,
-}) => {
+const Buttons: React.FC<ButtonsProps> = ({ tChartRef, setDrawedLineList }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { isDrawing } = useSelector((state: RootState) => state.common);
+
+  const onDeleteSeries = () => {
+    if (!tChartRef.current) return;
+    const { selectedSeries, chart, setSelectedSeries } = tChartRef.current;
+    chart.removeSeries(selectedSeries);
+    const { id } = selectedSeries.options();
+
+    setDrawedLineList((prev) =>
+      prev.filter((lineOptions) => lineOptions.id !== id)
+    );
+
+    setSelectedSeries(null);
+  };
 
   const toggleDrawingState = useCallback(
     () => dispatch(toggleDrawing(!isDrawing)),
     [dispatch, isDrawing]
   );
-
-  const onDeleteSeries = () => {
-    if (!tChartRef.current) return;
-    const { selectedSeries, chart } = tChartRef.current;
-    setDrawedLineList((prev) =>
-      prev.filter((lineOption) => lineOption.id !== selectedSeries.options().id)
-    );
-    chart.removeSeries(selectedSeries);
-  };
 
   return (
     <>
