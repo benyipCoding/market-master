@@ -20,7 +20,7 @@ export const useSeries = <T>(
   seriesData?: CombineSeriesDataType,
   customOptions?: SeriesPartialOptions<T>
 ) => {
-  const { chart, setChildSeries } = useContext(ChartContext);
+  const { chart, setChildSeries, selectedSeries } = useContext(ChartContext);
   const [series, setSeries] = useState<ISeriesApi<SeriesType, Time>>();
 
   // dispatch series
@@ -53,7 +53,6 @@ export const useSeries = <T>(
     if (!series) return;
     const id = series.options().id;
     if (!id) throw new Error("Newly added series must have an id");
-    console.log("看看id", id);
 
     setChildSeries!((prev) => {
       const isExisted = prev.some((s) => s.options().id === id);
@@ -64,6 +63,7 @@ export const useSeries = <T>(
     });
 
     if (!seriesData || !seriesData.length) return;
+
     series.setData(
       seriesData.map((item) => ({
         ...item,
@@ -74,5 +74,6 @@ export const useSeries = <T>(
 
   return {
     series,
+    selectedSeries,
   };
 };

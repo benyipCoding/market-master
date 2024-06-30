@@ -38,6 +38,10 @@ const TChart: React.ForwardRefRenderFunction<
   const [lineId_equation, setLineId_equation] = useState<
     Record<string, Equation>
   >({});
+  const [selectedSeries, setSelectedSeries] = useState<ISeriesApi<
+    SeriesType,
+    Time
+  > | null>(null);
 
   // Collection of series instances for all children components
   const [childSeries, setChildSeries] = useState<
@@ -66,9 +70,9 @@ const TChart: React.ForwardRefRenderFunction<
   useEffect(() => {
     if (!chart) return;
     chart.applyOptions({
-      // handleScale: !isDrawing,
+      handleScale: !isDrawing,
       handleScroll: !isDrawing,
-      // rightPriceScale: { autoScale: !isDrawing },
+      rightPriceScale: { autoScale: !isDrawing },
     });
   }, [chart, isDrawing]);
 
@@ -76,6 +80,8 @@ const TChart: React.ForwardRefRenderFunction<
     chart: chart!,
     childSeries: childSeries,
     lineId_equation,
+    selectedSeries: selectedSeries!,
+    setSelectedSeries,
   }));
 
   return (
@@ -88,6 +94,7 @@ const TChart: React.ForwardRefRenderFunction<
         value={{
           chart,
           setChildSeries,
+          selectedSeries,
         }}
       >
         {children}

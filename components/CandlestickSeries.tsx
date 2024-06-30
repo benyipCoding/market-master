@@ -1,15 +1,6 @@
 "use client";
-import {
-  CandlestickData,
-  CandlestickSeriesPartialOptions,
-  Time,
-} from "lightweight-charts";
 import { useSeries } from "@/hooks/useSeries";
-
-interface CandlestickSeriesProps {
-  seriesData: CandlestickData<Time>[];
-  customSeriesOptions?: CandlestickSeriesPartialOptions;
-}
+import { CandlestickSeriesProps } from "./interfaces/CandlestickSeries";
 
 const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   seriesData,
