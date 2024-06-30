@@ -36,9 +36,7 @@ export const useEnableDrawingLine = ({
       chart!
     );
 
-    const lineId = `${childSeries[0].options().id}_line_${
-      drawedLineList.length + 1
-    }`;
+    const lineId = `${childSeries[0].options().id}_line_${Date.now()}`;
     setDrawingLineId(lineId);
     setDrawedLineList([
       ...drawedLineList,
@@ -109,7 +107,6 @@ export const useEnableDrawingLine = ({
     if (!lineData || !lineData.length) return;
 
     try {
-      console.log({ drawingSeries });
       drawingSeries.setData(lineData);
       recordEquation(
         drawStartPoint.customValues! as Point,
@@ -119,9 +116,7 @@ export const useEnableDrawingLine = ({
         chart,
         childSeries[0]
       );
-    } catch (error) {
-      // console.log(error);
-    }
+    } catch (error) {}
   }, [childSeries, drawingLineId, drawStartPoint, drawEndPoint]);
 
   return { drawStart, cleanUp };
