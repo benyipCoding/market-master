@@ -1,33 +1,10 @@
 import { toggleDrawing } from "@/store/commonSlice";
-import { Equation, Point, calcValue, recordEquation } from "@/utils/helpers";
+import { Point, calcValue, recordEquation } from "@/utils/helpers";
 import { AppDispatch, RootState } from "@/store";
-import {
-  DeepPartial,
-  IChartApi,
-  ISeriesApi,
-  LineData,
-  LineSeriesPartialOptions,
-  LineStyleOptions,
-  PriceLineSource,
-  SeriesOptionsCommon,
-  SeriesType,
-  Time,
-  UTCTimestamp,
-} from "lightweight-charts";
+import { LineData, Time, UTCTimestamp } from "lightweight-charts";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
-interface IEnableDrawingLine {
-  childSeries: ISeriesApi<SeriesType, Time>[];
-  chart: IChartApi;
-  drawedLineList: LineSeriesPartialOptions[];
-  setDrawedLineList: React.Dispatch<
-    React.SetStateAction<DeepPartial<LineStyleOptions & SeriesOptionsCommon>[]>
-  >;
-  setLineId_equation: React.Dispatch<
-    React.SetStateAction<Record<string, Equation>>
-  >;
-}
+import { IEnableDrawingLine } from "./interfaces";
 
 // Use for activating the function of drawing straight lines
 export const useEnableDrawingLine = ({
@@ -41,7 +18,7 @@ export const useEnableDrawingLine = ({
     null
   );
   const [drawEndPoint, setDrawEndPoint] = useState<LineData<Time> | null>(null);
-  const [drawingLineTitle, setDrawingLineTitle] = useState("");
+  const [drawingLineId, setDrawingLineId] = useState("");
   const { isDrawing } = useSelector((state: RootState) => state.common);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -59,16 +36,16 @@ export const useEnableDrawingLine = ({
       chart!
     );
 
-    const lineId = `${childSeries[0].options().title}_line_${
+    const lineId = `${childSeries[0].options().id}_line_${
       drawedLineList.length + 1
     }`;
-    setDrawingLineTitle(lineId);
+    setDrawingLineId(lineId);
     setDrawedLineList([
       ...drawedLineList,
       {
-        title: lineId,
+        // title: lineId,
         lastValueVisible: false,
-        baseLineVisible: false,
+        id: lineId,
       },
     ]);
     setDrawStartPoint({
@@ -104,14 +81,14 @@ export const useEnableDrawingLine = ({
     document.onmouseup = null;
     setDrawStartPoint(null);
     setDrawEndPoint(null);
-    setDrawingLineTitle("");
+    setDrawingLineId("");
   };
 
   useEffect(() => {
     // find drawing line series from child series pool
-    if (!drawingLineTitle) return;
+    if (!drawingLineId) return;
     const drawingSeries = childSeries.find(
-      (child) => child.options().title === drawingLineTitle
+      (child) => child.options().id === drawingLineId
     );
     // draw the line
     if (!drawingSeries || !drawStartPoint || !drawEndPoint) return;
@@ -126,7 +103,7 @@ export const useEnableDrawingLine = ({
         ...point,
         customValues: {
           ...point.customValues,
-          id: drawingLineTitle,
+          id: drawingLineId,
           isStartPoint: index === 0,
         },
       }));
@@ -136,11 +113,11 @@ export const useEnableDrawingLine = ({
       recordEquation(
         drawStartPoint.customValues! as Point,
         drawEndPoint.customValues! as Point,
-        drawingLineTitle,
+        drawingLineId,
         setLineId_equation
       );
     } catch (error) {}
-  }, [childSeries, drawingLineTitle, drawStartPoint, drawEndPoint]);
+  }, [childSeries, drawingLineId, drawStartPoint, drawEndPoint]);
 
   return { drawStart, cleanUp };
 };

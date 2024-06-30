@@ -51,12 +51,12 @@ export const useSeries = <T>(
   // record series instance and set data
   useEffect(() => {
     if (!series) return;
-    const title = series.options().title;
-    if (!title)
-      throw new Error("Newly added series must have a title property");
+    const id = series.options().id;
+    if (!id) throw new Error("Newly added series must have an id");
+    console.log("看看id", id);
 
     setChildSeries!((prev) => {
-      const isExisted = prev.some((s) => s.options().title === title);
+      const isExisted = prev.some((s) => s.options().id === id);
       if (isExisted) {
         return [...prev];
       }
@@ -67,7 +67,7 @@ export const useSeries = <T>(
     series.setData(
       seriesData.map((item) => ({
         ...item,
-        customValues: { id: `${title}_${type}` },
+        customValues: { id: `${id}_${type}` },
       }))
     );
   }, [series, seriesData, setChildSeries]);

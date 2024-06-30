@@ -13,7 +13,7 @@ import {
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleDrawing } from "@/store/commonSlice";
-import { isWithinRange, throttle } from "@/utils/helpers";
+import { throttle } from "@/utils/helpers";
 import { TChartRef } from "@/components/interfaces/TChart";
 
 const Home = () => {
@@ -38,30 +38,34 @@ const Home = () => {
   };
 
   const crosshairMoveHandler = (param: MouseEventParams<Time>) => {
-    try {
-      if (!tChartRef.current) return;
-      const { lineId_equation, childSeries } = tChartRef.current;
-      if (!childSeries[1]) return;
-      const id = childSeries[1]?.options().title;
-      const setX = childSeries[1]
-        .data()
-        .map((d) => d.customValues!.x as number)
-        .sort((a, b) => a - b);
-      if (!lineId_equation[id]) return;
-      const equation = lineId_equation[id];
-      const isClickLine =
-        isWithinRange(equation(param.point!.x), param.point!.y) &&
-        param.point!.x >= setX[0] &&
-        param.point!.x <= setX[1];
-      if (isClickLine) {
-        console.log("hovering line" + id);
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    // try {
+    //   if (!tChartRef.current) return;
+    //   const { lineId_equation, childSeries } = tChartRef.current;
+    //   if (!childSeries[1]) return;
+    //   const id = childSeries[1]?.options().title;
+    //   const setX = childSeries[1]
+    //     .data()
+    //     .map((d) => d.customValues!.x as number)
+    //     .sort((a, b) => a - b);
+    //   if (!lineId_equation[id]) return;
+    //   const equation = lineId_equation[id];
+    //   const isClickLine =
+    //     isWithinRange(equation(param.point!.x), param.point!.y) &&
+    //     param.point!.x >= setX[0] &&
+    //     param.point!.x <= setX[1];
+    //   if (isClickLine) {
+    //     console.log("hovering line" + id);
+    //   }
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
 
-  const chartClickHandler = (param: MouseEventParams<Time>) => {};
+  const chartClickHandler = (param: MouseEventParams<Time>) => {
+    if (!tChartRef.current) return;
+    const { childSeries } = tChartRef.current;
+    console.log(childSeries[1]?.options());
+  };
 
   const onDeleteSeries = () => {};
 
@@ -102,10 +106,10 @@ const Home = () => {
       >
         <CandlestickSeries
           seriesData={candlestickData}
-          customSeriesOptions={{ title: "XAU/USD" }}
+          customSeriesOptions={{ id: "XAU/USD" }}
         />
         {drawedLineList.map((lineOption) => (
-          <LineSeries customSeriesOptions={lineOption} key={lineOption.title} />
+          <LineSeries customSeriesOptions={lineOption} key={lineOption.id} />
         ))}
       </TChart>
     </div>
