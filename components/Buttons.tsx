@@ -13,7 +13,6 @@ const Buttons: React.FC<ButtonsProps> = ({ tChartRef, setDrawedLineList }) => {
     const { selectedSeries, chart, setSelectedSeries } = tChartRef.current;
     chart.removeSeries(selectedSeries);
     const { id } = selectedSeries.options();
-    console.log("line id:", id);
 
     setDrawedLineList((prev) =>
       prev.filter((lineOptions) => lineOptions.id !== id)

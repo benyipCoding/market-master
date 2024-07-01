@@ -13,22 +13,41 @@ import React, { useEffect, useRef, useState } from "react";
 import { findHoveringSeries, throttle } from "@/utils/helpers";
 import { TChartRef } from "@/components/interfaces/TChart";
 import Buttons from "@/components/Buttons";
+import clsx from "clsx";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 const Home = () => {
+  // TChart component instance
+  const tChartRef = useRef<TChartRef>(null);
+
   const [candlestickData, setCandlestickData] = useState<
     CandlestickData<Time>[]
   >([]);
+  // The list of drawed line series
   const [drawedLineList, setDrawedLineList] = useState<
     LineSeriesPartialOptions[]
   >([]);
-  const tChartRef = useRef<TChartRef>(null);
+  const [isGrabing, setIsGrabing] = useState(false);
+  const { isDrawing, mousePressing } = useSelector(
+    (state: RootState) => state.common
+  );
 
   const getCandlestickData = async () => {
     const res = await getDummyData();
     setCandlestickData(res.data);
   };
 
-  const crosshairMoveHandler = (param: MouseEventParams<Time>) => {};
+  const crosshairMoveHandler = (param: MouseEventParams<Time>) => {
+    const { selectedSeries } = tChartRef.current!;
+    if (!selectedSeries) return;
+    const data = param.seriesData.get(selectedSeries);
+
+    if (data) setIsGrabing(true);
+    else setIsGrabing(false);
+
+    console.log(data);
+  };
 
   const chartClickHandler = (param: MouseEventParams<Time>) => {
     try {
@@ -62,8 +81,8 @@ const Home = () => {
   useEffect(() => {
     if (!tChartRef.current?.chart) return;
     const { chart } = tChartRef.current!;
-
-    chart.subscribeCrosshairMove(throttle(crosshairMoveHandler, 500));
+    // Subscribe event when chart init
+    chart.subscribeCrosshairMove(throttle(crosshairMoveHandler, 10));
     chart.subscribeClick(chartClickHandler);
   }, [tChartRef.current?.chart]);
 
@@ -71,7 +90,11 @@ const Home = () => {
     <div className="h-full flex bg-black">
       <Buttons tChartRef={tChartRef} setDrawedLineList={setDrawedLineList} />
       <TChart
-        className="w-4/5 h-4/5 m-auto"
+        className={clsx(
+          "w-full h-full m-auto",
+          isGrabing && "cursor-grab",
+          isDrawing && mousePressing && "cursor-grabbing"
+        )}
         setDrawedLineList={setDrawedLineList}
         drawedLineList={drawedLineList}
         ref={tChartRef}

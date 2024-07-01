@@ -1,4 +1,4 @@
-import { toggleDrawing } from "@/store/commonSlice";
+import { toggleDrawing, toggleMousePressing } from "@/store/commonSlice";
 import { Point, calcValue, recordEquation } from "@/utils/helpers";
 import { AppDispatch, RootState } from "@/store";
 import { LineData, Time, UTCTimestamp } from "lightweight-charts";
@@ -51,6 +51,7 @@ export const useEnableDrawingLine = ({
       customValues: { x, y },
     });
 
+    dispatch(toggleMousePressing(true));
     document.onmousemove = (mouseEvent) => drawMove(mouseEvent, chartContainer);
     document.onmouseup = drawEnd;
   };
@@ -70,6 +71,7 @@ export const useEnableDrawingLine = ({
 
   const drawEnd = () => {
     dispatch(toggleDrawing(false));
+    dispatch(toggleMousePressing(false));
     Promise.resolve().then(cleanUp);
   };
 

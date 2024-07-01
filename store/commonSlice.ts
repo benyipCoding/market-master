@@ -2,10 +2,12 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 interface CommonState {
   isDrawing: boolean;
+  mousePressing: boolean;
 }
 
 const initState: CommonState = {
   isDrawing: false,
+  mousePressing: false,
 };
 
 export const commonSlice = createSlice({
@@ -15,9 +17,12 @@ export const commonSlice = createSlice({
     toggleDrawing(state, action: PayloadAction<boolean>) {
       state.isDrawing = action.payload;
     },
+    toggleMousePressing(state, action: PayloadAction<boolean>) {
+      state.mousePressing = action.payload;
+    },
   },
 });
 
-export const { toggleDrawing } = commonSlice.actions;
+export const { toggleDrawing, toggleMousePressing } = commonSlice.actions;
 
 export default commonSlice.reducer;
