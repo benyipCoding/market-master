@@ -14,8 +14,9 @@ import { findHoveringSeries, throttle } from "@/utils/helpers";
 import { TChartRef } from "@/components/interfaces/TChart";
 import Buttons from "@/components/Buttons";
 import clsx from "clsx";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
+import { toggleIsCanGrab } from "@/store/commonSlice";
 
 const Home = () => {
   // TChart component instance
@@ -28,10 +29,10 @@ const Home = () => {
   const [drawedLineList, setDrawedLineList] = useState<
     LineSeriesPartialOptions[]
   >([]);
-  const [isGrabing, setIsGrabing] = useState(false);
-  const { isDrawing, mousePressing } = useSelector(
+  const { isDrawing, mousePressing, isCanGrab } = useSelector(
     (state: RootState) => state.common
   );
+  const dispatch = useDispatch<AppDispatch>();
 
   const getCandlestickData = async () => {
     const res = await getDummyData();
@@ -43,8 +44,8 @@ const Home = () => {
     if (!selectedSeries) return;
     const data = param.seriesData.get(selectedSeries);
 
-    if (data) setIsGrabing(true);
-    else setIsGrabing(false);
+    if (data) dispatch(toggleIsCanGrab(true));
+    else dispatch(toggleIsCanGrab(false));
 
     console.log(data);
   };
@@ -92,7 +93,7 @@ const Home = () => {
       <TChart
         className={clsx(
           "w-full h-full m-auto",
-          isGrabing && "cursor-grab",
+          isCanGrab && "cursor-grab",
           isDrawing && mousePressing && "cursor-grabbing"
         )}
         setDrawedLineList={setDrawedLineList}
