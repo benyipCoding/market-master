@@ -51,6 +51,8 @@ const Home = () => {
   };
 
   const chartClickHandler = (param: MouseEventParams<Time>) => {
+    console.log(11111111);
+
     try {
       if (!tChartRef.current) return;
       const { lineId_equation, childSeries, chart, setSelectedSeries } =
