@@ -11,6 +11,7 @@ const Buttons: React.FC<ButtonsProps> = ({ tChartRef, setDrawedLineList }) => {
   const onDeleteSeries = () => {
     if (!tChartRef.current) return;
     const { selectedSeries, chart, setSelectedSeries } = tChartRef.current;
+    if (!selectedSeries) return;
     chart.removeSeries(selectedSeries);
     const { id } = selectedSeries.options();
 
