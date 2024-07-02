@@ -74,7 +74,7 @@ const TChart: React.ForwardRefRenderFunction<
       handleScroll: !isDrawing,
       rightPriceScale: { autoScale: !isDrawing },
     });
-  }, [chart, isDrawing]);
+  }, [isDrawing]);
 
   useImperativeHandle(ref, () => ({
     chart: chart!,
