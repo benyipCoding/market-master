@@ -25,7 +25,7 @@ const Home = () => {
   const [candlestickData, setCandlestickData] = useState<
     CandlestickData<Time>[]
   >([]);
-  // The list of drawed line series
+  // The list of drawed line series ..
   const [drawedLineList, setDrawedLineList] = useState<
     LineSeriesPartialOptions[]
   >([]);
