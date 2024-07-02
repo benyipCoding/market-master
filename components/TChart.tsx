@@ -1,12 +1,13 @@
 "use client";
 import { defaultChartOptions } from "@/constants/chartOptions";
 import { useEnableDrawingLine } from "@/hooks/useEnableDrawingLine";
-import { RootState } from "@/store";
+import { AppDispatch, RootState } from "@/store";
 import clsx from "clsx";
 import {
   createChart,
   IChartApi,
   ISeriesApi,
+  MouseEventParams,
   SeriesType,
   Time,
 } from "lightweight-charts";
@@ -18,10 +19,12 @@ import React, {
   useEffect,
   forwardRef,
   useImperativeHandle,
+  useCallback,
 } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { TChartRef, TChartProps, IChartContext } from "./interfaces/TChart";
-import { Equation } from "@/utils/helpers";
+import { Equation, findHoveringSeries, throttle } from "@/utils/helpers";
+import { toggleIsCanGrab } from "@/store/commonSlice";
 
 export const ChartContext = createContext<IChartContext>({});
 
@@ -33,7 +36,9 @@ const TChart: React.ForwardRefRenderFunction<
   ref
 ) => {
   const container = useRef<HTMLDivElement>(null);
-  const { isDrawing } = useSelector((state: RootState) => state.common);
+  const { isDrawing, isCanGrab, mousePressing } = useSelector(
+    (state: RootState) => state.common
+  );
   const [chart, setChart] = useState<IChartApi>();
   const [lineId_equation, setLineId_equation] = useState<
     Record<string, Equation>
@@ -57,6 +62,45 @@ const TChart: React.ForwardRefRenderFunction<
     setLineId_equation,
   });
 
+  const dispatch = useDispatch<AppDispatch>();
+
+  const crosshairMoveHandler = useCallback(
+    (param: MouseEventParams<Time>) => {
+      if (!selectedSeries) return;
+      const data = param.seriesData.get(selectedSeries);
+
+      if (data) dispatch(toggleIsCanGrab(true));
+      else dispatch(toggleIsCanGrab(false));
+
+      console.log(data);
+    },
+    [selectedSeries]
+  );
+
+  const chartClickHandler = useCallback(
+    (param: MouseEventParams<Time>) => {
+      try {
+        if (!param.point) return;
+
+        const hoveringSeries = findHoveringSeries(
+          childSeries,
+          chart!,
+          lineId_equation,
+          param.point
+        );
+
+        if (hoveringSeries) {
+          setSelectedSeries(hoveringSeries);
+        } else {
+          setSelectedSeries(null);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [chart, childSeries, lineId_equation]
+  );
+
   useEffect(() => {
     if (!container.current) return;
     setChart(createChart(container.current, defaultChartOptions));
@@ -76,6 +120,12 @@ const TChart: React.ForwardRefRenderFunction<
     });
   }, [isDrawing]);
 
+  useEffect(() => {
+    if (!chart) return;
+    chart.subscribeCrosshairMove(throttle(crosshairMoveHandler, 10));
+    chart.subscribeClick(chartClickHandler);
+  }, [chart, chartClickHandler, crosshairMoveHandler]);
+
   useImperativeHandle(ref, () => ({
     chart: chart!,
     childSeries: childSeries,
@@ -86,7 +136,12 @@ const TChart: React.ForwardRefRenderFunction<
 
   return (
     <div
-      className={clsx("relative", className)}
+      className={clsx(
+        "relative",
+        className,
+        isCanGrab && "cursor-grab",
+        isDrawing && mousePressing && "cursor-grabbing"
+      )}
       ref={container}
       onMouseDown={(e) => (drawable ? drawStart(e, container.current) : null)}
     >
