@@ -1,4 +1,10 @@
-import { ISeriesApi, SeriesType, Time, IChartApi } from "lightweight-charts";
+import {
+  ISeriesApi,
+  SeriesType,
+  Time,
+  IChartApi,
+  LineData,
+} from "lightweight-charts";
 
 export const calcMouseCoordinate = (
   mouseEvent: React.MouseEvent<HTMLDivElement, MouseEvent> | MouseEvent,
@@ -135,4 +141,25 @@ export const findHoveringSeries = (
       isWithinRange(price, series.coordinateToPrice(point.y)!) && isInBoundary;
     return isHoveringOverLine;
   });
+};
+
+export const makeLineData = (
+  point1: LineData<Time>,
+  point2: LineData<Time>,
+  lineId: string
+) => {
+  return [point1, point2]
+    .sort(
+      (a, b) =>
+        new Date(a.time as string).getTime() -
+        new Date(b.time as string).getTime()
+    )
+    .map((point, index) => ({
+      ...point,
+      customValues: {
+        ...point.customValues,
+        id: lineId,
+        isStartPoint: index === 0,
+      },
+    }));
 };

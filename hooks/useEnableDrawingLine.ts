@@ -1,5 +1,10 @@
 import { toggleDrawing, toggleMousePressing } from "@/store/commonSlice";
-import { Point, calcValue, recordEquation } from "@/utils/helpers";
+import {
+  Point,
+  calcValue,
+  makeLineData,
+  recordEquation,
+} from "@/utils/helpers";
 import { AppDispatch, RootState } from "@/store";
 import { LineData, Time, UTCTimestamp } from "lightweight-charts";
 import { useEffect, useState } from "react";
@@ -92,20 +97,8 @@ export const useEnableDrawingLine = ({
     // draw the line
     if (!drawingSeries || !drawStartPoint || !drawEndPoint) return;
 
-    const lineData = [drawStartPoint, drawEndPoint]
-      .sort(
-        (a, b) =>
-          new Date(a.time as string).getTime() -
-          new Date(b.time as string).getTime()
-      )
-      .map((point, index) => ({
-        ...point,
-        customValues: {
-          ...point.customValues,
-          id: drawingLineId,
-          isStartPoint: index === 0,
-        },
-      }));
+    const lineData = makeLineData(drawStartPoint, drawEndPoint, drawingLineId);
+
     if (!lineData || !lineData.length) return;
 
     try {

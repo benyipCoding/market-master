@@ -11,16 +11,15 @@ import {
   selectedLineOptions,
 } from "@/constants/seriesOptions";
 import { LineSeriesProps } from "./interfaces/LineSeries";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 const LineSeries: React.FC<LineSeriesProps> = ({
   seriesData,
   customSeriesOptions,
 }) => {
-  const { series, selectedSeries } = useSeries(
-    "Line",
-    seriesData,
-    customSeriesOptions
-  );
+  const { selectedSeries } = useSelector((state: RootState) => state.common);
+  const { series } = useSeries("Line", seriesData, customSeriesOptions);
 
   const [originalOptions, setOriginalOptions] =
     useState<DeepPartial<LineStyleOptions & SeriesOptionsCommon>>(

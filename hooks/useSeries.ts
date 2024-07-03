@@ -20,7 +20,7 @@ export const useSeries = <T>(
   seriesData?: CombineSeriesDataType,
   customOptions?: SeriesPartialOptions<T>
 ) => {
-  const { chart, setChildSeries, selectedSeries } = useContext(ChartContext);
+  const { chart, setChildSeries } = useContext(ChartContext);
   const [series, setSeries] = useState<ISeriesApi<SeriesType, Time>>();
 
   // dispatch series
@@ -74,6 +74,5 @@ export const useSeries = <T>(
 
   return {
     series,
-    selectedSeries,
   };
 };
