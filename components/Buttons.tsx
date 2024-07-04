@@ -25,6 +25,7 @@ const Buttons: React.FC<ButtonsProps> = ({ tChartRef, setDrawedLineList }) => {
   };
 
   const toggleDrawingState = useCallback(() => {
+    dispatch(setSelectedSeries(null));
     dispatch(toggleDrawing(!isDrawing));
   }, [dispatch, isDrawing]);
 
@@ -34,7 +35,7 @@ const Buttons: React.FC<ButtonsProps> = ({ tChartRef, setDrawedLineList }) => {
         className="absolute left-0 top-0 p-2 bg-blue-500 z-10 flex justify-center items-center cursor-pointer"
         onClick={toggleDrawingState}
       >
-        {isDrawing ? "Finish Draw" : "Start Draw"}
+        {isDrawing && !selectedSeries ? "Finish Draw" : "Start Draw"}
       </div>
 
       <div
