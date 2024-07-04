@@ -8,8 +8,14 @@ import {
   DeepPartial,
   LineStyleOptions,
   SeriesOptionsCommon,
+  LineData,
 } from "lightweight-charts";
 
+declare module "lightweight-charts" {
+  interface SeriesOptionsCommon {
+    id: string;
+  }
+}
 export interface IEnableDrawingLine {
   childSeries: ISeriesApi<SeriesType, Time>[];
   chart: IChartApi;
@@ -22,8 +28,12 @@ export interface IEnableDrawingLine {
   >;
 }
 
-declare module "lightweight-charts" {
-  interface SeriesOptionsCommon {
-    id: string;
-  }
+export interface IDragLineSeries {
+  dom: HTMLDivElement;
+  baseSeries: ISeriesApi<SeriesType, Time>;
+  chart: IChartApi;
+  hoveringPoint: LineData<Time> | undefined;
+  setLineId_equation: React.Dispatch<
+    React.SetStateAction<Record<string, Equation>>
+  >;
 }
