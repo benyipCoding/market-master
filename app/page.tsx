@@ -23,6 +23,7 @@ import {
 const Home = () => {
   // TChart component instance
   const tChartRef = useRef<TChartRef>(null);
+  const dispatch = useDispatch<AppDispatch>();
 
   const [candlestickData, setCandlestickData] = useState<
     CandlestickData<Time>[]
@@ -32,8 +33,6 @@ const Home = () => {
   const [drawedLineList, setDrawedLineList] = useState<
     LineSeriesPartialOptions[]
   >([]);
-
-  const dispatch = useDispatch<AppDispatch>();
 
   const getCandlestickData = async () => {
     const res = await getDummyData();

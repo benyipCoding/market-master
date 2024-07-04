@@ -96,7 +96,7 @@ const TChart: React.ForwardRefRenderFunction<
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDrawing]);
 
-  // 鼠标移动事件 light-weight chart专属
+  // Mouse movement event (exclusive to light weight chart)
   useEffect(() => {
     if (selectedSeries) {
       const point = mouseMovingEventParam?.seriesData.get(selectedSeries) as
@@ -109,7 +109,7 @@ const TChart: React.ForwardRefRenderFunction<
     }
   }, [mouseMovingEventParam, selectedSeries]);
 
-  // 鼠标点击事件 light-weight chart专属
+  // Mouse click events (exclusive to light weight chart)
   useEffect(() => {
     try {
       if (!mouseClickEventParam?.point || !chart) return;
