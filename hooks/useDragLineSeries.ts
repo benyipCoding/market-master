@@ -2,7 +2,7 @@ import { AppDispatch, RootState } from "@/store";
 import { toggleDrawing, toggleMousePressing } from "@/store/commonSlice";
 import { calcValue, makeLineData, recordEquation } from "@/utils/helpers";
 import { LineData, Time, UTCTimestamp } from "lightweight-charts";
-import { useCallback } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IDragLineSeries } from "./interfaces";
 
@@ -14,7 +14,9 @@ export const useDragLineSeries = ({
   setLineId_equation,
 }: IDragLineSeries) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { selectedSeries } = useSelector((state: RootState) => state.common);
+  const { selectedSeries, mouseMovingEventParam } = useSelector(
+    (state: RootState) => state.common
+  );
 
   const changeSelectedSeries = useCallback(
     (e: globalThis.MouseEvent) => {
@@ -49,31 +51,33 @@ export const useDragLineSeries = ({
     [hoveringPoint]
   );
 
-  const dragMove = (e: MouseEvent, fixedPoint: LineData<Time>) => {
-    const [time, value, x, y] = calcValue(e, dom, baseSeries, chart);
+  const dragMove = useCallback(
+    (e: MouseEvent, fixedPoint: LineData<Time>) => {
+      const [time, value, x, y] = calcValue(e, dom, baseSeries, chart);
 
-    const dynamicPoint: LineData<Time> = {
-      value: value as number,
-      time: time as UTCTimestamp,
-      customValues: { x, y },
-    };
+      const dynamicPoint: LineData<Time> = {
+        value: value as number,
+        time: time as UTCTimestamp,
+        customValues: { x, y },
+      };
 
-    const lineId = selectedSeries!.options().id;
+      const lineId = selectedSeries!.options().id;
+      const lineData = makeLineData(dynamicPoint, fixedPoint, lineId);
 
-    const lineData = makeLineData(dynamicPoint, fixedPoint, lineId);
-
-    try {
-      selectedSeries!.setData(lineData);
-      recordEquation(
-        dynamicPoint.customValues as any,
-        fixedPoint.customValues as any,
-        lineId,
-        setLineId_equation,
-        chart!,
-        baseSeries
-      );
-    } catch (error) {}
-  };
+      try {
+        selectedSeries!.setData(lineData);
+        recordEquation(
+          dynamicPoint.customValues as any,
+          fixedPoint.customValues as any,
+          lineId,
+          setLineId_equation,
+          chart!,
+          baseSeries
+        );
+      } catch (error) {}
+    },
+    [selectedSeries, setLineId_equation]
+  );
 
   const dragEnd = () => {
     dispatch(toggleDrawing(false));
@@ -83,6 +87,10 @@ export const useDragLineSeries = ({
       document.onmouseup = null;
     });
   };
+
+  // useEffect(() => {
+  //   console.log(mouseMovingEventParam?.seriesData.get(baseSeries));
+  // }, [mouseMovingEventParam?.seriesData.get(baseSeries)]);
 
   return {
     changeSelectedSeries,
