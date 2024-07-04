@@ -50,7 +50,7 @@ export function throttle<T extends AnyFunction>(func: T, wait: number): T {
 export function isWithinRange(
   reference: number,
   actual: number,
-  rate: number = 0.006
+  rate: number = 0.005
 ) {
   const amount = reference * rate;
   return Math.abs(reference - actual) <= amount;

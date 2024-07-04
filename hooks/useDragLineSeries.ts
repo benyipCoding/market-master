@@ -2,7 +2,7 @@ import { AppDispatch, RootState } from "@/store";
 import { toggleDrawing, toggleMousePressing } from "@/store/commonSlice";
 import { calcValue, makeLineData, recordEquation } from "@/utils/helpers";
 import { LineData, Time, UTCTimestamp } from "lightweight-charts";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IDragLineSeries } from "./interfaces";
 
@@ -17,9 +17,12 @@ export const useDragLineSeries = ({
   const { selectedSeries, mouseMovingEventParam } = useSelector(
     (state: RootState) => state.common
   );
+  const [dynamic, setDynamic] = useState<LineData<Time> | null>(null);
+  const [fixed, setFixed] = useState<LineData<Time> | null>(null);
+  const lineId = useMemo(() => selectedSeries?.options().id, [selectedSeries]);
 
   const changeSelectedSeries = useCallback(
-    (e: globalThis.MouseEvent) => {
+    (e: MouseEvent | React.MouseEvent<HTMLDivElement, MouseEvent>) => {
       dispatch(toggleDrawing(true));
       dispatch(toggleMousePressing(true));
       // Calculate time and value based on mouse position
@@ -39,20 +42,19 @@ export const useDragLineSeries = ({
         time: time as UTCTimestamp,
         customValues: { x, y },
       };
-      const lineId = selectedSeries!.options().id;
-      const lineData = makeLineData(dynamicPoint, fixedPoint, lineId);
-      // Rendering line
-      selectedSeries!.setData(lineData);
 
-      // Bind events when the mouse move and mouse up
-      document.onmousemove = (e) => dragMove(e, fixedPoint);
+      setDynamic(dynamicPoint);
+      setFixed(fixedPoint);
+
+      // // Bind events when the mouse move and mouse up
+      document.onmousemove = dragMove;
       document.onmouseup = dragEnd;
     },
-    [hoveringPoint]
+    [baseSeries, hoveringPoint?.customValues, selectedSeries]
   );
 
   const dragMove = useCallback(
-    (e: MouseEvent, fixedPoint: LineData<Time>) => {
+    (e: MouseEvent) => {
       const [time, value, x, y] = calcValue(e, dom, baseSeries, chart);
 
       const dynamicPoint: LineData<Time> = {
@@ -61,36 +63,48 @@ export const useDragLineSeries = ({
         customValues: { x, y },
       };
 
-      const lineId = selectedSeries!.options().id;
-      const lineData = makeLineData(dynamicPoint, fixedPoint, lineId);
-
-      try {
-        selectedSeries!.setData(lineData);
-        recordEquation(
-          dynamicPoint.customValues as any,
-          fixedPoint.customValues as any,
-          lineId,
-          setLineId_equation,
-          chart!,
-          baseSeries
-        );
-      } catch (error) {}
+      setDynamic(dynamicPoint);
     },
-    [selectedSeries, setLineId_equation]
+    [baseSeries, chart, dom]
   );
+
+  const cleanUp = () => {
+    document.onmousemove = null;
+    document.onmouseup = null;
+    setDynamic(null);
+    setFixed(null);
+  };
 
   const dragEnd = () => {
     dispatch(toggleDrawing(false));
     dispatch(toggleMousePressing(false));
-    Promise.resolve().then(() => {
-      document.onmousemove = null;
-      document.onmouseup = null;
-    });
+    Promise.resolve().then(cleanUp);
   };
 
-  // useEffect(() => {
-  //   console.log(mouseMovingEventParam?.seriesData.get(baseSeries));
-  // }, [mouseMovingEventParam?.seriesData.get(baseSeries)]);
+  useEffect(() => {
+    if (!dynamic || !fixed || !lineId || !selectedSeries) return;
+
+    const lineData = makeLineData(dynamic, fixed, lineId);
+    try {
+      selectedSeries.setData(lineData);
+      recordEquation(
+        dynamic.customValues as any,
+        fixed.customValues as any,
+        lineId,
+        setLineId_equation,
+        chart!,
+        baseSeries
+      );
+    } catch (error) {}
+  }, [
+    baseSeries,
+    chart,
+    dynamic,
+    fixed,
+    lineId,
+    selectedSeries,
+    setLineId_equation,
+  ]);
 
   return {
     changeSelectedSeries,

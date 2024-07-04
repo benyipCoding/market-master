@@ -53,9 +53,9 @@ const TChart: React.ForwardRefRenderFunction<
     ISeriesApi<SeriesType, Time>[]
   >([]);
 
-  const [hoveringPoint, setHoveringPoint] = useState<
-    LineData<Time> | undefined
-  >();
+  const [hoveringPoint, setHoveringPoint] = useState<LineData<Time> | null>(
+    null
+  );
   const isCanGrab = useMemo<boolean>(() => !!hoveringPoint, [hoveringPoint]);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -72,7 +72,7 @@ const TChart: React.ForwardRefRenderFunction<
     dom: container.current!,
     baseSeries: childSeries[0],
     chart: chart!,
-    hoveringPoint,
+    hoveringPoint: hoveringPoint!,
     setLineId_equation,
   });
 
@@ -99,13 +99,15 @@ const TChart: React.ForwardRefRenderFunction<
   // Mouse movement event (exclusive to light weight chart)
   useEffect(() => {
     if (selectedSeries) {
-      const point = mouseMovingEventParam?.seriesData.get(selectedSeries) as
-        | LineData<Time>
-        | undefined;
+      const point = mouseMovingEventParam?.seriesData.get(
+        selectedSeries
+      ) as LineData<Time> | null;
 
-      setHoveringPoint(point);
-    } else {
-      if (container.current!.onmousedown) container.current!.onmousedown = null;
+      if (point) {
+        setHoveringPoint(point);
+      } else {
+        setHoveringPoint(null);
+      }
     }
   }, [mouseMovingEventParam, selectedSeries]);
 
@@ -129,14 +131,6 @@ const TChart: React.ForwardRefRenderFunction<
     }
   }, [mouseClickEventParam]);
 
-  useEffect(() => {
-    if (hoveringPoint) {
-      container.current!.onmousedown = changeSelectedSeries;
-    } else {
-      container.current!.onmousedown = null;
-    }
-  }, [hoveringPoint]);
-
   useImperativeHandle(ref, () => ({
     chart: chart!,
     childSeries: childSeries,
@@ -153,7 +147,9 @@ const TChart: React.ForwardRefRenderFunction<
       ref={container}
       // Only unselected series can trigger the line drawing function
       onMouseDown={(e) =>
-        drawable && !selectedSeries ? drawStart(e, container.current) : null
+        hoveringPoint
+          ? changeSelectedSeries(e)
+          : drawStart(e, container.current)
       }
     >
       <ChartContext.Provider
