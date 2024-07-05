@@ -34,7 +34,7 @@ export const useEnableDrawingLine = ({
     if (!isDrawing) return;
     if (!chartContainer) throw new Error("Missing DOM");
 
-    const [time, value, x, y] = calcValue(
+    const [time, value, x, y, logic] = calcValue(
       mouseEvent,
       chartContainer,
       childSeries[0],
@@ -53,7 +53,7 @@ export const useEnableDrawingLine = ({
     setDrawStartPoint({
       value: value as number,
       time: time as UTCTimestamp,
-      customValues: { x, y },
+      customValues: { x, y, logic, price: value },
     });
 
     dispatch(toggleMousePressing(true));
@@ -63,11 +63,16 @@ export const useEnableDrawingLine = ({
 
   const drawMove = (e: MouseEvent, dom: HTMLDivElement | null) => {
     try {
-      const [time, value, x, y] = calcValue(e, dom, childSeries[0], chart!);
+      const [time, value, x, y, logic] = calcValue(
+        e,
+        dom,
+        childSeries[0],
+        chart!
+      );
       setDrawEndPoint({
         value: value as number,
         time: time as UTCTimestamp,
-        customValues: { x, y },
+        customValues: { x, y, logic, price: value },
       });
     } catch (error) {
       console.log(error);
@@ -108,8 +113,7 @@ export const useEnableDrawingLine = ({
         drawEndPoint.customValues! as Point,
         drawingLineId,
         setLineId_equation,
-        chart,
-        childSeries[0]
+        chart
       );
     } catch (error) {}
   }, [childSeries, drawingLineId, drawStartPoint, drawEndPoint]);

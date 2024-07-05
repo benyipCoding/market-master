@@ -24,7 +24,8 @@ export const calcValue = (
   const [x, y] = calcMouseCoordinate(mouseEvent, chartContainer);
   const valueY = series.coordinateToPrice(y);
   const valueX = chart.timeScale().coordinateToTime(x);
-  return [valueX, valueY, x, y];
+  const logic = chart.timeScale().coordinateToLogical(x);
+  return [valueX, valueY, x, y, logic];
 };
 
 type AnyFunction = (...args: any[]) => any;
@@ -67,51 +68,40 @@ export function debonce<T extends AnyFunction>(func: T, wait: number): T {
   } as T;
 }
 
-export type Point = { x: number; y: number };
+export type Point = { x: number; y: number; logic?: number; price?: number };
 export type Equation = (x: number) => number;
 
 export function generateLinearEquation(
   point1: Point,
   point2: Point,
-  chart: IChartApi,
-  series: ISeriesApi<SeriesType, Time>
+  chart: IChartApi
 ): Equation {
   // Point slope rate
-  const { x: x1, y: y1 } = point1;
-  const { x: x2, y: y2 } = point2;
-  const t1 = new Date(
-    chart.timeScale().coordinateToTime(x1) as string
-  ).getTime();
-  const t2 = new Date(
-    chart.timeScale().coordinateToTime(x2) as string
-  ).getTime();
-  const p1 = series.coordinateToPrice(y1) as number;
-  const p2 = series.coordinateToPrice(y2) as number;
+  const { logic: logic1, price: price1 } = point1;
+  const { logic: logic2, price: price2 } = point2;
 
-  const m = (p2 - p1) / (t2 - t1);
+  const m = (price2! - price1!) / (logic2! - logic1!);
 
   return function (x: number) {
-    const t = new Date(
-      chart.timeScale().coordinateToTime(x) as string
-    ).getTime();
+    const logic = chart.timeScale().coordinateToLogical(x);
 
-    return m * (t - t1) + p1;
+    return m * (logic! - logic1!) + price1!;
   };
 }
 
-export const recordEquation = function (
+export const recordEquation = debonce(function (
   point1: Point,
   point2: Point,
   lineSeriesId: string,
   setLineId_equation: React.Dispatch<
     React.SetStateAction<Record<string, Equation>>
   >,
-  chart: IChartApi,
-  series: ISeriesApi<SeriesType, Time>
+  chart: IChartApi
 ) {
-  const equation = generateLinearEquation(point1, point2, chart, series);
+  const equation = generateLinearEquation(point1, point2, chart);
   setLineId_equation((prev) => ({ ...prev, [lineSeriesId]: equation }));
-};
+},
+500);
 
 export const findHoveringSeries = (
   childSeries: ISeriesApi<SeriesType, Time>[],
@@ -138,6 +128,7 @@ export const findHoveringSeries = (
 
     const isHoveringOverLine =
       isWithinRange(price, series.coordinateToPrice(point.y)!) && isInBoundary;
+
     return isHoveringOverLine;
   });
 };

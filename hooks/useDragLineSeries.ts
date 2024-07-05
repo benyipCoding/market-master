@@ -25,8 +25,7 @@ export const useDragLineSeries = ({
     (e: MouseEvent | React.MouseEvent<HTMLDivElement, MouseEvent>) => {
       dispatch(toggleDrawing(true));
       dispatch(toggleMousePressing(true));
-      // Calculate time and value based on mouse position
-      const [time, value, x, y] = calcValue(e, dom, baseSeries, chart);
+
       // Find invariant point
       const fixedPoint = selectedSeries!
         .data()
@@ -36,14 +35,7 @@ export const useDragLineSeries = ({
             (hoveringPoint?.customValues as Record<string, unknown>)
               .isStartPoint
         ) as LineData<Time>;
-      // Calculate dynamic point
-      const dynamicPoint: LineData<Time> = {
-        value: value as number,
-        time: time as UTCTimestamp,
-        customValues: { x, y },
-      };
 
-      setDynamic(dynamicPoint);
       setFixed(fixedPoint);
 
       // // Bind events when the mouse move and mouse up
@@ -55,17 +47,17 @@ export const useDragLineSeries = ({
 
   const dragMove = useCallback(
     (e: MouseEvent) => {
-      const [time, value, x, y] = calcValue(e, dom, baseSeries, chart);
+      const [time, value, x, y, logic] = calcValue(e, dom, baseSeries, chart);
 
       const dynamicPoint: LineData<Time> = {
         value: value as number,
         time: time as UTCTimestamp,
-        customValues: { x, y },
+        customValues: { x, y, logic, price: value },
       };
 
       setDynamic(dynamicPoint);
     },
-    [baseSeries, chart, dom]
+    [baseSeries]
   );
 
   const cleanUp = () => {
@@ -75,7 +67,7 @@ export const useDragLineSeries = ({
     setFixed(null);
   };
 
-  const dragEnd = () => {
+  const dragEnd = (e: MouseEvent) => {
     dispatch(toggleDrawing(false));
     dispatch(toggleMousePressing(false));
     Promise.resolve().then(cleanUp);
@@ -85,28 +77,22 @@ export const useDragLineSeries = ({
     if (!dynamic || !fixed || !lineId || !selectedSeries) return;
 
     const lineData = makeLineData(dynamic, fixed, lineId);
+
     try {
       selectedSeries.setData(lineData);
+
       recordEquation(
-        dynamic.customValues as any,
         fixed.customValues as any,
+        dynamic.customValues as any,
         lineId,
         setLineId_equation,
-        chart!,
-        baseSeries
+        chart!
       );
     } catch (error) {}
-  }, [
-    baseSeries,
-    chart,
-    dynamic,
-    fixed,
-    lineId,
-    selectedSeries,
-    setLineId_equation,
-  ]);
+  }, [baseSeries, dynamic, fixed, lineId, mouseMovingEventParam?.point]);
 
   return {
     changeSelectedSeries,
+    cleanUp,
   };
 };

@@ -65,7 +65,7 @@ const Home = () => {
     <div className="h-full flex bg-black">
       <Buttons tChartRef={tChartRef} setDrawedLineList={setDrawedLineList} />
       <TChart
-        className="w-full h-full m-auto"
+        className="w-4/5 h-4/5 m-auto"
         setDrawedLineList={setDrawedLineList}
         drawedLineList={drawedLineList}
         ref={tChartRef}

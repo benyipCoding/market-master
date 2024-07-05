@@ -60,7 +60,7 @@ const TChart: React.ForwardRefRenderFunction<
   const dispatch = useDispatch<AppDispatch>();
 
   // Activate the function of drawing straight lines
-  const { drawStart, cleanUp } = useEnableDrawingLine({
+  const { drawStart, cleanUp: cleanUp1 } = useEnableDrawingLine({
     chart: chart!,
     childSeries,
     drawedLineList,
@@ -68,7 +68,7 @@ const TChart: React.ForwardRefRenderFunction<
     setLineId_equation,
   });
   //  Activate the function of draging lines
-  const { changeSelectedSeries } = useDragLineSeries({
+  const { changeSelectedSeries, cleanUp: cleanUp2 } = useDragLineSeries({
     dom: container.current!,
     baseSeries: childSeries[0],
     chart: chart!,
@@ -81,7 +81,8 @@ const TChart: React.ForwardRefRenderFunction<
     setChart(createChart(container.current, defaultChartOptions));
 
     return () => {
-      cleanUp();
+      cleanUp1();
+      cleanUp2();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -103,11 +104,8 @@ const TChart: React.ForwardRefRenderFunction<
         selectedSeries
       ) as LineData<Time> | null;
 
-      if (point) {
-        setHoveringPoint(point);
-      } else {
-        setHoveringPoint(null);
-      }
+      if (point) setHoveringPoint(point);
+      else setHoveringPoint(null);
     }
   }, [mouseMovingEventParam, selectedSeries]);
 
@@ -119,7 +117,7 @@ const TChart: React.ForwardRefRenderFunction<
         childSeries,
         chart,
         lineId_equation,
-        mouseClickEventParam.point
+        mouseClickEventParam.point!
       );
       if (hoveringSeries) {
         dispatch(setSelectedSeries(hoveringSeries));
