@@ -33,11 +33,11 @@ export const useDragLineSeries = ({
 
   const changeSelectedSeries = useCallback(
     (e: MouseEvent | React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      if (!selectedSeries) return;
       dispatch(toggleDrawing(true));
       dispatch(toggleMousePressing(true));
-
       // Find invariant point
-      const fixedPoint = selectedSeries!
+      const fixedPoint = selectedSeries
         .data()
         .find(
           (point) =>
