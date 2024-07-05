@@ -2,11 +2,17 @@ import { toggleDrawing, toggleMousePressing } from "@/store/commonSlice";
 import {
   Point,
   calcValue,
+  findClosestPrice,
   makeLineData,
   recordEquation,
 } from "@/utils/helpers";
 import { AppDispatch, RootState } from "@/store";
-import { LineData, Time, UTCTimestamp } from "lightweight-charts";
+import {
+  CandlestickData,
+  LineData,
+  Time,
+  UTCTimestamp,
+} from "lightweight-charts";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IEnableDrawingLine } from "./interfaces";
@@ -24,7 +30,9 @@ export const useEnableDrawingLine = ({
   );
   const [drawEndPoint, setDrawEndPoint] = useState<LineData<Time> | null>(null);
   const [drawingLineId, setDrawingLineId] = useState("");
-  const { isDrawing } = useSelector((state: RootState) => state.common);
+  const { isDrawing, mouseMovingEventParam } = useSelector(
+    (state: RootState) => state.common
+  );
   const dispatch = useDispatch<AppDispatch>();
 
   const drawStart = (
@@ -50,10 +58,24 @@ export const useEnableDrawingLine = ({
         id: lineId,
       },
     ]);
+
+    const currentCandlestick = mouseMovingEventParam?.seriesData.get(
+      childSeries[0]
+    ) as CandlestickData<Time>;
+
+    const refecences = [
+      currentCandlestick.open,
+      currentCandlestick.high,
+      currentCandlestick.low,
+      currentCandlestick.close,
+    ];
+
+    const cloestStart = findClosestPrice(value as number, refecences);
+
     setDrawStartPoint({
-      value: value as number,
+      value: cloestStart || (value as number),
       time: time as UTCTimestamp,
-      customValues: { x, y, logic, price: value },
+      customValues: { x, y, logic, price: cloestStart || value },
     });
 
     dispatch(toggleMousePressing(true));
@@ -102,7 +124,32 @@ export const useEnableDrawingLine = ({
     // draw the line
     if (!drawingSeries || !drawStartPoint || !drawEndPoint) return;
 
-    const lineData = makeLineData(drawStartPoint, drawEndPoint, drawingLineId);
+    const currentCandlestick = mouseMovingEventParam?.seriesData.get(
+      childSeries[0]
+    ) as CandlestickData<Time>;
+    const refecences = [
+      currentCandlestick.open,
+      currentCandlestick.high,
+      currentCandlestick.low,
+      currentCandlestick.close,
+    ];
+
+    const cloestEnd = findClosestPrice(drawEndPoint.value, refecences);
+
+    const lineData = cloestEnd
+      ? makeLineData(
+          drawStartPoint,
+          {
+            ...drawEndPoint,
+            value: cloestEnd,
+            customValues: {
+              ...drawEndPoint.customValues,
+              price: cloestEnd,
+            },
+          },
+          drawingLineId
+        )
+      : makeLineData(drawStartPoint, drawEndPoint, drawingLineId);
 
     if (!lineData || !lineData.length) return;
 
@@ -116,7 +163,13 @@ export const useEnableDrawingLine = ({
         chart
       );
     } catch (error) {}
-  }, [childSeries, drawingLineId, drawStartPoint, drawEndPoint]);
+  }, [
+    childSeries,
+    drawingLineId,
+    drawStartPoint,
+    drawEndPoint,
+    mouseMovingEventParam,
+  ]);
 
   return { drawStart, cleanUp };
 };

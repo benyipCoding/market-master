@@ -20,7 +20,7 @@ export const defaultCandleStickOptions: CandlestickSeriesPartialOptions = {
 export const defaultLineOptions: LineSeriesPartialOptions = {
   color: "yellow",
   priceLineVisible: false,
-  lineWidth: 3,
+  lineWidth: 2,
   // pointMarkersVisible: false,
 };
 

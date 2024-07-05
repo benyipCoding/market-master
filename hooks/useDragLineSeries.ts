@@ -1,7 +1,17 @@
 import { AppDispatch, RootState } from "@/store";
 import { toggleDrawing, toggleMousePressing } from "@/store/commonSlice";
-import { calcValue, makeLineData, recordEquation } from "@/utils/helpers";
-import { LineData, Time, UTCTimestamp } from "lightweight-charts";
+import {
+  calcValue,
+  findClosestPrice,
+  makeLineData,
+  recordEquation,
+} from "@/utils/helpers";
+import {
+  CandlestickData,
+  LineData,
+  Time,
+  UTCTimestamp,
+} from "lightweight-charts";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IDragLineSeries } from "./interfaces";
@@ -76,7 +86,31 @@ export const useDragLineSeries = ({
   useEffect(() => {
     if (!dynamic || !fixed || !lineId || !selectedSeries) return;
 
-    const lineData = makeLineData(dynamic, fixed, lineId);
+    const currentCandlestick = mouseMovingEventParam?.seriesData.get(
+      baseSeries
+    ) as CandlestickData<Time>;
+
+    const cloest = findClosestPrice(dynamic.value, [
+      currentCandlestick.open,
+      currentCandlestick.high,
+      currentCandlestick.low,
+      currentCandlestick.close,
+    ]);
+
+    const lineData = cloest
+      ? makeLineData(
+          {
+            ...dynamic,
+            value: cloest!,
+            customValues: {
+              ...dynamic.customValues,
+              price: cloest,
+            },
+          },
+          fixed,
+          lineId
+        )
+      : makeLineData(dynamic, fixed, lineId);
 
     try {
       selectedSeries.setData(lineData);
@@ -89,7 +123,7 @@ export const useDragLineSeries = ({
         chart!
       );
     } catch (error) {}
-  }, [baseSeries, dynamic, fixed, lineId, mouseMovingEventParam?.point]);
+  }, [dynamic, fixed, lineId, selectedSeries, mouseMovingEventParam]);
 
   return {
     changeSelectedSeries,

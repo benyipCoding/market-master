@@ -51,9 +51,9 @@ export function throttle<T extends AnyFunction>(func: T, wait: number): T {
 export function isWithinRange(
   reference: number,
   actual: number,
-  rate: number = 0.005
+  sensitivity: number = 0.005
 ) {
-  const amount = reference * rate;
+  const amount = reference * sensitivity;
   return Math.abs(reference - actual) <= amount;
 }
 
@@ -152,4 +152,33 @@ export const makeLineData = (
         isStartPoint: index === 0,
       },
     }));
+};
+
+export const findClosestPrice = (
+  targetPrice: number,
+  references: number[],
+  sensitivity: number = 0.002
+): number | undefined => {
+  if (!references.length)
+    throw new Error("References argument can not be an empty array.");
+
+  const closestPrices = references.filter((price) =>
+    isWithinRange(price, targetPrice, sensitivity)
+  );
+
+  if (!closestPrices.length) return;
+  if (closestPrices.length === 1) return closestPrices[0];
+
+  let closest = closestPrices[0];
+  let minDiff = Math.abs(targetPrice - closest);
+
+  for (let i = 1; i < closestPrices.length; i++) {
+    let currentDiff = Math.abs(targetPrice - closestPrices[i]);
+    if (currentDiff < minDiff) {
+      minDiff = currentDiff;
+      closest = closestPrices[i];
+    }
+  }
+
+  return closest;
 };
