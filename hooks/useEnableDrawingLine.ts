@@ -41,6 +41,7 @@ export const useEnableDrawingLine = ({
   ) => {
     if (!isDrawing) return;
     if (!chartContainer) throw new Error("Missing DOM");
+    if (mouseEvent.button === 2) return; // Function return when mouse right click.
 
     const [time, value, x, y, logic] = calcValue(
       mouseEvent,
@@ -63,12 +64,14 @@ export const useEnableDrawingLine = ({
       childSeries[0]
     ) as CandlestickData<Time>;
 
-    const refecences = [
-      currentCandlestick.open,
-      currentCandlestick.high,
-      currentCandlestick.low,
-      currentCandlestick.close,
-    ];
+    const refecences = currentCandlestick
+      ? [
+          currentCandlestick.open,
+          currentCandlestick.high,
+          currentCandlestick.low,
+          currentCandlestick.close,
+        ]
+      : [];
 
     const cloestStart = findClosestPrice(value as number, refecences);
 
@@ -127,12 +130,15 @@ export const useEnableDrawingLine = ({
     const currentCandlestick = mouseMovingEventParam?.seriesData.get(
       childSeries[0]
     ) as CandlestickData<Time>;
-    const refecences = [
-      currentCandlestick.open,
-      currentCandlestick.high,
-      currentCandlestick.low,
-      currentCandlestick.close,
-    ];
+
+    const refecences = currentCandlestick
+      ? [
+          currentCandlestick.open,
+          currentCandlestick.high,
+          currentCandlestick.low,
+          currentCandlestick.close,
+        ]
+      : [];
 
     const cloestEnd = findClosestPrice(drawEndPoint.value, refecences);
 

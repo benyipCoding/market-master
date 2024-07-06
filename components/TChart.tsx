@@ -24,7 +24,7 @@ import React, {
 import { useDispatch, useSelector } from "react-redux";
 import { TChartRef, TChartProps, IChartContext } from "./interfaces/TChart";
 import { Equation, findHoveringSeries } from "@/utils/helpers";
-import { setSelectedSeries } from "@/store/commonSlice";
+import { setHoveringSeries, setSelectedSeries } from "@/store/commonSlice";
 import { useDragLineSeries } from "@/hooks/useDragLineSeries";
 
 export const ChartContext = createContext<IChartContext>({});
@@ -32,10 +32,7 @@ export const ChartContext = createContext<IChartContext>({});
 const TChart: React.ForwardRefRenderFunction<
   TChartRef,
   PropsWithChildren<TChartProps>
-> = (
-  { children, className, setDrawedLineList, drawable = true, drawedLineList },
-  ref
-) => {
+> = ({ children, className, setDrawedLineList, drawedLineList }, ref) => {
   const container = useRef<HTMLDivElement>(null);
   const {
     isDrawing,
@@ -99,6 +96,8 @@ const TChart: React.ForwardRefRenderFunction<
 
   // Mouse movement event (exclusive to light weight chart)
   useEffect(() => {
+    if (!chart) return;
+
     if (selectedSeries) {
       const point = mouseMovingEventParam?.seriesData.get(
         selectedSeries
@@ -107,25 +106,34 @@ const TChart: React.ForwardRefRenderFunction<
       if (point) setHoveringPoint(point);
       else setHoveringPoint(null);
     }
+
+    const hoveringSeries = findHoveringSeries(
+      childSeries,
+      chart,
+      lineId_equation,
+      mouseMovingEventParam?.point!
+    );
+
+    if (hoveringSeries) {
+      dispatch(setHoveringSeries(hoveringSeries));
+    } else {
+      dispatch(setHoveringSeries(null));
+    }
   }, [mouseMovingEventParam, selectedSeries]);
 
   // Mouse click events (exclusive to light weight chart)
   useEffect(() => {
-    try {
-      if (!mouseClickEventParam?.point || !chart) return;
-      const hoveringSeries = findHoveringSeries(
-        childSeries,
-        chart,
-        lineId_equation,
-        mouseClickEventParam.point!
-      );
-      if (hoveringSeries) {
-        dispatch(setSelectedSeries(hoveringSeries));
-      } else {
-        dispatch(setSelectedSeries(null));
-      }
-    } catch (error) {
-      console.log(error);
+    if (!mouseClickEventParam?.point || !chart) return;
+    const hoveringSeries = findHoveringSeries(
+      childSeries,
+      chart,
+      lineId_equation,
+      mouseClickEventParam.point!
+    );
+    if (hoveringSeries) {
+      dispatch(setSelectedSeries(hoveringSeries));
+    } else {
+      dispatch(setSelectedSeries(null));
     }
   }, [mouseClickEventParam]);
 

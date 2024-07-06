@@ -90,12 +90,17 @@ export const useDragLineSeries = ({
       baseSeries
     ) as CandlestickData<Time>;
 
-    const cloest = findClosestPrice(dynamic.value, [
-      currentCandlestick.open,
-      currentCandlestick.high,
-      currentCandlestick.low,
-      currentCandlestick.close,
-    ]);
+    const cloest = findClosestPrice(
+      dynamic.value,
+      currentCandlestick
+        ? [
+            currentCandlestick.open,
+            currentCandlestick.high,
+            currentCandlestick.low,
+            currentCandlestick.close,
+          ]
+        : []
+    );
 
     const lineData = cloest
       ? makeLineData(

@@ -1,13 +1,9 @@
 "use client";
-import {
-  DeepPartial,
-  LineStyleOptions,
-  SeriesOptionsCommon,
-} from "lightweight-charts";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useSeries } from "@/hooks/useSeries";
 import {
   defaultLineOptions,
+  hoveringLineOptions,
   selectedLineOptions,
 } from "@/constants/seriesOptions";
 import { LineSeriesProps } from "./interfaces/LineSeries";
@@ -18,22 +14,20 @@ const LineSeries: React.FC<LineSeriesProps> = ({
   seriesData,
   customSeriesOptions,
 }) => {
-  const { selectedSeries } = useSelector((state: RootState) => state.common);
+  const { selectedSeries, hoveringSeries } = useSelector(
+    (state: RootState) => state.common
+  );
   const { series } = useSeries("Line", seriesData, customSeriesOptions);
-
-  const [originalOptions, setOriginalOptions] =
-    useState<DeepPartial<LineStyleOptions & SeriesOptionsCommon>>(
-      defaultLineOptions
-    );
 
   useEffect(() => {
     if (series === selectedSeries) {
-      setOriginalOptions(series!.options());
       series?.applyOptions(selectedLineOptions);
+    } else if (series === hoveringSeries) {
+      series?.applyOptions(hoveringLineOptions);
     } else {
-      series?.applyOptions(originalOptions);
+      series?.applyOptions(defaultLineOptions);
     }
-  }, [selectedSeries, series]);
+  }, [selectedSeries, series, hoveringSeries]);
 
   return null;
 };

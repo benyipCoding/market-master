@@ -109,6 +109,8 @@ export const findHoveringSeries = (
   lineId_equation: Record<string, Equation>,
   point: Point
 ) => {
+  if (!point) return;
+
   return childSeries.find((series, index) => {
     if (index === 0) return;
 
@@ -159,8 +161,7 @@ export const findClosestPrice = (
   references: number[],
   sensitivity: number = 0.002
 ): number | undefined => {
-  if (!references.length)
-    throw new Error("References argument can not be an empty array.");
+  if (!references.length) return;
 
   const closestPrices = references.filter((price) =>
     isWithinRange(price, targetPrice, sensitivity)
