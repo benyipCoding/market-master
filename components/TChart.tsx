@@ -23,7 +23,7 @@ import React, {
 } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { TChartRef, TChartProps, IChartContext } from "./interfaces/TChart";
-import { Equation, findHoveringSeries } from "@/utils/helpers";
+import { Equation, findHoveringSeries, isWithinRange } from "@/utils/helpers";
 import { setHoveringSeries, setSelectedSeries } from "@/store/commonSlice";
 import { useDragLineSeries } from "@/hooks/useDragLineSeries";
 
@@ -103,8 +103,15 @@ const TChart: React.ForwardRefRenderFunction<
         selectedSeries
       ) as LineData<Time> | null;
 
-      if (point) setHoveringPoint(point);
-      else setHoveringPoint(null);
+      if (point) {
+        if (
+          isWithinRange(
+            point.customValues!.y as number,
+            mouseMovingEventParam?.point?.y!
+          )
+        )
+          setHoveringPoint(point);
+      } else setHoveringPoint(null);
     }
 
     const hoveringSeries = findHoveringSeries(
