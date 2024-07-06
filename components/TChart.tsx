@@ -140,7 +140,8 @@ const TChart: React.ForwardRefRenderFunction<
         "relative",
         className,
         isCanGrab && "cursor-grab",
-        isDrawing && mousePressing && "cursor-grabbing"
+        mousePressing && "cursor-grabbing",
+        isDrawing && !mousePressing && "cursor-crosshair"
       )}
       ref={container}
       // Only unselected series can trigger the line drawing function
