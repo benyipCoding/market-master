@@ -103,15 +103,8 @@ const TChart: React.ForwardRefRenderFunction<
         selectedSeries
       ) as LineData<Time> | null;
 
-      if (point) {
-        if (
-          isWithinRange(
-            point.customValues!.y as number,
-            mouseMovingEventParam?.point?.y!
-          )
-        )
-          setHoveringPoint(point);
-      } else setHoveringPoint(null);
+      if (point) setHoveringPoint(point);
+      else setHoveringPoint(null);
     }
 
     const hoveringSeries = findHoveringSeries(

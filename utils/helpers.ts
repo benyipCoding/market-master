@@ -159,7 +159,7 @@ export const makeLineData = (
 export const findClosestPrice = (
   targetPrice: number,
   references: number[],
-  sensitivity: number = 0.002
+  sensitivity: number = 0.0025
 ): number | undefined => {
   if (!references.length) return;
 

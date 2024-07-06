@@ -51,6 +51,8 @@ const Buttons: React.FC<ButtonsProps> = ({ tChartRef, setDrawedLineList }) => {
   useEffect(() => {
     if (selectedSeries) {
       hotkeys("Delete", onDeleteSeries);
+
+      document.addEventListener("contextmenu", contextmenuHandler);
     } else {
       hotkeys.unbind("Delete");
     }

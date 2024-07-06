@@ -39,9 +39,8 @@ export const useEnableDrawingLine = ({
     mouseEvent: React.MouseEvent<HTMLDivElement, MouseEvent>,
     chartContainer: HTMLDivElement | null
   ) => {
-    if (!isDrawing) return;
+    if (!isDrawing || mouseEvent.button === 2) return; // Function return when mouse right click.
     if (!chartContainer) throw new Error("Missing DOM");
-    if (mouseEvent.button === 2) return; // Function return when mouse right click.
 
     const [time, value, x, y, logic] = calcValue(
       mouseEvent,
