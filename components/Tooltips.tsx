@@ -59,6 +59,7 @@ const Tooltips: React.FC<TooltipsProps> = ({ productName, tChartRef }) => {
 
   useEffect(() => {
     if (!mouseClickEventParam?.point || !tChartRef.current) return;
+
     if (visible || selectedSeries) {
       setVisible(false);
       return;
@@ -104,9 +105,7 @@ const Tooltips: React.FC<TooltipsProps> = ({ productName, tChartRef }) => {
 
   return (
     <div
-      className={clsx(
-        "absolute w-fit z-10 pointer-events-none p-[1px] rounded-sm"
-      )}
+      className={clsx("absolute w-fit z-10 p-[1px] rounded-sm overflow-hidden")}
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
@@ -120,7 +119,7 @@ const Tooltips: React.FC<TooltipsProps> = ({ productName, tChartRef }) => {
           <h1 className="mb-2">{productName}</h1>
           <p className="text-sm mb-1">{currentCandlestick?.time.toString()}</p>
           {["open", "high", "low", "close"].map((label) => (
-            <p className="flex text-sm" key={label}>
+            <p className="flex text-sm pointer-events-none" key={label}>
               <span className="w-14">{label}:</span>
               <span>{(currentCandlestick as any)[label]}</span>
             </p>
