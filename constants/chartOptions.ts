@@ -3,6 +3,7 @@ import {
   ColorType,
   CrosshairMode,
   DeepPartial,
+  LineStyle,
   TickMarkType,
   Time,
 } from "lightweight-charts";
@@ -11,8 +12,8 @@ import {
 export const defaultChartOptions: DeepPartial<ChartOptions> = {
   autoSize: true,
   layout: {
-    background: { type: ColorType.Solid, color: "#1e1e1e" },
-    textColor: "rgba(255, 255, 255, 0.9)", // 文本颜色
+    background: { type: ColorType.Solid, color: "black" },
+    textColor: "white", // 文本颜色
   },
   grid: {
     vertLines: {
@@ -28,6 +29,11 @@ export const defaultChartOptions: DeepPartial<ChartOptions> = {
     mode: CrosshairMode.Normal,
     vertLine: {
       labelVisible: true,
+      color: "#515151",
+    },
+    horzLine: {
+      labelVisible: true,
+      color: "#515151",
     },
   },
   // priceScale: {

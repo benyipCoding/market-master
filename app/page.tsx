@@ -19,6 +19,7 @@ import {
   setMouseClickEventParam,
   setMouseMovingEventParam,
 } from "@/store/commonSlice";
+import Tooltips from "@/components/Tooltips";
 
 const Home = () => {
   // TChart component instance
@@ -65,7 +66,7 @@ const Home = () => {
     <div className="h-full flex bg-black">
       <Buttons tChartRef={tChartRef} setDrawedLineList={setDrawedLineList} />
       <TChart
-        className="w-4/5 h-4/5 m-auto"
+        className="w-full h-full m-auto"
         setDrawedLineList={setDrawedLineList}
         drawedLineList={drawedLineList}
         ref={tChartRef}
@@ -77,6 +78,7 @@ const Home = () => {
         {drawedLineList.map((lineOption) => (
           <LineSeries customSeriesOptions={lineOption} key={lineOption.id} />
         ))}
+        <Tooltips productName="XAU/USD" tChartRef={tChartRef} />
       </TChart>
     </div>
   );
