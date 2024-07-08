@@ -1,11 +1,11 @@
-import axios from "axios";
-import { CandlestickData, Time } from "lightweight-charts";
+// import axios from "axios";
+// import { CandlestickData, Time } from "lightweight-charts";
 import { NextResponse } from "next/server";
+import fs from "node:fs";
+import { join } from "node:path";
 
 export async function GET(req: Request) {
-  const res = await axios.get<CandlestickData<Time>[]>(
-    "http://localhost:3000/api/xau-usd/chart-data"
-  );
+  const data = fs.readFileSync(join(process.cwd(), "./dummy.json"));
 
-  return NextResponse.json(res.data);
+  return NextResponse.json(JSON.parse(data.toString()));
 }
