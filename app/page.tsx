@@ -17,6 +17,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store";
 import {
   setMouseClickEventParam,
+  setMouseDblClickEventParam,
   setMouseMovingEventParam,
 } from "@/store/commonSlice";
 import Tooltips from "@/components/Tooltips";
@@ -48,6 +49,10 @@ const Home = () => {
     dispatch(setMouseClickEventParam(param));
   };
 
+  const chartDblClickHandler = (param: MouseEventParams<Time>) => {
+    dispatch(setMouseDblClickEventParam(param));
+  };
+
   // get dummy candlestick data
   useEffect(() => {
     getCandlestickData();
@@ -59,6 +64,7 @@ const Home = () => {
     // Subscribe event when chart init
     chart.subscribeCrosshairMove(throttle(crosshairMoveHandler, 0));
     chart.subscribeClick(chartClickHandler);
+    chart.subscribeDblClick(chartDblClickHandler);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tChartRef.current?.chart]);
 
@@ -73,7 +79,7 @@ const Home = () => {
       >
         <CandlestickSeries
           seriesData={candlestickData}
-          customSeriesOptions={{ id: "XAU/USD", title: "XAU/USD" }}
+          customSeriesOptions={{ id: "XAU/USD" }}
         />
         {drawedLineList.map((lineOption) => (
           <LineSeries customSeriesOptions={lineOption} key={lineOption.id} />

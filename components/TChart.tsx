@@ -23,7 +23,7 @@ import React, {
 } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { TChartRef, TChartProps, IChartContext } from "./interfaces/TChart";
-import { Equation, findHoveringSeries, isWithinRange } from "@/utils/helpers";
+import { Equation, findHoveringSeries } from "@/utils/helpers";
 import { setHoveringSeries, setSelectedSeries } from "@/store/commonSlice";
 import { useDragLineSeries } from "@/hooks/useDragLineSeries";
 
@@ -38,6 +38,7 @@ const TChart: React.ForwardRefRenderFunction<
     isDrawing,
     mouseMovingEventParam,
     mouseClickEventParam,
+    mouseDblClickEventParam,
     mousePressing,
     selectedSeries,
   } = useSelector((state: RootState) => state.common);
@@ -138,6 +139,12 @@ const TChart: React.ForwardRefRenderFunction<
       dispatch(setSelectedSeries(null));
     }
   }, [mouseClickEventParam]);
+
+  // Mouse double click events (exclusive to light weight chart)
+  useEffect(() => {
+    if (!selectedSeries) return;
+    console.log(selectedSeries);
+  }, [mouseDblClickEventParam]);
 
   useImperativeHandle(ref, () => ({
     chart: chart!,

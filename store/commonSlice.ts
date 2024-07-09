@@ -11,6 +11,7 @@ interface CommonState {
   mousePressing: boolean;
   mouseMovingEventParam?: MouseEventParams<Time>;
   mouseClickEventParam?: MouseEventParams<Time>;
+  mouseDblClickEventParam?: MouseEventParams<Time>;
   selectedSeries: ISeriesApi<SeriesType, Time> | null;
   hoveringSeries: ISeriesApi<SeriesType, Time> | null;
 }
@@ -44,6 +45,12 @@ export const commonSlice = createSlice({
     ) {
       state.mouseClickEventParam = action.payload;
     },
+    setMouseDblClickEventParam(
+      state,
+      action: PayloadAction<MouseEventParams<Time>>
+    ) {
+      state.mouseDblClickEventParam = action.payload;
+    },
     setSelectedSeries(
       state,
       action: PayloadAction<ISeriesApi<SeriesType, Time> | null>
@@ -66,6 +73,7 @@ export const {
   setMouseClickEventParam,
   setSelectedSeries,
   setHoveringSeries,
+  setMouseDblClickEventParam,
 } = commonSlice.actions;
 
 export default commonSlice.reducer;

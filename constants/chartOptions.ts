@@ -3,7 +3,6 @@ import {
   ColorType,
   CrosshairMode,
   DeepPartial,
-  LineStyle,
   TickMarkType,
   Time,
 } from "lightweight-charts";
@@ -34,6 +33,7 @@ export const defaultChartOptions: DeepPartial<ChartOptions> = {
     horzLine: {
       labelVisible: true,
       color: "#515151",
+      labelBackgroundColor: "#4338ca",
     },
   },
   // priceScale: {
