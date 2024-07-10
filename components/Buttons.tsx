@@ -4,6 +4,7 @@ import React, { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ButtonsProps } from "./interfaces/Buttons";
 import hotkeys from "hotkeys-js";
+import { Button } from "./ui/button";
 
 const Buttons: React.FC<ButtonsProps> = ({ tChartRef, setDrawedLineList }) => {
   const dispatch = useDispatch<AppDispatch>();
@@ -66,19 +67,20 @@ const Buttons: React.FC<ButtonsProps> = ({ tChartRef, setDrawedLineList }) => {
 
   return (
     <>
-      <div
-        className="absolute left-0 top-0 p-2 bg-blue-500 z-10 flex justify-center items-center cursor-pointer"
+      <Button
+        className="absolute left-2 top-2 z-10"
+        variant="default"
         onClick={toggleDrawingState}
       >
         {isDrawing && !selectedSeries ? "Finish Draw" : "Start Draw"}
-      </div>
-
-      <div
-        className="absolute left-40 top-0 p-2 bg-red-500 z-10 flex justify-center items-center cursor-pointer"
+      </Button>
+      <Button
+        className="absolute left-32 top-2 z-10"
+        variant="destructive"
         onClick={onDeleteSeries}
       >
         Delete
-      </div>
+      </Button>
     </>
   );
 };
