@@ -50,3 +50,17 @@ export const defaultChartOptions: DeepPartial<ChartOptions> = {
     },
   },
 };
+
+export const lightModeOptions: DeepPartial<ChartOptions> = {
+  layout: {
+    background: { type: ColorType.Solid, color: "white" },
+    textColor: "black", // 文本颜色
+  },
+};
+
+export const darkModeOptions: DeepPartial<ChartOptions> = {
+  layout: {
+    background: { type: ColorType.Solid, color: "black" },
+    textColor: "white", // 文本颜色
+  },
+};

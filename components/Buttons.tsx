@@ -68,7 +68,7 @@ const Buttons: React.FC<ButtonsProps> = ({ tChartRef, setDrawedLineList }) => {
   return (
     <>
       <Button
-        className="absolute left-2 top-2 z-10 bg-primary"
+        className="absolute left-2 top-2 z-10"
         variant="default"
         onClick={toggleDrawingState}
       >

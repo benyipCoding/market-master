@@ -9,7 +9,6 @@ import React, {
   useState,
 } from "react";
 import { useSelector } from "react-redux";
-import { TChartRef } from "./interfaces/TChart";
 import { CandlestickData, Time } from "lightweight-charts";
 import { TooltipsProps } from "./interfaces/Tooltips";
 
@@ -101,12 +100,13 @@ const Tooltips: React.FC<TooltipsProps> = ({ productName, tChartRef }) => {
 
   return (
     <div
-      className={clsx("absolute w-fit z-10 p-[2px] rounded-sm overflow-hidden")}
+      className={clsx(
+        "absolute w-fit z-10 p-[2px] rounded-sm overflow-hidden bg-conic-gradient"
+      )}
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
         display: `${visible ? "block" : "none"}`,
-        backgroundImage: `conic-gradient(#FFC876, #79FFF7, #9F53FF, #FF98E2, #FFC876)`,
       }}
       ref={tooltipsWrapper}
     >

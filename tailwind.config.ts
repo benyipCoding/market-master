@@ -76,6 +76,10 @@ const config = {
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
       },
+      backgroundImage: {
+        "conic-gradient":
+          "conic-gradient(#FFC876, #79FFF7, #9F53FF, #FF98E2, #FFC876)",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

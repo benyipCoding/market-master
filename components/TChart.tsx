@@ -1,5 +1,9 @@
 "use client";
-import { defaultChartOptions } from "@/constants/chartOptions";
+import {
+  darkModeOptions,
+  defaultChartOptions,
+  lightModeOptions,
+} from "@/constants/chartOptions";
 import { useEnableDrawingLine } from "@/hooks/useEnableDrawingLine";
 import { AppDispatch, RootState } from "@/store";
 import clsx from "clsx";
@@ -26,6 +30,8 @@ import { TChartRef, TChartProps, IChartContext } from "./interfaces/TChart";
 import { Equation, findHoveringSeries } from "@/utils/helpers";
 import { setHoveringSeries, setSelectedSeries } from "@/store/commonSlice";
 import { useDragLineSeries } from "@/hooks/useDragLineSeries";
+import { useTheme } from "next-themes";
+import theme from "tailwindcss/defaultTheme";
 
 export const ChartContext = createContext<IChartContext>({});
 
@@ -59,6 +65,7 @@ const TChart: React.ForwardRefRenderFunction<
   );
   const isCanGrab = useMemo<boolean>(() => !!hoveringPoint, [hoveringPoint]);
   const dispatch = useDispatch<AppDispatch>();
+  const { theme } = useTheme();
 
   // Activate the function of drawing straight lines
   const { drawStart, cleanUp: cleanUp1 } = useEnableDrawingLine({
@@ -79,6 +86,7 @@ const TChart: React.ForwardRefRenderFunction<
 
   useEffect(() => {
     if (!container.current) return;
+
     setChart(createChart(container.current, defaultChartOptions));
 
     return () => {
@@ -148,6 +156,16 @@ const TChart: React.ForwardRefRenderFunction<
     if (!selectedSeries || !dialogTrigger) return;
     dialogTrigger.click();
   }, [mouseDblClickEventParam]);
+
+  // toggle light or dark mode
+  useEffect(() => {
+    if (!chart) return;
+    if (theme === "light") {
+      chart.applyOptions(lightModeOptions);
+    } else {
+      chart.applyOptions(darkModeOptions);
+    }
+  }, [chart, theme]);
 
   useImperativeHandle(ref, () => ({
     chart: chart!,
