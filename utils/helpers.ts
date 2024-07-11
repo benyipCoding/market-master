@@ -103,12 +103,19 @@ export const recordEquation = debonce(function (
 },
 500);
 
-export const findHoveringSeries = (
-  childSeries: ISeriesApi<SeriesType, Time>[],
-  chart: IChartApi,
-  lineId_equation: Record<string, Equation>,
-  point: Point
-) => {
+export interface IFindHoveringSeries {
+  childSeries: ISeriesApi<SeriesType, Time>[];
+  chart: IChartApi;
+  lineId_equation: Record<string, Equation>;
+  point: Point;
+}
+
+export const findHoveringSeries = ({
+  childSeries,
+  chart,
+  lineId_equation,
+  point,
+}: IFindHoveringSeries) => {
   if (!point) return;
 
   return childSeries.find((series, index) => {

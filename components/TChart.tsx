@@ -83,10 +83,9 @@ const TChart: React.ForwardRefRenderFunction<
     hoveringPoint: hoveringPoint!,
     setLineId_equation,
   });
-
+  // Mounted
   useEffect(() => {
     if (!container.current) return;
-
     setChart(createChart(container.current, defaultChartOptions));
 
     return () => {
@@ -95,7 +94,7 @@ const TChart: React.ForwardRefRenderFunction<
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
+  // Fix screen when isDrawing is true
   useEffect(() => {
     if (!chart) return;
     chart.applyOptions({
@@ -119,12 +118,12 @@ const TChart: React.ForwardRefRenderFunction<
       else setHoveringPoint(null);
     }
 
-    const hoveringSeries = findHoveringSeries(
+    const hoveringSeries = findHoveringSeries({
       childSeries,
       chart,
       lineId_equation,
-      mouseMovingEventParam?.point!
-    );
+      point: mouseMovingEventParam?.point!,
+    });
 
     if (hoveringSeries) {
       dispatch(setHoveringSeries(hoveringSeries));
@@ -137,12 +136,12 @@ const TChart: React.ForwardRefRenderFunction<
   useEffect(() => {
     if (!mouseClickEventParam?.point || !chart) return;
     // Find out if the series was hit by a mouse click
-    const hoveringSeries = findHoveringSeries(
+    const hoveringSeries = findHoveringSeries({
       childSeries,
       chart,
       lineId_equation,
-      mouseClickEventParam.point!
-    );
+      point: mouseClickEventParam.point!,
+    });
 
     if (hoveringSeries) {
       dispatch(setSelectedSeries(hoveringSeries));
@@ -157,7 +156,7 @@ const TChart: React.ForwardRefRenderFunction<
     dialogTrigger.click();
   }, [mouseDblClickEventParam]);
 
-  // toggle light or dark mode
+  // Toggle light or dark mode
   useEffect(() => {
     if (!chart) return;
     if (theme === "light") {

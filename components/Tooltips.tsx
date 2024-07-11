@@ -55,11 +55,10 @@ const Tooltips: React.FC<TooltipsProps> = ({ productName, tChartRef }) => {
   useEffect(() => {
     if (!mouseClickEventParam?.point || !tChartRef.current) return;
 
-    if (visible || selectedSeries) {
+    if (visible) {
       setVisible(false);
       return;
     }
-
     // get candlestick data
     const { childSeries } = tChartRef.current;
     const data = mouseClickEventParam.seriesData.get(childSeries[0]) as
@@ -67,7 +66,11 @@ const Tooltips: React.FC<TooltipsProps> = ({ productName, tChartRef }) => {
       | undefined;
     setCurrentCandlestick(data);
     setVisible(true);
-  }, [mouseClickEventParam, selectedSeries]);
+  }, [mouseClickEventParam]);
+
+  useEffect(() => {
+    setVisible(false);
+  }, [selectedSeries]);
 
   useLayoutEffect(() => {
     if (!tooltipsWrapper.current || !mouseClickEventParam?.point) return;
