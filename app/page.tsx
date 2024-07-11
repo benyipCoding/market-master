@@ -21,6 +21,14 @@ import {
   setMouseMovingEventParam,
 } from "@/store/commonSlice";
 import Tooltips from "@/components/Tooltips";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const Home = () => {
   // TChart component instance
@@ -35,6 +43,9 @@ const Home = () => {
   const [drawedLineList, setDrawedLineList] = useState<
     LineSeriesPartialOptions[]
   >([]);
+
+  // dialog trigger
+  const dialogTriggerRef = useRef<HTMLButtonElement>(null);
 
   const getCandlestickData = async () => {
     const res = await getDummyData();
@@ -69,24 +80,43 @@ const Home = () => {
   }, [tChartRef.current?.chart]);
 
   return (
-    <div className="h-full flex bg-black">
-      <Buttons tChartRef={tChartRef} setDrawedLineList={setDrawedLineList} />
-      <TChart
-        className="w-full h-full m-auto"
-        setDrawedLineList={setDrawedLineList}
-        drawedLineList={drawedLineList}
-        ref={tChartRef}
-      >
-        <CandlestickSeries
-          seriesData={candlestickData}
-          customSeriesOptions={{ id: "XAU/USD" }}
-        />
-        {drawedLineList.map((lineOption) => (
-          <LineSeries customSeriesOptions={lineOption} key={lineOption.id} />
-        ))}
-        <Tooltips productName="XAU/USD" tChartRef={tChartRef} />
-      </TChart>
-    </div>
+    <>
+      <div className="h-full flex bg-black">
+        <Buttons tChartRef={tChartRef} setDrawedLineList={setDrawedLineList} />
+        <TChart
+          className="w-full h-full m-auto"
+          setDrawedLineList={setDrawedLineList}
+          drawedLineList={drawedLineList}
+          dialogTrigger={dialogTriggerRef.current}
+          ref={tChartRef}
+        >
+          <CandlestickSeries
+            seriesData={candlestickData}
+            customSeriesOptions={{ id: "XAU/USD" }}
+          />
+          {drawedLineList.map((lineOption) => (
+            <LineSeries customSeriesOptions={lineOption} key={lineOption.id} />
+          ))}
+          <Tooltips productName="XAU/USD" tChartRef={tChartRef} />
+        </TChart>
+      </div>
+
+      <Dialog>
+        <DialogTrigger
+          ref={dialogTriggerRef}
+          className="hidden"
+        ></DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Are you absolutely sure?</DialogTitle>
+            {/* <DialogDescription>
+              This action cannot be undone. This will permanently delete your
+              account and remove your data from our servers.
+            </DialogDescription> */}
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

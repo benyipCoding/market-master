@@ -17,6 +17,7 @@ export interface TChartProps {
   >;
   drawable?: boolean;
   drawedLineList: LineSeriesPartialOptions[];
+  dialogTrigger: HTMLButtonElement | null;
 }
 
 export interface IChartContext {

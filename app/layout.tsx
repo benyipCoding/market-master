@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Inter as FontSans } from "next/font/google";
 import "@/styles/globals.css";
-import CombineProvider from "@/components/CombineProvider";
+import StoreProvider from "@/providers/StoreProvider";
+import { ThemeProvider } from "@/providers/ThemeProvider";
 import { cn } from "@/lib/utils";
 
 const fontSans = FontSans({ subsets: ["latin"], variable: "--font-sans" });
@@ -24,7 +25,14 @@ export default function RootLayout({
           fontSans.variable
         )}
       >
-        <CombineProvider>{children}</CombineProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <StoreProvider>{children}</StoreProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

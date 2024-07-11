@@ -32,7 +32,10 @@ export const ChartContext = createContext<IChartContext>({});
 const TChart: React.ForwardRefRenderFunction<
   TChartRef,
   PropsWithChildren<TChartProps>
-> = ({ children, className, setDrawedLineList, drawedLineList }, ref) => {
+> = (
+  { children, className, setDrawedLineList, drawedLineList, dialogTrigger },
+  ref
+) => {
   const container = useRef<HTMLDivElement>(null);
   const {
     isDrawing,
@@ -142,8 +145,8 @@ const TChart: React.ForwardRefRenderFunction<
 
   // Mouse double click events (exclusive to light weight chart)
   useEffect(() => {
-    if (!selectedSeries) return;
-    console.log(selectedSeries);
+    if (!selectedSeries || !dialogTrigger) return;
+    dialogTrigger.click();
   }, [mouseDblClickEventParam]);
 
   useImperativeHandle(ref, () => ({
