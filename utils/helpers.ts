@@ -190,3 +190,10 @@ export const findClosestPrice = (
 
   return closest;
 };
+
+// First letter uppercase
+export const titleCase = (str: string): string => {
+  if (typeof str !== "string" || !str.length) return "";
+  const result = str[0].toUpperCase() + str.slice(1);
+  return result;
+};

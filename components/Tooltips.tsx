@@ -11,6 +11,7 @@ import React, {
 import { useSelector } from "react-redux";
 import { CandlestickData, Time } from "lightweight-charts";
 import { TooltipsProps } from "./interfaces/Tooltips";
+import { titleCase } from "@/utils/helpers";
 
 const tooltipsOffset = {
   x: 5,
@@ -119,7 +120,7 @@ const Tooltips: React.FC<TooltipsProps> = ({ productName, tChartRef }) => {
           <p className="text-sm mb-1">{currentCandlestick?.time.toString()}</p>
           {["open", "high", "low", "close"].map((label) => (
             <p className="flex text-sm pointer-events-none" key={label}>
-              <span className="w-14">{label}:</span>
+              <span className="w-14">{titleCase(label)}:</span>
               <span>{(currentCandlestick as any)[label]}</span>
             </p>
           ))}
