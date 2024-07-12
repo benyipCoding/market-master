@@ -31,7 +31,8 @@ import { Equation, findHoveringSeries } from "@/utils/helpers";
 import { setHoveringSeries, setSelectedSeries } from "@/store/commonSlice";
 import { useDragLineSeries } from "@/hooks/useDragLineSeries";
 import { useTheme } from "next-themes";
-import theme from "tailwindcss/defaultTheme";
+import { ContextMenu, ContextMenuTrigger } from "./ui/context-menu";
+import TChartContextMenu from "./TChartContextMenu";
 
 export const ChartContext = createContext<IChartContext>({});
 
@@ -172,31 +173,37 @@ const TChart: React.ForwardRefRenderFunction<
   }));
 
   return (
-    <div
-      className={clsx(
-        "relative",
-        className,
-        isCanGrab && "cursor-grab",
-        mousePressing && "cursor-grabbing",
-        isDrawing && !mousePressing && "cursor-crosshair"
-      )}
-      ref={container}
-      // Only unselected series can trigger the line drawing function
-      onMouseDown={(e) =>
-        hoveringPoint
-          ? changeSelectedSeries(e)
-          : drawStart(e, container.current)
-      }
-    >
-      <ChartContext.Provider
-        value={{
-          chart,
-          setChildSeries,
-        }}
+    <ContextMenu>
+      <ContextMenuTrigger
+        className={clsx(
+          "relative block",
+          className,
+          isCanGrab && "cursor-grab",
+          mousePressing && "cursor-grabbing",
+          isDrawing && !mousePressing && "cursor-crosshair"
+        )}
+        ref={container}
+        // Only unselected series can trigger the line drawing function
+        onMouseDown={(e) =>
+          hoveringPoint
+            ? changeSelectedSeries(
+                e as MouseEvent | React.MouseEvent<HTMLDivElement, MouseEvent>
+              )
+            : drawStart(e as any, container.current)
+        }
       >
-        {children}
-      </ChartContext.Provider>
-    </div>
+        <ChartContext.Provider
+          value={{
+            chart,
+            setChildSeries,
+          }}
+        >
+          {children}
+        </ChartContext.Provider>
+      </ContextMenuTrigger>
+
+      <TChartContextMenu />
+    </ContextMenu>
   );
 };
 
