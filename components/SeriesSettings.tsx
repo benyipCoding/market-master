@@ -97,12 +97,10 @@ const SeriesSettings = () => {
                 </div>
               </CardContent>
               <CardFooter className="flex justify-end gap-2">
-                <Button type="submit" variant={"secondary"} className="">
+                <Button variant={"secondary"} className="">
                   Apply
                 </Button>
-                <Button type="submit" variant={"outline"}>
-                  Cancel
-                </Button>
+                <Button variant={"outline"}>Cancel</Button>
                 <Button type="submit">Confirm</Button>
               </CardFooter>
             </form>

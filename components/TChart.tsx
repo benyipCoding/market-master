@@ -33,6 +33,7 @@ import { useDragLineSeries } from "@/hooks/useDragLineSeries";
 import { useTheme } from "next-themes";
 import { ContextMenu, ContextMenuTrigger } from "./ui/context-menu";
 import TChartContextMenu from "./TChartContextMenu";
+import { TChartContextMenuRef } from "./interfaces/TChartContextMenu";
 
 export const ChartContext = createContext<IChartContext>({});
 
@@ -71,6 +72,7 @@ const TChart: React.ForwardRefRenderFunction<
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
 
   const contextMenuTriggerDisable = useMemo(() => isDrawing, [isDrawing]);
+  const contextMenuRef = useRef<TChartContextMenuRef>(null);
 
   // Activate the function of drawing straight lines
   const { drawStart, cleanUp: cleanUp1 } = useEnableDrawingLine({
@@ -174,7 +176,8 @@ const TChart: React.ForwardRefRenderFunction<
   // When ContextMenu visible
   useEffect(() => {
     if (!contextMenuVisible) return;
-    console.log("When ContextMenu visible", hoveringSeries?.options()?.id);
+    if (hoveringSeries) contextMenuRef.current?.setSeriesSettingsDisable(false);
+    else contextMenuRef.current?.setSeriesSettingsDisable(true);
   }, [contextMenuVisible]);
 
   useImperativeHandle(ref, () => ({
@@ -184,7 +187,7 @@ const TChart: React.ForwardRefRenderFunction<
   }));
 
   return (
-    <ContextMenu onOpenChange={setContextMenuVisible}>
+    <ContextMenu onOpenChange={setContextMenuVisible} modal={false}>
       <ContextMenuTrigger
         disabled={contextMenuTriggerDisable}
         className={clsx(
@@ -214,7 +217,10 @@ const TChart: React.ForwardRefRenderFunction<
         </ChartContext.Provider>
       </ContextMenuTrigger>
 
-      <TChartContextMenu />
+      <TChartContextMenu
+        ref={contextMenuRef}
+        setDialogVisible={setDialogVisible}
+      />
     </ContextMenu>
   );
 };

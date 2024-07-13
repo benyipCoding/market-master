@@ -11,14 +11,35 @@ import {
   ContextMenuRadioItem,
   ContextMenuShortcut,
 } from "./ui/context-menu";
-import React from "react";
+import React, { forwardRef, useImperativeHandle, useState } from "react";
+import {
+  TChartContextMenuRef,
+  TChartContextMenuProps,
+} from "./interfaces/TChartContextMenu";
 
-const TChartContextMenu = () => {
+const TChartContextMenu: React.ForwardRefRenderFunction<
+  TChartContextMenuRef,
+  TChartContextMenuProps
+> = ({ setDialogVisible }, ref) => {
+  const [seriesSettingsDisable, setSeriesSettingsDisable] = useState(true);
+
+  const openSeriesSettingsDialog = () => {
+    setDialogVisible(true);
+  };
+
+  useImperativeHandle(ref, () => ({
+    setSeriesSettingsDisable,
+  }));
+
   return (
     <ContextMenuContent className="w-64">
-      <ContextMenuItem inset>
-        Back
-        <ContextMenuShortcut>⌘[</ContextMenuShortcut>
+      <ContextMenuItem
+        inset
+        disabled={seriesSettingsDisable}
+        onSelect={openSeriesSettingsDialog}
+      >
+        Series Settings...
+        {/* <ContextMenuShortcut>⌘[</ContextMenuShortcut> */}
       </ContextMenuItem>
       <ContextMenuItem inset disabled>
         Forward
@@ -58,4 +79,4 @@ const TChartContextMenu = () => {
   );
 };
 
-export default TChartContextMenu;
+export default forwardRef(TChartContextMenu);
