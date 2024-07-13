@@ -4,6 +4,7 @@ import "@/styles/globals.css";
 import StoreProvider from "@/providers/StoreProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { cn } from "@/lib/utils";
+import { Dialog } from "@/components/ui/dialog";
 
 const fontSans = FontSans({ subsets: ["latin"], variable: "--font-sans" });
 

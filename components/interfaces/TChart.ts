@@ -1,4 +1,3 @@
-import { Equation } from "@/utils/helpers";
 import {
   DeepPartial,
   LineStyleOptions,
@@ -17,7 +16,7 @@ export interface TChartProps {
   >;
   drawable?: boolean;
   drawedLineList: LineSeriesPartialOptions[];
-  dialogTrigger: HTMLButtonElement | null;
+  setDialogVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface IChartContext {

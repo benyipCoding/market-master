@@ -21,14 +21,8 @@ import {
   setMouseMovingEventParam,
 } from "@/store/commonSlice";
 import Tooltips from "@/components/Tooltips";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog } from "@/components/ui/dialog";
+import SeriesSettings from "@/components/SeriesSettings";
 
 const Home = () => {
   // TChart component instance
@@ -45,7 +39,7 @@ const Home = () => {
   >([]);
 
   // dialog trigger
-  const dialogTriggerRef = useRef<HTMLButtonElement>(null);
+  const [dialogVisible, setDialogVisible] = useState(false);
 
   const getCandlestickData = async () => {
     const res = await getDummyData();
@@ -87,8 +81,8 @@ const Home = () => {
           className="w-full h-full m-auto"
           setDrawedLineList={setDrawedLineList}
           drawedLineList={drawedLineList}
-          dialogTrigger={dialogTriggerRef.current}
           ref={tChartRef}
+          setDialogVisible={setDialogVisible}
         >
           <CandlestickSeries
             seriesData={candlestickData}
@@ -101,17 +95,8 @@ const Home = () => {
         </TChart>
       </div>
 
-      <Dialog>
-        <DialogTrigger
-          ref={dialogTriggerRef}
-          className="hidden"
-        ></DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Are you absolutely sure?</DialogTitle>
-            <div className="w-full h-full bg-pink-300">123</div>
-          </DialogHeader>
-        </DialogContent>
+      <Dialog onOpenChange={setDialogVisible} open={dialogVisible}>
+        <SeriesSettings />
       </Dialog>
     </>
   );

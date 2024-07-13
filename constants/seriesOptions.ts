@@ -21,7 +21,7 @@ export const defaultLineOptions: LineSeriesPartialOptions = {
   color: "yellow",
   priceLineVisible: false,
   lineWidth: 2,
-  // pointMarkersVisible: false,
+  pointMarkersVisible: false,
 };
 
 export const selectedLineOptions: LineSeriesPartialOptions = {

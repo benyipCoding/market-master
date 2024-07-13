@@ -40,7 +40,7 @@ const TChart: React.ForwardRefRenderFunction<
   TChartRef,
   PropsWithChildren<TChartProps>
 > = (
-  { children, className, setDrawedLineList, drawedLineList, dialogTrigger },
+  { children, className, setDrawedLineList, drawedLineList, setDialogVisible },
   ref
 ) => {
   const container = useRef<HTMLDivElement>(null);
@@ -153,8 +153,8 @@ const TChart: React.ForwardRefRenderFunction<
 
   // Mouse double click events (exclusive to light weight chart)
   useEffect(() => {
-    if (!selectedSeries || !dialogTrigger) return;
-    dialogTrigger.click();
+    if (!selectedSeries) return;
+    setDialogVisible(true);
   }, [mouseDblClickEventParam]);
 
   // Toggle light or dark mode
