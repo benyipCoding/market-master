@@ -170,6 +170,7 @@ const TChart: React.ForwardRefRenderFunction<
   useImperativeHandle(ref, () => ({
     chart: chart!,
     childSeries: childSeries,
+    chartContainer: container,
   }));
 
   return (

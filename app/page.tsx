@@ -23,6 +23,7 @@ import {
 import Tooltips from "@/components/Tooltips";
 import { Dialog } from "@/components/ui/dialog";
 import SeriesSettings from "@/components/SeriesSettings";
+import CustomDialogContent from "@/components/CustomDialogContent";
 
 const Home = () => {
   // TChart component instance
@@ -96,7 +97,12 @@ const Home = () => {
       </div>
 
       <Dialog onOpenChange={setDialogVisible} open={dialogVisible}>
-        <SeriesSettings />
+        <CustomDialogContent
+          dialogVisible={dialogVisible}
+          dragConstraints={tChartRef.current?.chartContainer!}
+        >
+          <SeriesSettings />
+        </CustomDialogContent>
       </Dialog>
     </>
   );

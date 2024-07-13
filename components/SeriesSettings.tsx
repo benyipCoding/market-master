@@ -1,18 +1,10 @@
-import { DialogContent, DialogTitle } from "@/components/ui/dialog";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { DialogTitle } from "@/components/ui/dialog";
+import React from "react";
 import { DialogHeader } from "./ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "./ui/button";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "./ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
 import {
   Select,
   SelectContent,
@@ -23,8 +15,8 @@ import {
 
 const SeriesSettings = () => {
   return (
-    <DialogContent hideOverlay={true} className="bg-blue-300 duration-0">
-      <DialogHeader className="">
+    <>
+      <DialogHeader>
         <DialogTitle>Series Settings</DialogTitle>
       </DialogHeader>
       <Tabs defaultValue="property" className="cursor-auto">
@@ -68,7 +60,7 @@ const SeriesSettings = () => {
           <div className="bg-rose-500">series data</div>
         </TabsContent>
       </Tabs>
-    </DialogContent>
+    </>
   );
 };
 

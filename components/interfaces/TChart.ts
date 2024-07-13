@@ -29,4 +29,5 @@ export interface IChartContext {
 export interface TChartRef {
   chart: IChartApi;
   childSeries: ISeriesApi<SeriesType, Time>[];
+  chartContainer: React.RefObject<HTMLDivElement>;
 }
