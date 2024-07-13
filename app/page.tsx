@@ -21,9 +21,10 @@ import {
   setMouseMovingEventParam,
 } from "@/store/commonSlice";
 import Tooltips from "@/components/Tooltips";
-import { Dialog } from "@/components/ui/dialog";
+import { Dialog, DialogFooter } from "@/components/ui/dialog";
 import SeriesSettings from "@/components/SeriesSettings";
 import CustomDialogContent from "@/components/CustomDialogContent";
+import { Button } from "@/components/ui/button";
 
 const Home = () => {
   // TChart component instance
@@ -102,6 +103,9 @@ const Home = () => {
           dragConstraints={tChartRef.current?.chartContainer!}
         >
           <SeriesSettings />
+          {/* <DialogFooter>
+            <Button type="submit" onClick={onSubmitSignal}>Save changes</Button>
+          </DialogFooter> */}
         </CustomDialogContent>
       </Dialog>
     </>

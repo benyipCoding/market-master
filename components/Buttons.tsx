@@ -8,7 +8,7 @@ import { Button } from "./ui/button";
 
 const Buttons: React.FC<ButtonsProps> = ({ tChartRef, setDrawedLineList }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { isDrawing, selectedSeries } = useSelector(
+  const { isDrawing, selectedSeries, hoveringSeries } = useSelector(
     (state: RootState) => state.common
   );
 
@@ -27,7 +27,7 @@ const Buttons: React.FC<ButtonsProps> = ({ tChartRef, setDrawedLineList }) => {
   const toggleDrawingState = useCallback(() => {
     dispatch(setSelectedSeries(null));
     dispatch(toggleDrawing(!isDrawing));
-  }, [dispatch, isDrawing]);
+  }, [isDrawing]);
 
   const contextmenuHandler = (e: MouseEvent) => {
     e.preventDefault();
@@ -68,7 +68,7 @@ const Buttons: React.FC<ButtonsProps> = ({ tChartRef, setDrawedLineList }) => {
   return (
     <>
       <Button
-        className="absolute left-2 top-2 z-10 bg-primary"
+        className="absolute left-2 top-2 z-10"
         variant="default"
         onClick={toggleDrawingState}
       >

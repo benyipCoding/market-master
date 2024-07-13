@@ -51,6 +51,7 @@ const TChart: React.ForwardRefRenderFunction<
     mouseDblClickEventParam,
     mousePressing,
     selectedSeries,
+    hoveringSeries,
   } = useSelector((state: RootState) => state.common);
   const [chart, setChart] = useState<IChartApi>();
   const [lineId_equation, setLineId_equation] = useState<
@@ -67,6 +68,9 @@ const TChart: React.ForwardRefRenderFunction<
   const isCanGrab = useMemo<boolean>(() => !!hoveringPoint, [hoveringPoint]);
   const dispatch = useDispatch<AppDispatch>();
   const { theme } = useTheme();
+  const [contextMenuVisible, setContextMenuVisible] = useState(false);
+
+  const contextMenuTriggerDisable = useMemo(() => isDrawing, [isDrawing]);
 
   // Activate the function of drawing straight lines
   const { drawStart, cleanUp: cleanUp1 } = useEnableDrawingLine({
@@ -95,7 +99,7 @@ const TChart: React.ForwardRefRenderFunction<
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  // Fix screen when isDrawing is true
+  // Freeze screen when isDrawing is true
   useEffect(() => {
     if (!chart) return;
     chart.applyOptions({
@@ -167,6 +171,12 @@ const TChart: React.ForwardRefRenderFunction<
     }
   }, [chart, theme]);
 
+  // When ContextMenu visible
+  useEffect(() => {
+    if (!contextMenuVisible) return;
+    console.log("When ContextMenu visible", hoveringSeries?.options()?.id);
+  }, [contextMenuVisible]);
+
   useImperativeHandle(ref, () => ({
     chart: chart!,
     childSeries: childSeries,
@@ -174,8 +184,9 @@ const TChart: React.ForwardRefRenderFunction<
   }));
 
   return (
-    <ContextMenu>
+    <ContextMenu onOpenChange={setContextMenuVisible}>
       <ContextMenuTrigger
+        disabled={contextMenuTriggerDisable}
         className={clsx(
           "relative block",
           className,
