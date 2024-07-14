@@ -10,7 +10,6 @@ import { AppDispatch, RootState } from "@/store";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleMousePressing } from "@/store/commonSlice";
 import { cn } from "@/lib/utils";
-
 import PropertySettingsForm from "./PropertySettingsForm";
 import SeriesDataForm from "./SeriesDataForm";
 
@@ -47,6 +46,21 @@ const SeriesSettings = () => {
   };
   const endDrag = () => dispatch(toggleMousePressing(false));
 
+  const TABS = [
+    {
+      tabLabel: "Property",
+      title: "Property settings",
+      id: "property",
+      com: <PropertySettingsForm />,
+    },
+    {
+      tabLabel: "Series Data",
+      title: "Data settings",
+      id: "seriesData",
+      com: <SeriesDataForm />,
+    },
+  ];
+
   return (
     <>
       <DialogHeader
@@ -56,27 +70,24 @@ const SeriesSettings = () => {
       >
         <DialogTitle className="select-none">Series Settings</DialogTitle>
       </DialogHeader>
-      <Tabs defaultValue="property" className="cursor-auto">
+      <Tabs defaultValue={TABS[0].id} className="cursor-auto">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="property">Property</TabsTrigger>
-          <TabsTrigger value="seriesData">Series Data</TabsTrigger>
+          {TABS.map((tab) => (
+            <TabsTrigger value={tab.id} key={`tab_${tab.id}`}>
+              {tab.tabLabel}
+            </TabsTrigger>
+          ))}
         </TabsList>
-        <TabsContent value="property">
-          <Card className="w-full">
-            <CardHeader>
-              <CardTitle className="select-none">Property settings</CardTitle>
-            </CardHeader>
-            <PropertySettingsForm />
-          </Card>
-        </TabsContent>
-        <TabsContent value="seriesData">
-          <Card className="w-full">
-            <CardHeader>
-              <CardTitle className="select-none">Data settings</CardTitle>
-            </CardHeader>
-            <SeriesDataForm />
-          </Card>
-        </TabsContent>
+        {TABS.map((tab) => (
+          <TabsContent value={tab.id} key={`content_${tab.id}`}>
+            <Card className="w-full">
+              <CardHeader>
+                <CardTitle className="select-none">{tab.title}</CardTitle>
+              </CardHeader>
+              {tab.com}
+            </Card>
+          </TabsContent>
+        ))}
       </Tabs>
     </>
   );
