@@ -8,7 +8,7 @@ import { Button } from "./ui/button";
 
 const Buttons: React.FC<ButtonsProps> = ({ tChartRef, setDrawedLineList }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { isDrawing, selectedSeries, hoveringSeries } = useSelector(
+  const { isDrawing, selectedSeries } = useSelector(
     (state: RootState) => state.common
   );
 
