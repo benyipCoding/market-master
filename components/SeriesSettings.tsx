@@ -2,7 +2,6 @@ import { DialogTitle } from "@/components/ui/dialog";
 import React, { useContext } from "react";
 import { DialogHeader } from "./ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-
 import { Card, CardHeader, CardTitle, CardFooter } from "./ui/card";
 import { Button } from "./ui/button";
 import { CustomDialogContentContext } from "./CustomDialogContent";
@@ -24,7 +23,6 @@ export const CommonFooter = () => {
       >
         Reset
       </Button>
-
       <Button type="button" variant={"secondary"} size="sm">
         Apply
       </Button>
