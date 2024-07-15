@@ -33,7 +33,7 @@ const SeriesDataForm = () => {
   return (
     <form onSubmit={onSubmit}>
       <CardContent>
-        <div className="grid w-full items-center gap-4">
+        <div className="grid w-full items-center gap-2">
           {/* Start point */}
           <div className="flex flex-col space-y-1.5 gap-2">
             <Label htmlFor="seriesLabel" className="py-1 flex justify-between">

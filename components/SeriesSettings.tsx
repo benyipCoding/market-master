@@ -1,5 +1,5 @@
 import { DialogTitle } from "@/components/ui/dialog";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { DialogHeader } from "./ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardFooter } from "./ui/card";
@@ -34,6 +34,21 @@ export const CommonFooter = () => {
   );
 };
 
+const TABS = [
+  {
+    tabLabel: "Property",
+    title: "Property settings",
+    id: "property",
+    com: <PropertySettingsForm />,
+  },
+  {
+    tabLabel: "Series Data",
+    title: "Data settings",
+    id: "seriesData",
+    com: <SeriesDataForm />,
+  },
+];
+
 const SeriesSettings = () => {
   const { dragControls } = useContext(CustomDialogContentContext);
   const { mousePressing } = useSelector((state: RootState) => state.common);
@@ -44,27 +59,18 @@ const SeriesSettings = () => {
   };
   const endDrag = () => dispatch(toggleMousePressing(false));
 
-  const TABS = [
-    {
-      tabLabel: "Property",
-      title: "Property settings",
-      id: "property",
-      com: <PropertySettingsForm />,
-    },
-    {
-      tabLabel: "Series Data",
-      title: "Data settings",
-      id: "seriesData",
-      com: <SeriesDataForm />,
-    },
-  ];
+  useEffect(() => {
+    document.addEventListener("pointerup", endDrag);
+    return () => {
+      document.removeEventListener("pointerup", endDrag);
+    };
+  }, []);
 
   return (
     <>
       <DialogHeader
         className={cn("py-6 cursor-grab", mousePressing && "cursor-grabbing")}
         onPointerDown={startDrag}
-        onPointerUp={endDrag}
       >
         <DialogTitle className="select-none">Series Settings</DialogTitle>
       </DialogHeader>

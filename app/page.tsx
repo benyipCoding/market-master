@@ -19,6 +19,7 @@ import {
   setMouseClickEventParam,
   setMouseDblClickEventParam,
   setMouseMovingEventParam,
+  toggleMousePressing,
 } from "@/store/commonSlice";
 import Tooltips from "@/components/Tooltips";
 import { Dialog } from "@/components/ui/dialog";
