@@ -15,12 +15,12 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import React, { useState } from "react";
-import { SeriesSettingsFormValueType } from "./interfaces/SeriesSettings";
+import { PropertySettingsFormValueType } from "./interfaces/SeriesSettings";
 import { CardContent } from "./ui/card";
 import { CommonFooter } from "./SeriesSettings";
 
 const PropertySettingsForm = () => {
-  const [formValue, setFormValue] = useState<SeriesSettingsFormValueType>({
+  const [formValue, setFormValue] = useState<PropertySettingsFormValueType>({
     seriesLabel: "",
     showLabel: false,
     seriesColor: "",
