@@ -25,6 +25,12 @@ import Tooltips from "@/components/Tooltips";
 import { Dialog } from "@/components/ui/dialog";
 import SeriesSettings from "@/components/SeriesSettings";
 import CustomDialogContent from "@/components/CustomDialogContent";
+import {
+  getDefaultLineOptions,
+  hasDefaultLineOptions,
+  setDefaultLineOptions,
+} from "@/utils/storage";
+import { defaultLineOptions } from "@/constants/seriesOptions";
 
 const Home = () => {
   // TChart component instance
@@ -63,6 +69,7 @@ const Home = () => {
   // get dummy candlestick data
   useEffect(() => {
     getCandlestickData();
+    if (!hasDefaultLineOptions()) setDefaultLineOptions(defaultLineOptions);
   }, []);
 
   useEffect(() => {

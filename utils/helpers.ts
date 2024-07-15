@@ -197,3 +197,10 @@ export const titleCase = (str: string): string => {
   const result = str[0].toUpperCase() + str.slice(1);
   return result;
 };
+
+// Firsh letter lowercase
+export const textCase = (str: string): string => {
+  if (typeof str !== "string" || !str.length) return "";
+  const result = str[0].toLowerCase() + str.slice(1);
+  return result;
+};

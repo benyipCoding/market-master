@@ -51,13 +51,7 @@ export const useEnableDrawingLine = ({
 
     const lineId = `${childSeries[0].options().id}_line_${Date.now()}`;
     setDrawingLineId(lineId);
-    setDrawedLineList([
-      ...drawedLineList,
-      {
-        lastValueVisible: false,
-        id: lineId,
-      },
-    ]);
+    setDrawedLineList([...drawedLineList, { id: lineId, showLabel: false }]);
 
     const currentCandlestick = mouseMovingEventParam?.seriesData.get(
       childSeries[0]
@@ -77,7 +71,12 @@ export const useEnableDrawingLine = ({
     setDrawStartPoint({
       value: cloestStart || (value as number),
       time: time as UTCTimestamp,
-      customValues: { x, y, logic, price: cloestStart || value },
+      customValues: {
+        x,
+        y,
+        logic,
+        price: cloestStart || value,
+      },
     });
 
     dispatch(toggleMousePressing(true));

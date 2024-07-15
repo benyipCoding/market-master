@@ -176,8 +176,10 @@ const TChart: React.ForwardRefRenderFunction<
   // When ContextMenu visible
   useEffect(() => {
     if (!contextMenuVisible) return;
-    if (hoveringSeries) contextMenuRef.current?.setSeriesSettingsDisable(false);
-    else contextMenuRef.current?.setSeriesSettingsDisable(true);
+    if (hoveringSeries) {
+      contextMenuRef.current?.setSeriesSettingsDisable(false);
+      setTimeout(() => dispatch(setSelectedSeries(hoveringSeries)));
+    } else contextMenuRef.current?.setSeriesSettingsDisable(true);
   }, [contextMenuVisible]);
 
   useImperativeHandle(ref, () => ({

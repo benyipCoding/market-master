@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Calendar as CalendarIcon, Minus, Plus } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "@/components/ui/input";
 import { CardContent } from "./ui/card";
@@ -37,6 +37,10 @@ const SeriesDataForm = () => {
     e.preventDefault();
     console.log(formValue);
   };
+
+  useEffect(() => {
+    console.log("sasasa");
+  }, []);
 
   return (
     <form onSubmit={onSubmit}>

@@ -1,7 +1,6 @@
 import {
   CandlestickSeriesPartialOptions,
   LineSeriesPartialOptions,
-  LineStyle,
 } from "lightweight-charts";
 
 // default candle stick series options
@@ -19,10 +18,11 @@ export const defaultCandleStickOptions: CandlestickSeriesPartialOptions = {
 
 // default line series options
 export const defaultLineOptions: LineSeriesPartialOptions = {
-  color: "yellow",
+  color: "#ffff00",
   priceLineVisible: false,
   lineWidth: 2,
   pointMarkersVisible: false,
+  lastValueVisible: false,
 };
 
 export const selectedLineOptions: LineSeriesPartialOptions = {
@@ -55,7 +55,7 @@ export const SeriesColors = [
   },
   {
     label: "yellow",
-    value: "#facc15",
+    value: "#ffff00",
   },
   {
     label: "green",

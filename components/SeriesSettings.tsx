@@ -1,8 +1,8 @@
 import { DialogFooter, DialogTitle } from "@/components/ui/dialog";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { DialogHeader } from "./ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Card, CardHeader, CardTitle, CardFooter } from "./ui/card";
+import { Card, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { CustomDialogContentContext } from "./CustomDialogContent";
 import { AppDispatch, RootState } from "@/store";
@@ -12,7 +12,11 @@ import { cn } from "@/lib/utils";
 import PropertySettingsForm from "./PropertySettingsForm";
 import SeriesDataForm from "./SeriesDataForm";
 
-export const CommonFooter = () => {
+interface CommonFooterProps {
+  onConfirm: () => void;
+}
+
+export const CommonFooter: React.FC<CommonFooterProps> = ({ onConfirm }) => {
   return (
     <>
       <div className="absolute left-6 flex gap-2">
@@ -29,7 +33,9 @@ export const CommonFooter = () => {
       <Button type="button" variant={"outline"} size="sm">
         Cancel
       </Button>
-      <Button size="sm">Confirm</Button>
+      <Button size="sm" onClick={onConfirm}>
+        Confirm
+      </Button>
     </>
   );
 };
@@ -39,17 +45,16 @@ const TABS = [
     tabLabel: "Property",
     title: "Property settings",
     id: "property",
-    com: <PropertySettingsForm />,
   },
   {
     tabLabel: "Series Data",
     title: "Data settings",
     id: "seriesData",
-    com: <SeriesDataForm />,
   },
 ];
 
 const SeriesSettings = () => {
+  const [currentTab, setCurrentTab] = useState("property");
   const { dragControls } = useContext(CustomDialogContentContext);
   const { mousePressing } = useSelector((state: RootState) => state.common);
   const dispatch = useDispatch<AppDispatch>();
@@ -58,6 +63,10 @@ const SeriesSettings = () => {
     dispatch(toggleMousePressing(true));
   };
   const endDrag = () => dispatch(toggleMousePressing(false));
+
+  const onConfirm = () => {
+    console.log("current tab:", currentTab);
+  };
 
   useEffect(() => {
     document.addEventListener("pointerup", endDrag);
@@ -74,7 +83,11 @@ const SeriesSettings = () => {
       >
         <DialogTitle className="select-none">Series Settings</DialogTitle>
       </DialogHeader>
-      <Tabs defaultValue={TABS[0].id} className="cursor-auto">
+      <Tabs
+        className="cursor-auto"
+        value={currentTab}
+        onValueChange={setCurrentTab}
+      >
         <TabsList className="grid w-full grid-cols-2">
           {TABS.map((tab) => (
             <TabsTrigger value={tab.id} key={`tab_${tab.id}`}>
@@ -88,13 +101,17 @@ const SeriesSettings = () => {
               <CardHeader>
                 <CardTitle className="select-none">{tab.title}</CardTitle>
               </CardHeader>
-              {tab.com}
+              {tab.id === "property" ? (
+                <PropertySettingsForm />
+              ) : (
+                <SeriesDataForm />
+              )}
             </Card>
           </TabsContent>
         ))}
       </Tabs>
       <DialogFooter className="mt-2">
-        <CommonFooter />
+        <CommonFooter onConfirm={onConfirm} />
       </DialogFooter>
     </>
   );

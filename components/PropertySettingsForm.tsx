@@ -3,7 +3,7 @@ import {
   LineWidthOptions,
   LineStyleOptions,
 } from "@/constants/seriesOptions";
-import { titleCase } from "@/utils/helpers";
+import { textCase, titleCase } from "@/utils/helpers";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import {
@@ -14,12 +14,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PropertySettingsFormValueType } from "./interfaces/SeriesSettings";
 import { CardContent } from "./ui/card";
-import { CommonFooter } from "./SeriesSettings";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { getDefaultLineOptions } from "@/utils/storage";
+import { LineSeriesPartialOptions, LineStyle } from "lightweight-charts";
 
 const PropertySettingsForm = () => {
+  const { selectedSeries } = useSelector((state: RootState) => state.common);
+
   const [formValue, setFormValue] = useState<PropertySettingsFormValueType>({
     seriesLabel: "",
     showLabel: false,
@@ -32,6 +37,22 @@ const PropertySettingsForm = () => {
     e.preventDefault();
     console.log(formValue);
   };
+
+  useEffect(() => {
+    if (!selectedSeries) throw new Error("Missing selectedSeries!");
+    const options = selectedSeries.options() as LineSeriesPartialOptions;
+    const defaultLineOptions = getDefaultLineOptions();
+    console.log("wawawa");
+
+    setFormValue({
+      ...formValue,
+      seriesLabel: options.title!,
+      showLabel: options.showLabel!,
+      seriesColor: options.color!,
+      lineWidth: `${(options.lineWidth as number) - 2}`,
+      // lineStyle: textCase(LineStyle[options.lineStyle!]),
+    });
+  }, []);
 
   return (
     <form onSubmit={onSubmit}>
