@@ -45,7 +45,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <Comp
         className={cn(
-          "dark:text-white active:scale-90",
+          "dark:text-white active:scale-90 select-none",
           buttonVariants({ variant, size, className })
         )}
         style={{ transition: "0.3s" }}

@@ -147,8 +147,6 @@ const PropertySettingsForm = () => {
           </div>
         </div>
       </CardContent>
-      {/* Card footer */}
-      <CommonFooter />
     </form>
   );
 };

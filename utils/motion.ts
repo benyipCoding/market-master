@@ -12,7 +12,7 @@ export const customDialogContentPopIn = () => {
       x: "-50%",
       y: "-50%",
       scale: 0,
-      opacity: 0.5,
+      opacity: 0,
     },
     show: {
       x: "-50%",

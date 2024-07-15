@@ -1,4 +1,4 @@
-import { DialogTitle } from "@/components/ui/dialog";
+import { DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import React, { useContext, useEffect } from "react";
 import { DialogHeader } from "./ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -14,15 +14,15 @@ import SeriesDataForm from "./SeriesDataForm";
 
 export const CommonFooter = () => {
   return (
-    <CardFooter className="flex justify-end gap-2 relative">
-      <Button
-        type="button"
-        variant={"ghost"}
-        className="absolute left-6"
-        size="sm"
-      >
-        Reset
-      </Button>
+    <>
+      <div className="absolute left-6 flex gap-2">
+        <Button type="button" variant={"outline"} size="sm">
+          Reset
+        </Button>
+        <Button type="button" variant={"outline"} size="sm">
+          Set Default
+        </Button>
+      </div>
       <Button type="button" variant={"secondary"} size="sm">
         Apply
       </Button>
@@ -30,7 +30,7 @@ export const CommonFooter = () => {
         Cancel
       </Button>
       <Button size="sm">Confirm</Button>
-    </CardFooter>
+    </>
   );
 };
 
@@ -93,6 +93,9 @@ const SeriesSettings = () => {
           </TabsContent>
         ))}
       </Tabs>
+      <DialogFooter className="mt-2">
+        <CommonFooter />
+      </DialogFooter>
     </>
   );
 };

@@ -11,7 +11,6 @@ import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "@/components/ui/input";
 import { FaMinus, FaPlus } from "react-icons/fa6";
-import { CommonFooter } from "./SeriesSettings";
 import { CardContent } from "./ui/card";
 import { format } from "date-fns";
 import { SeriesDataFormValueType } from "./interfaces/SeriesSettings";
@@ -94,7 +93,7 @@ const SeriesDataForm = () => {
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {formValue[item.timeProp] ? (
-                        format(formValue[item.timeProp], "yyyy-MM-dd HH:mm:ss")
+                        formValue[item.timeProp]
                       ) : (
                         <span>Pick a date</span>
                       )}
@@ -107,13 +106,27 @@ const SeriesDataForm = () => {
                       <Input
                         placeholder={item.timeInputPlaceholder}
                         className="pl-8"
+                        value={formValue[item.timeProp]}
+                        onChange={(e) =>
+                          setFormValue({
+                            ...formValue,
+                            [item.timeProp]: e.target.value,
+                          })
+                        }
                       />
                     </div>
                     <Calendar
                       mode="single"
                       selected={formValue[item.timeProp]}
                       onSelect={(date) =>
-                        setFormValue({ ...formValue, [item.timeProp]: date })
+                        // setFormValue({ ...formValue, [item.timeProp]: date })
+                        setFormValue({
+                          ...formValue,
+                          [item.timeProp]: format(
+                            date as Date,
+                            "yyyy-MM-dd HH:mm:ss"
+                          ),
+                        })
                       }
                       initialFocus
                       disabled={(date) =>
@@ -128,8 +141,6 @@ const SeriesDataForm = () => {
           ))}
         </div>
       </CardContent>
-      {/* Card footer */}
-      <CommonFooter />
     </form>
   );
 };
