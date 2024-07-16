@@ -45,11 +45,13 @@ const TABS = [
     tabLabel: "Property",
     title: "Property settings",
     id: "property",
+    com: <PropertySettingsForm />,
   },
   {
     tabLabel: "Series Data",
     title: "Data settings",
     id: "seriesData",
+    com: <SeriesDataForm />,
   },
 ];
 
@@ -101,11 +103,7 @@ const SeriesSettings = () => {
               <CardHeader>
                 <CardTitle className="select-none">{tab.title}</CardTitle>
               </CardHeader>
-              {tab.id === "property" ? (
-                <PropertySettingsForm />
-              ) : (
-                <SeriesDataForm />
-              )}
+              {tab.com}
             </Card>
           </TabsContent>
         ))}

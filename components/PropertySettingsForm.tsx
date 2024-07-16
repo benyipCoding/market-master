@@ -39,20 +39,20 @@ const PropertySettingsForm = () => {
   };
 
   useEffect(() => {
-    if (!selectedSeries) throw new Error("Missing selectedSeries!");
+    if (!selectedSeries) return;
     const options = selectedSeries.options() as LineSeriesPartialOptions;
-    const defaultLineOptions = getDefaultLineOptions();
-    console.log("wawawa");
+    // const defaultLineOptions = getDefaultLineOptions();
 
-    setFormValue({
-      ...formValue,
-      seriesLabel: options.title!,
-      showLabel: options.showLabel!,
-      seriesColor: options.color!,
-      lineWidth: `${(options.lineWidth as number) - 2}`,
-      // lineStyle: textCase(LineStyle[options.lineStyle!]),
-    });
-  }, []);
+    Promise.resolve().then(() =>
+      setFormValue({
+        seriesLabel: options.title!,
+        showLabel: options.showLabel!,
+        seriesColor: options.color!,
+        lineWidth: `${(options.lineWidth as number) - 2}`,
+        lineStyle: textCase(LineStyle[options.lineStyle!]),
+      })
+    );
+  }, [selectedSeries]);
 
   return (
     <form onSubmit={onSubmit}>
