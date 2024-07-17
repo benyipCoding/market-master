@@ -25,16 +25,6 @@ export const defaultLineOptions: LineSeriesPartialOptions = {
   lastValueVisible: false,
 };
 
-export const selectedLineOptions: LineSeriesPartialOptions = {
-  lineWidth: 4,
-  pointMarkersVisible: true,
-};
-
-export const hoveringLineOptions: LineSeriesPartialOptions = {
-  lineWidth: 3,
-  pointMarkersVisible: true,
-};
-
 export const SeriesColors = [
   {
     label: "white",

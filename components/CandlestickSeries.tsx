@@ -1,6 +1,7 @@
 "use client";
 import { useSeries } from "@/hooks/useSeries";
 import { CandlestickSeriesProps } from "./interfaces/CandlestickSeries";
+import { memo } from "react";
 
 const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   seriesData,
@@ -11,4 +12,6 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   return null;
 };
 
-export default CandlestickSeries;
+const CandlestickSeriesWithMemo = memo(CandlestickSeries);
+
+export default CandlestickSeriesWithMemo;

@@ -6,9 +6,11 @@ export function setDefaultLineOptions(options: LineSeriesPartialOptions) {
   return localStorage.setItem(DEFAULT_LINE_OPTIONS, JSON.stringify(options));
 }
 
-export function getDefaultLineOptions(): LineSeriesPartialOptions | null {
+export function getDefaultLineOptions(): LineSeriesPartialOptions {
   const options = localStorage.getItem(DEFAULT_LINE_OPTIONS);
-  return options ? JSON.parse(options) : null;
+  if (!options)
+    throw new Error("Missing default line options in localstorage!");
+  return JSON.parse(options);
 }
 
 export function hasDefaultLineOptions(): boolean {

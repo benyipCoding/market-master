@@ -14,17 +14,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { PropertySettingsFormValueType } from "./interfaces/SeriesSettings";
-import { CardContent } from "./ui/card";
+import { CardContent, CardFooter } from "./ui/card";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { getDefaultLineOptions } from "@/utils/storage";
 import { LineSeriesPartialOptions, LineStyle } from "lightweight-charts";
+import { CommonFooter } from "./SeriesSettings";
 
 const PropertySettingsForm = () => {
   const { selectedSeries } = useSelector((state: RootState) => state.common);
-
   const [formValue, setFormValue] = useState<PropertySettingsFormValueType>({
     seriesLabel: "",
     showLabel: false,
@@ -32,6 +32,19 @@ const PropertySettingsForm = () => {
     lineWidth: "",
     lineStyle: "",
   });
+
+  const formValueHasChanged = useMemo<boolean>(() => {
+    if (!selectedSeries) return false;
+
+    const options = selectedSeries.options() as LineSeriesPartialOptions;
+    return [
+      formValue.showLabel !== options.showLabel,
+      formValue.seriesLabel !== options.title,
+      formValue.lineWidth !== `${(options.lineWidth as number) - 2}`,
+      formValue.seriesColor !== options.color,
+      formValue.lineStyle !== textCase(LineStyle[options.lineStyle!]),
+    ].some(Boolean);
+  }, [formValue, selectedSeries]);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -53,6 +66,12 @@ const PropertySettingsForm = () => {
       })
     );
   }, [selectedSeries]);
+
+  useEffect(() => {
+    return () => {
+      console.log("组件被卸载");
+    };
+  }, []);
 
   return (
     <form onSubmit={onSubmit}>
@@ -168,6 +187,9 @@ const PropertySettingsForm = () => {
           </div>
         </div>
       </CardContent>
+      <CardFooter className="flex justify-end relative items-center gap-2">
+        <CommonFooter formValueHasChanged={formValueHasChanged} />
+      </CardFooter>
     </form>
   );
 };

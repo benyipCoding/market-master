@@ -13,29 +13,40 @@ import PropertySettingsForm from "./PropertySettingsForm";
 import SeriesDataForm from "./SeriesDataForm";
 
 interface CommonFooterProps {
-  onConfirm: () => void;
+  // onConfirm: () => void;
+  formValueHasChanged: boolean;
 }
 
-export const CommonFooter: React.FC<CommonFooterProps> = ({ onConfirm }) => {
+export const CommonFooter: React.FC<CommonFooterProps> = ({
+  formValueHasChanged,
+}) => {
   return (
     <>
       <div className="absolute left-6 flex gap-2">
-        <Button type="button" variant={"outline"} size="sm">
+        {/* <Button type="button" variant={"ghost"} size="sm">
           Reset
-        </Button>
-        <Button type="button" variant={"outline"} size="sm">
+        </Button> */}
+        <Button
+          type="button"
+          variant={"ghost"}
+          size="sm"
+          disabled={!formValueHasChanged}
+        >
           Set Default
         </Button>
       </div>
-      <Button type="button" variant={"secondary"} size="sm">
+      <Button
+        type="button"
+        variant={"secondary"}
+        size="sm"
+        disabled={!formValueHasChanged}
+      >
         Apply
       </Button>
       <Button type="button" variant={"outline"} size="sm">
         Cancel
       </Button>
-      <Button size="sm" onClick={onConfirm}>
-        Confirm
-      </Button>
+      <Button size="sm">Confirm</Button>
     </>
   );
 };
@@ -65,10 +76,6 @@ const SeriesSettings = () => {
     dispatch(toggleMousePressing(true));
   };
   const endDrag = () => dispatch(toggleMousePressing(false));
-
-  const onConfirm = () => {
-    console.log("current tab:", currentTab);
-  };
 
   useEffect(() => {
     document.addEventListener("pointerup", endDrag);
@@ -108,9 +115,9 @@ const SeriesSettings = () => {
           </TabsContent>
         ))}
       </Tabs>
-      <DialogFooter className="mt-2">
+      {/* <DialogFooter className="mt-2">
         <CommonFooter onConfirm={onConfirm} />
-      </DialogFooter>
+      </DialogFooter> */}
     </>
   );
 };

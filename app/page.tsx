@@ -68,12 +68,15 @@ const Home = () => {
 
   // get dummy candlestick data
   useEffect(() => {
+    console.log("page的挂载完成");
+
     getCandlestickData();
     if (!hasDefaultLineOptions()) setDefaultLineOptions(defaultLineOptions);
   }, []);
 
   useEffect(() => {
     if (!tChartRef.current?.chart) return;
+
     const { chart } = tChartRef.current!;
     // Subscribe event when chart init
     chart.subscribeCrosshairMove(throttle(crosshairMoveHandler, 0));

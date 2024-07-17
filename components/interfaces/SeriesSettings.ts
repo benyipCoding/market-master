@@ -1,5 +1,3 @@
-import { LineStyle } from "lightweight-charts";
-
 export interface PropertySettingsFormValueType {
   seriesLabel: string;
   showLabel: boolean;
