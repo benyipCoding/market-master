@@ -1,4 +1,4 @@
-import { DialogFooter, DialogTitle } from "@/components/ui/dialog";
+import { DialogTitle } from "@/components/ui/dialog";
 import React, { useContext, useEffect, useState } from "react";
 import { DialogHeader } from "./ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -11,21 +11,20 @@ import { toggleMousePressing } from "@/store/commonSlice";
 import { cn } from "@/lib/utils";
 import PropertySettingsForm from "./PropertySettingsForm";
 import SeriesDataForm from "./SeriesDataForm";
+import { SeriesSettingsProps } from "./interfaces/SeriesSettings";
 
 interface CommonFooterProps {
-  // onConfirm: () => void;
+  onCancel: () => void;
   formValueHasChanged: boolean;
 }
 
 export const CommonFooter: React.FC<CommonFooterProps> = ({
   formValueHasChanged,
+  onCancel,
 }) => {
   return (
     <>
       <div className="absolute left-6 flex gap-2">
-        {/* <Button type="button" variant={"ghost"} size="sm">
-          Reset
-        </Button> */}
         <Button
           type="button"
           variant={"ghost"}
@@ -43,7 +42,7 @@ export const CommonFooter: React.FC<CommonFooterProps> = ({
       >
         Apply
       </Button>
-      <Button type="button" variant={"outline"} size="sm">
+      <Button type="button" variant={"outline"} size="sm" onClick={onCancel}>
         Cancel
       </Button>
       <Button size="sm">Confirm</Button>
@@ -56,17 +55,19 @@ const TABS = [
     tabLabel: "Property",
     title: "Property settings",
     id: "property",
-    com: <PropertySettingsForm />,
+    // com: PropertySettingsForm,
   },
   {
     tabLabel: "Series Data",
     title: "Data settings",
     id: "seriesData",
-    com: <SeriesDataForm />,
+    // com: SeriesDataForm ,
   },
 ];
 
-const SeriesSettings = () => {
+const SeriesSettings: React.FC<SeriesSettingsProps> = ({
+  setDialogVisible,
+}) => {
   const [currentTab, setCurrentTab] = useState("property");
   const { dragControls } = useContext(CustomDialogContentContext);
   const { mousePressing } = useSelector((state: RootState) => state.common);
@@ -110,7 +111,11 @@ const SeriesSettings = () => {
               <CardHeader>
                 <CardTitle className="select-none">{tab.title}</CardTitle>
               </CardHeader>
-              {tab.com}
+              {tab.id === "property" ? (
+                <PropertySettingsForm setDialogVisible={setDialogVisible} />
+              ) : (
+                <SeriesDataForm setDialogVisible={setDialogVisible} />
+              )}
             </Card>
           </TabsContent>
         ))}

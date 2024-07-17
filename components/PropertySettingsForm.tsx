@@ -15,15 +15,19 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import React, { useEffect, useMemo, useState } from "react";
-import { PropertySettingsFormValueType } from "./interfaces/SeriesSettings";
+import {
+  PropertySettingsFormProps,
+  PropertySettingsFormValueType,
+} from "./interfaces/SeriesSettings";
 import { CardContent, CardFooter } from "./ui/card";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { getDefaultLineOptions } from "@/utils/storage";
 import { LineSeriesPartialOptions, LineStyle } from "lightweight-charts";
 import { CommonFooter } from "./SeriesSettings";
 
-const PropertySettingsForm = () => {
+const PropertySettingsForm: React.FC<PropertySettingsFormProps> = ({
+  setDialogVisible,
+}) => {
   const { selectedSeries } = useSelector((state: RootState) => state.common);
   const [formValue, setFormValue] = useState<PropertySettingsFormValueType>({
     seriesLabel: "",
@@ -66,12 +70,6 @@ const PropertySettingsForm = () => {
       })
     );
   }, [selectedSeries]);
-
-  useEffect(() => {
-    return () => {
-      console.log("组件被卸载");
-    };
-  }, []);
 
   return (
     <form onSubmit={onSubmit}>
@@ -188,7 +186,10 @@ const PropertySettingsForm = () => {
         </div>
       </CardContent>
       <CardFooter className="flex justify-end relative items-center gap-2">
-        <CommonFooter formValueHasChanged={formValueHasChanged} />
+        <CommonFooter
+          formValueHasChanged={formValueHasChanged}
+          onCancel={() => setDialogVisible(false)}
+        />
       </CardFooter>
     </form>
   );

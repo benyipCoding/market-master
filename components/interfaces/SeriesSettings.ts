@@ -8,7 +8,17 @@ export interface PropertySettingsFormValueType {
 
 export interface SeriesDataFormValueType extends Record<string, any> {
   startPointValue: string;
-  startPointTime: Date | undefined;
+  startPointTime: Date | string;
   endPointValue: string;
-  endPointTime: Date | undefined;
+  endPointTime: Date | string;
 }
+
+export interface CommonProps {
+  setDialogVisible: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export interface SeriesSettingsProps extends CommonProps {}
+
+export interface PropertySettingsFormProps extends CommonProps {}
+
+export interface SeriesDataFormProps extends CommonProps {}

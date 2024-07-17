@@ -1,12 +1,19 @@
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Calendar as CalendarIcon, Minus, Plus } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "@/components/ui/input";
-import { CardContent } from "./ui/card";
-import { SeriesDataFormValueType } from "./interfaces/SeriesSettings";
-import { format } from "date-fns";
+import { CardContent, CardFooter } from "./ui/card";
+import {
+  SeriesDataFormProps,
+  SeriesDataFormValueType,
+} from "./interfaces/SeriesSettings";
+import { CommonFooter } from "./SeriesSettings";
+import { LineData, Time } from "lightweight-charts";
+import { RootState } from "@/store";
+import { useSelector } from "react-redux";
+import { produce } from "immer";
 
 const FormItems = [
   {
@@ -25,13 +32,27 @@ const FormItems = [
   },
 ];
 
-const SeriesDataForm = () => {
+const SeriesDataForm: React.FC<SeriesDataFormProps> = ({
+  setDialogVisible,
+}) => {
+  const { selectedSeries } = useSelector((state: RootState) => state.common);
+
   const [formValue, setFormValue] = useState<SeriesDataFormValueType>({
     startPointValue: "",
-    startPointTime: undefined,
+    startPointTime: "",
     endPointValue: "",
-    endPointTime: undefined,
+    endPointTime: "",
   });
+
+  const formValueHasChanged = useMemo<boolean>(() => {
+    if (!selectedSeries) return false;
+
+    const seriesData = selectedSeries.data() as LineData<Time>[];
+    return [
+      formValue.startPointValue !== `${seriesData[0].value.toFixed(2)}`,
+      formValue.endPointValue !== `${seriesData[1].value.toFixed(2)}`,
+    ].some(Boolean);
+  }, [formValue, selectedSeries]);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -39,8 +60,19 @@ const SeriesDataForm = () => {
   };
 
   useEffect(() => {
-    console.log("sasasa");
-  }, []);
+    if (!selectedSeries) return;
+    const seriesData = selectedSeries.data() as LineData<Time>[];
+    console.log({ seriesData });
+
+    setFormValue(
+      produce(formValue, (formValue) => {
+        formValue.startPointTime = seriesData[0].time as string;
+        formValue.endPointTime = seriesData[1].time as string;
+        formValue.startPointValue = `${seriesData[0].value.toFixed(2)}`;
+        formValue.endPointValue = `${seriesData[1].value.toFixed(2)}`;
+      })
+    );
+  }, [selectedSeries]);
 
   return (
     <form onSubmit={onSubmit}>
@@ -59,7 +91,7 @@ const SeriesDataForm = () => {
               {/* Value */}
               <div className="flex w-full items-center gap-3">
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   size="icon"
                   className="h-8 w-8 shrink-0 rounded-full"
                   type="button"
@@ -78,7 +110,7 @@ const SeriesDataForm = () => {
                   }
                 />
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   size="icon"
                   className="h-8 w-8 shrink-0 rounded-full"
                   type="button"
@@ -92,20 +124,22 @@ const SeriesDataForm = () => {
                 <Button
                   variant={"outline"}
                   className="active:scale-100"
-                  disabled
+                  type="button"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {formValue[item.timeProp] ? (
-                    format(formValue[item.timeProp], "yyyy-MM-dd HH:mm:ss")
-                  ) : (
-                    <span>Pick a date</span>
-                  )}
+                  {formValue[item.timeProp]}
                 </Button>
               </div>
             </div>
           ))}
         </div>
       </CardContent>
+      <CardFooter className="flex justify-end relative items-center gap-2">
+        <CommonFooter
+          formValueHasChanged={formValueHasChanged}
+          onCancel={() => setDialogVisible(false)}
+        />
+      </CardFooter>
     </form>
   );
 };

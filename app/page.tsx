@@ -19,17 +19,12 @@ import {
   setMouseClickEventParam,
   setMouseDblClickEventParam,
   setMouseMovingEventParam,
-  toggleMousePressing,
 } from "@/store/commonSlice";
 import Tooltips from "@/components/Tooltips";
 import { Dialog } from "@/components/ui/dialog";
 import SeriesSettings from "@/components/SeriesSettings";
 import CustomDialogContent from "@/components/CustomDialogContent";
-import {
-  getDefaultLineOptions,
-  hasDefaultLineOptions,
-  setDefaultLineOptions,
-} from "@/utils/storage";
+import { hasDefaultLineOptions, setDefaultLineOptions } from "@/utils/storage";
 import { defaultLineOptions } from "@/constants/seriesOptions";
 
 const Home = () => {
@@ -68,8 +63,6 @@ const Home = () => {
 
   // get dummy candlestick data
   useEffect(() => {
-    console.log("page的挂载完成");
-
     getCandlestickData();
     if (!hasDefaultLineOptions()) setDefaultLineOptions(defaultLineOptions);
   }, []);
@@ -98,7 +91,7 @@ const Home = () => {
         >
           <CandlestickSeries
             seriesData={candlestickData}
-            customSeriesOptions={{ id: "XAU/USD" }}
+            customSeriesOptions={{ id: "XAU/USD", toFixedNum: 2 }}
           />
           {drawedLineList.map((lineOption) => (
             <LineSeries customSeriesOptions={lineOption} key={lineOption.id} />
@@ -111,7 +104,7 @@ const Home = () => {
         <CustomDialogContent
           dragConstraints={tChartRef.current?.chartContainer!}
         >
-          <SeriesSettings />
+          <SeriesSettings setDialogVisible={setDialogVisible} />
         </CustomDialogContent>
       </Dialog>
     </>

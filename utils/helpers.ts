@@ -22,9 +22,11 @@ export const calcValue = (
   chart: IChartApi
 ) => {
   const [x, y] = calcMouseCoordinate(mouseEvent, chartContainer);
-  const valueY = series.coordinateToPrice(y);
+  const toFixedNum = series.options().toFixedNum;
+  const valueY = +series.coordinateToPrice(y)!.toFixed(toFixedNum);
   const valueX = chart.timeScale().coordinateToTime(x);
   const logic = chart.timeScale().coordinateToLogical(x);
+
   return [valueX, valueY, x, y, logic];
 };
 

@@ -15,6 +15,7 @@ declare module "lightweight-charts" {
   interface SeriesOptionsCommon {
     id: string;
     showLabel: boolean;
+    toFixedNum: number;
   }
 }
 export interface IEnableDrawingLine {
