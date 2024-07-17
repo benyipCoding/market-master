@@ -55,6 +55,10 @@ const PropertySettingsForm: React.FC<PropertySettingsFormProps> = ({
     console.log(formValue);
   };
 
+  const onApply = () => {
+    console.log(formValue);
+  };
+
   useEffect(() => {
     if (!selectedSeries) return;
     const options = selectedSeries.options() as LineSeriesPartialOptions;
@@ -69,7 +73,7 @@ const PropertySettingsForm: React.FC<PropertySettingsFormProps> = ({
         lineStyle: textCase(LineStyle[options.lineStyle!]),
       })
     );
-  }, [selectedSeries]);
+  }, []);
 
   return (
     <form onSubmit={onSubmit}>
@@ -189,6 +193,8 @@ const PropertySettingsForm: React.FC<PropertySettingsFormProps> = ({
         <CommonFooter
           formValueHasChanged={formValueHasChanged}
           onCancel={() => setDialogVisible(false)}
+          onApply={onApply}
+          onSetDefault={() => {}}
         />
       </CardFooter>
     </form>

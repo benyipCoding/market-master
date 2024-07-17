@@ -1,6 +1,9 @@
 import { ChartContext } from "@/components/TChart";
 import { defaultCandleStickOptions } from "@/constants/seriesOptions";
-import { getDefaultLineOptions } from "@/utils/storage";
+import {
+  getDefaultCandlestickOptions,
+  getDefaultLineOptions,
+} from "@/utils/storage";
 import {
   ISeriesApi,
   OhlcData,
@@ -36,7 +39,8 @@ export const useSeries = <T>(
       case "Candlestick":
         setSeries(
           chart.addCandlestickSeries(
-            Object.assign({}, defaultCandleStickOptions, customOptions)
+            // Object.assign({}, defaultCandleStickOptions, customOptions)
+            Object.assign({}, getDefaultCandlestickOptions(), customOptions)
           )
         );
         break;

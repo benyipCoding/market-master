@@ -15,12 +15,16 @@ import { SeriesSettingsProps } from "./interfaces/SeriesSettings";
 
 interface CommonFooterProps {
   onCancel: () => void;
+  onApply: () => void;
+  onSetDefault: () => void;
   formValueHasChanged: boolean;
 }
 
 export const CommonFooter: React.FC<CommonFooterProps> = ({
   formValueHasChanged,
   onCancel,
+  onApply,
+  onSetDefault,
 }) => {
   return (
     <>
@@ -30,6 +34,7 @@ export const CommonFooter: React.FC<CommonFooterProps> = ({
           variant={"ghost"}
           size="sm"
           disabled={!formValueHasChanged}
+          onClick={onSetDefault}
         >
           Set Default
         </Button>
@@ -39,6 +44,7 @@ export const CommonFooter: React.FC<CommonFooterProps> = ({
         variant={"secondary"}
         size="sm"
         disabled={!formValueHasChanged}
+        onClick={onApply}
       >
         Apply
       </Button>

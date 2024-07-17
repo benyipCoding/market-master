@@ -62,8 +62,6 @@ const SeriesDataForm: React.FC<SeriesDataFormProps> = ({
   useEffect(() => {
     if (!selectedSeries) return;
     const seriesData = selectedSeries.data() as LineData<Time>[];
-    console.log({ seriesData });
-
     setFormValue(
       produce(formValue, (formValue) => {
         formValue.startPointTime = seriesData[0].time as string;
@@ -72,7 +70,7 @@ const SeriesDataForm: React.FC<SeriesDataFormProps> = ({
         formValue.endPointValue = `${seriesData[1].value.toFixed(2)}`;
       })
     );
-  }, [selectedSeries]);
+  }, []);
 
   return (
     <form onSubmit={onSubmit}>
@@ -138,6 +136,8 @@ const SeriesDataForm: React.FC<SeriesDataFormProps> = ({
         <CommonFooter
           formValueHasChanged={formValueHasChanged}
           onCancel={() => setDialogVisible(false)}
+          onApply={() => {}}
+          onSetDefault={() => {}}
         />
       </CardFooter>
     </form>
