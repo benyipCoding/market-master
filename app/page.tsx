@@ -9,7 +9,7 @@ import {
   MouseEventParams,
   Time,
 } from "lightweight-charts";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { throttle } from "@/utils/helpers";
 import { TChartRef } from "@/components/interfaces/TChart";
 import Buttons from "@/components/Buttons";
@@ -26,12 +26,17 @@ import SeriesSettings from "@/components/SeriesSettings";
 import CustomDialogContent from "@/components/CustomDialogContent";
 import { DialogContentType } from "@/store/dialogSlice";
 import TechnicalIndexForm from "@/components/TechnicalIndexForm";
+import { cn } from "@/lib/utils";
 
 const Home = () => {
   // TChart component instance
   const tChartRef = useRef<TChartRef>(null);
   const dispatch = useDispatch<AppDispatch>();
   const { dialogContent } = useSelector((state: RootState) => state.dialog);
+  const hideOverlay = useMemo(
+    () => dialogContent === DialogContentType.DrawedLineSettings,
+    [dialogContent]
+  );
 
   const [candlestickData, setCandlestickData] = useState<
     CandlestickData<Time>[]
@@ -75,7 +80,6 @@ const Home = () => {
     chart.subscribeCrosshairMove(throttle(crosshairMoveHandler, 0));
     chart.subscribeClick(chartClickHandler);
     chart.subscribeDblClick(chartDblClickHandler);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tChartRef.current?.chart]);
 
   return (
@@ -107,7 +111,7 @@ const Home = () => {
       <Dialog onOpenChange={setDialogVisible} open={dialogVisible}>
         <CustomDialogContent
           dragConstraints={tChartRef.current?.chartContainer!}
-          overlayClass="bg-transparent"
+          overlayClass={cn(hideOverlay && "bg-transparent")}
         >
           {dialogContent === DialogContentType.DrawedLineSettings && (
             <SeriesSettings setDialogVisible={setDialogVisible} />
