@@ -62,6 +62,7 @@ const LineSeries: React.FC<LineSeriesProps> = ({
         };
 
         setCurrentSeriesOptions(newCurrentSeriesOptions);
+        console.log({ newCurrentSeriesOptions });
 
         series?.applyOptions({
           ...newCurrentSeriesOptions,

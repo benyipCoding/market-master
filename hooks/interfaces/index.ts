@@ -16,6 +16,7 @@ declare module "lightweight-charts" {
     id: string;
     showLabel: boolean;
     toFixedNum: number;
+    customTitle: string;
   }
 }
 export interface IEnableDrawingLine {

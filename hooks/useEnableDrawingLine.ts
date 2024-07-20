@@ -51,7 +51,10 @@ export const useEnableDrawingLine = ({
 
     const lineId = `${childSeries[0].options().id}_line_${Date.now()}`;
     setDrawingLineId(lineId);
-    setDrawedLineList([...drawedLineList, { id: lineId, showLabel: false }]);
+    setDrawedLineList([
+      ...drawedLineList,
+      { id: lineId, showLabel: false, customTitle: "" },
+    ]);
 
     const currentCandlestick = mouseMovingEventParam?.seriesData.get(
       childSeries[0]

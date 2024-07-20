@@ -31,9 +31,6 @@ export const useSeries = <T>(
   const { chart, setChildSeries } = useContext(ChartContext);
   const [series, setSeries] = useState<ISeriesApi<SeriesType, Time>>();
 
-  // set localstorage when default options do not existed
-
-  // dispatch series
   useEffect(() => {
     if (!chart) return;
     switch (type) {
@@ -51,7 +48,6 @@ export const useSeries = <T>(
           setDefaultCandlestickOptions(defaultCandleStickOptions);
         setSeries(
           chart.addCandlestickSeries(
-            // Object.assign({}, defaultCandleStickOptions, customOptions)
             Object.assign({}, getDefaultCandlestickOptions(), customOptions)
           )
         );

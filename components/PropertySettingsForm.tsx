@@ -47,10 +47,11 @@ const PropertySettingsForm: React.FC<PropertySettingsFormProps> = ({
     lineStyle: "",
   });
   const { emittery } = useContext(EmitteryContext);
+  const [trigger, setTrigger] = useState(0);
 
   const options = useMemo<LineSeriesPartialOptions>(
     () => selectedSeries?.options()!,
-    [selectedSeries?.options()]
+    [selectedSeries?.options(), trigger]
   );
 
   const formValueHasChanged = useMemo<boolean>(() => {
@@ -58,8 +59,8 @@ const PropertySettingsForm: React.FC<PropertySettingsFormProps> = ({
 
     return [
       formValue.showLabel !== options.showLabel,
-      formValue.seriesLabel !== options.title,
-      // formValue.lineWidth !== `${(options.lineWidth as number) - 2}`,
+      formValue.seriesLabel !== options.customTitle,
+      formValue.lineWidth !== `${(options.lineWidth as number) - 2}`,
       formValue.seriesColor !== options.color,
       formValue.lineStyle !== textCase(LineStyle[options.lineStyle!]),
     ].some(Boolean);
@@ -67,7 +68,8 @@ const PropertySettingsForm: React.FC<PropertySettingsFormProps> = ({
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formValue);
+    onApply();
+    setDialogVisible(false);
   };
 
   const onApply = () => {
@@ -76,7 +78,7 @@ const PropertySettingsForm: React.FC<PropertySettingsFormProps> = ({
     const payload: LineSeriesPartialOptions & EmitterEventType = {
       id: options.id,
       color: formValue.seriesColor,
-      title: formValue.seriesLabel,
+      customTitle: formValue.seriesLabel,
       lineWidth: +formValue.lineWidth as LineWidth,
       lineStyle: LineStyle[
         titleCase(formValue.lineStyle) as any
@@ -86,22 +88,18 @@ const PropertySettingsForm: React.FC<PropertySettingsFormProps> = ({
     };
 
     emittery?.emit(OnApply.Property, payload);
-  };
 
-  // const onRoger = () => {
-  // setTrigger((prev) => prev + 1);
-  // setTimeout(() => {
-  //   console.log(formValue);
-  //   console.log(selectedSeries?.options().title);
-  // }, 500);
-  // };
+    Promise.resolve().then(() => {
+      setTrigger((prev) => prev + 1);
+    });
+  };
 
   useEffect(() => {
     if (!selectedSeries) return;
 
     Promise.resolve().then(() =>
       setFormValue({
-        seriesLabel: options.title!,
+        seriesLabel: options.customTitle!,
         showLabel: options.showLabel!,
         seriesColor: options.color!,
         lineWidth: `${(options.lineWidth as number) - 2}`,
