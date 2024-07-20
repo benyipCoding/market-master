@@ -1,6 +1,6 @@
 import { AppDispatch, RootState } from "@/store";
 import { setSelectedSeries, toggleDrawing } from "@/store/commonSlice";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ButtonsProps } from "./interfaces/Buttons";
 import hotkeys from "hotkeys-js";
@@ -36,8 +36,6 @@ const Buttons: React.FC<ButtonsProps> = ({
 
   const contextmenuHandler = (e: MouseEvent) => {
     e.preventDefault();
-    console.log("inside contextmenuHandler");
-
     dispatch(setSelectedSeries(null));
     dispatch(toggleDrawing(false));
 
