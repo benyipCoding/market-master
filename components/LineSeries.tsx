@@ -1,16 +1,19 @@
 "use client";
-import React, { useEffect, useMemo } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { useSeries } from "@/hooks/useSeries";
 import { LineSeriesProps } from "./interfaces/LineSeries";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import {
   DeepPartial,
-  ISeriesApi,
   LineSeriesPartialOptions,
   LineWidth,
-  Time,
 } from "lightweight-charts";
+import {
+  EmitterEventType,
+  EmitteryContext,
+  OnApply,
+} from "@/providers/EmitteryProvider";
 
 const LineSeries: React.FC<LineSeriesProps> = ({
   seriesData,
@@ -20,11 +23,9 @@ const LineSeries: React.FC<LineSeriesProps> = ({
     (state: RootState) => state.common
   );
   const { series } = useSeries("Line", seriesData, customSeriesOptions);
-
-  const currentSeriesOptions = useMemo<LineSeriesPartialOptions>(
-    () => (series as ISeriesApi<"Line", Time>)?.options(),
-    [series]
-  );
+  const { emittery } = useContext(EmitteryContext);
+  const [currentSeriesOptions, setCurrentSeriesOptions] =
+    useState<LineSeriesPartialOptions>();
 
   const hoveringOptions = useMemo(
     () => ({
@@ -46,15 +47,58 @@ const LineSeries: React.FC<LineSeriesProps> = ({
     [currentSeriesOptions]
   );
 
+  const applyHandler = (
+    payload: LineSeriesPartialOptions & EmitterEventType
+  ) => {
+    const curOptions = series?.options()!;
+    if (curOptions.id !== payload.id) return;
+    switch (payload.eventName) {
+      case OnApply.Property:
+        delete payload.eventName;
+        const newCurrentSeriesOptions: LineSeriesPartialOptions = {
+          ...curOptions,
+          ...payload,
+          pointMarkersVisible: false,
+        };
+
+        setCurrentSeriesOptions(newCurrentSeriesOptions);
+
+        series?.applyOptions({
+          ...newCurrentSeriesOptions,
+          lineWidth: (newCurrentSeriesOptions?.lineWidth! +
+            2) as DeepPartial<LineWidth>,
+          pointMarkersVisible: true,
+        });
+        break;
+
+      default:
+        break;
+    }
+  };
+
   useEffect(() => {
+    if (!series) return;
     if (series === selectedSeries) {
       series?.applyOptions(selectedOptions);
     } else if (series === hoveringSeries) {
       series?.applyOptions(hoveringOptions);
     } else {
-      series?.applyOptions(currentSeriesOptions);
+      series?.applyOptions(currentSeriesOptions!);
     }
-  }, [selectedSeries, series, hoveringSeries]);
+  }, [selectedSeries, hoveringSeries]);
+
+  useEffect(() => {
+    if (!series) return;
+    emittery?.on(OnApply.Property, applyHandler);
+
+    setCurrentSeriesOptions(series.options());
+  }, [series]);
+
+  useEffect(() => {
+    return () => {
+      emittery?.off(OnApply.Property, applyHandler);
+    };
+  }, []);
 
   return null;
 };

@@ -71,11 +71,6 @@ const Home = () => {
 
   // get dummy candlestick data
   useEffect(() => {
-    // set localstorage when default options do not existed
-    if (!hasDefaultLineOptions()) setDefaultLineOptions(defaultLineOptions);
-    if (!hasDefaultCandlestickOptions())
-      setDefaultCandlestickOptions(defaultCandleStickOptions);
-
     getCandlestickData();
   }, []);
 

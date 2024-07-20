@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import {
   PropertySettingsFormProps,
   PropertySettingsFormValueType,
@@ -22,8 +22,18 @@ import {
 import { CardContent, CardFooter } from "./ui/card";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { LineSeriesPartialOptions, LineStyle } from "lightweight-charts";
+import {
+  DeepPartial,
+  LineSeriesPartialOptions,
+  LineStyle,
+  LineWidth,
+} from "lightweight-charts";
 import { CommonFooter } from "./SeriesSettings";
+import {
+  EmitterEventType,
+  EmitteryContext,
+  OnApply,
+} from "@/providers/EmitteryProvider";
 
 const PropertySettingsForm: React.FC<PropertySettingsFormProps> = ({
   setDialogVisible,
@@ -36,19 +46,24 @@ const PropertySettingsForm: React.FC<PropertySettingsFormProps> = ({
     lineWidth: "",
     lineStyle: "",
   });
+  const { emittery } = useContext(EmitteryContext);
+
+  const options = useMemo<LineSeriesPartialOptions>(
+    () => selectedSeries?.options()!,
+    [selectedSeries?.options()]
+  );
 
   const formValueHasChanged = useMemo<boolean>(() => {
     if (!selectedSeries) return false;
 
-    const options = selectedSeries.options() as LineSeriesPartialOptions;
     return [
       formValue.showLabel !== options.showLabel,
       formValue.seriesLabel !== options.title,
-      formValue.lineWidth !== `${(options.lineWidth as number) - 2}`,
+      // formValue.lineWidth !== `${(options.lineWidth as number) - 2}`,
       formValue.seriesColor !== options.color,
       formValue.lineStyle !== textCase(LineStyle[options.lineStyle!]),
     ].some(Boolean);
-  }, [formValue, selectedSeries]);
+  }, [formValue, selectedSeries?.options()]);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -56,13 +71,33 @@ const PropertySettingsForm: React.FC<PropertySettingsFormProps> = ({
   };
 
   const onApply = () => {
-    console.log(formValue);
+    if (!formValueHasChanged) return;
+
+    const payload: LineSeriesPartialOptions & EmitterEventType = {
+      id: options.id,
+      color: formValue.seriesColor,
+      title: formValue.seriesLabel,
+      lineWidth: +formValue.lineWidth as LineWidth,
+      lineStyle: LineStyle[
+        titleCase(formValue.lineStyle) as any
+      ] as unknown as DeepPartial<LineStyle>,
+      showLabel: formValue.showLabel,
+      eventName: OnApply.Property,
+    };
+
+    emittery?.emit(OnApply.Property, payload);
   };
+
+  // const onRoger = () => {
+  // setTrigger((prev) => prev + 1);
+  // setTimeout(() => {
+  //   console.log(formValue);
+  //   console.log(selectedSeries?.options().title);
+  // }, 500);
+  // };
 
   useEffect(() => {
     if (!selectedSeries) return;
-    const options = selectedSeries.options() as LineSeriesPartialOptions;
-    // const defaultLineOptions = getDefaultLineOptions();
 
     Promise.resolve().then(() =>
       setFormValue({

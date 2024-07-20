@@ -1,6 +1,7 @@
 import {
   CandlestickSeriesPartialOptions,
   LineSeriesPartialOptions,
+  LineStyle,
 } from "lightweight-charts";
 
 // default candle stick series options

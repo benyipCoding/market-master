@@ -1,8 +1,15 @@
 import { ChartContext } from "@/components/TChart";
-import { defaultCandleStickOptions } from "@/constants/seriesOptions";
+import {
+  defaultCandleStickOptions,
+  defaultLineOptions,
+} from "@/constants/seriesOptions";
 import {
   getDefaultCandlestickOptions,
   getDefaultLineOptions,
+  hasDefaultCandlestickOptions,
+  hasDefaultLineOptions,
+  setDefaultCandlestickOptions,
+  setDefaultLineOptions,
 } from "@/utils/storage";
 import {
   ISeriesApi,
@@ -24,11 +31,14 @@ export const useSeries = <T>(
   const { chart, setChildSeries } = useContext(ChartContext);
   const [series, setSeries] = useState<ISeriesApi<SeriesType, Time>>();
 
+  // set localstorage when default options do not existed
+
   // dispatch series
   useEffect(() => {
     if (!chart) return;
     switch (type) {
       case "Line":
+        if (!hasDefaultLineOptions()) setDefaultLineOptions(defaultLineOptions);
         setSeries(
           chart.addLineSeries(
             Object.assign({}, getDefaultLineOptions(), customOptions)
@@ -37,6 +47,8 @@ export const useSeries = <T>(
         break;
 
       case "Candlestick":
+        if (!hasDefaultCandlestickOptions())
+          setDefaultCandlestickOptions(defaultCandleStickOptions);
         setSeries(
           chart.addCandlestickSeries(
             // Object.assign({}, defaultCandleStickOptions, customOptions)

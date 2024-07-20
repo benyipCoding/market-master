@@ -4,6 +4,8 @@ import "@/styles/globals.css";
 import StoreProvider from "@/providers/StoreProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { cn } from "@/lib/utils";
+import EmitteryProvider from "@/providers/EmitteryProvider";
+
 const fontSans = FontSans({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
@@ -30,7 +32,9 @@ export default function RootLayout({
           // enableSystem
           // disableTransitionOnChange
         >
-          <StoreProvider>{children}</StoreProvider>
+          <StoreProvider>
+            <EmitteryProvider>{children}</EmitteryProvider>
+          </StoreProvider>
         </ThemeProvider>
       </body>
     </html>
