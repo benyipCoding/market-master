@@ -5,7 +5,7 @@ import {
   DialogPortal,
   DialogTitle,
 } from "@/components/ui/dialog";
-import React, { PropsWithChildren } from "react";
+import React, { PropsWithChildren, useEffect } from "react";
 import { motion, useDragControls } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
@@ -27,6 +27,18 @@ const CustomDialogContent: React.FC<
     dragControls?.start(event);
     dispatch(toggleMousePressing(true));
   };
+
+  const endDrag = () => {
+    dispatch(toggleMousePressing(false));
+  };
+
+  useEffect(() => {
+    document.addEventListener("pointerup", endDrag);
+
+    return () => {
+      document.removeEventListener("pointerup", endDrag);
+    };
+  }, []);
 
   return (
     <DialogPortal>

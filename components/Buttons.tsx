@@ -36,12 +36,14 @@ const Buttons: React.FC<ButtonsProps> = ({
 
   const contextmenuHandler = (e: MouseEvent) => {
     e.preventDefault();
+    console.log("inside contextmenuHandler");
+
     dispatch(setSelectedSeries(null));
     dispatch(toggleDrawing(false));
 
     setTimeout(() => {
       document.removeEventListener("contextmenu", contextmenuHandler);
-    }, 500);
+    }, 50);
   };
 
   const openTechnicalIndexDialog = () => {

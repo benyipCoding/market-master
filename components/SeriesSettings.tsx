@@ -70,17 +70,6 @@ const SeriesSettings: React.FC<SeriesSettingsProps> = ({
 }) => {
   const [currentTab, setCurrentTab] = useState("property");
 
-  const dispatch = useDispatch<AppDispatch>();
-
-  const endDrag = () => dispatch(toggleMousePressing(false));
-
-  useEffect(() => {
-    document.addEventListener("pointerup", endDrag);
-    return () => {
-      document.removeEventListener("pointerup", endDrag);
-    };
-  }, []);
-
   return (
     <Tabs
       className="cursor-auto"

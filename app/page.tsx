@@ -109,17 +109,19 @@ const Home = () => {
       </div>
 
       <Dialog onOpenChange={setDialogVisible} open={dialogVisible}>
-        <CustomDialogContent
-          dragConstraints={tChartRef.current?.chartContainer!}
-          overlayClass={cn(hideOverlay && "bg-transparent")}
-        >
-          {dialogContent === DialogContentType.DrawedLineSettings && (
-            <SeriesSettings setDialogVisible={setDialogVisible} />
-          )}
-          {dialogContent === DialogContentType.TechnicalIndex && (
-            <TechnicalIndexForm setDialogVisible={setDialogVisible} />
-          )}
-        </CustomDialogContent>
+        {dialogVisible && (
+          <CustomDialogContent
+            dragConstraints={tChartRef.current?.chartContainer!}
+            overlayClass={cn(hideOverlay && "bg-transparent")}
+          >
+            {dialogContent === DialogContentType.DrawedLineSettings && (
+              <SeriesSettings setDialogVisible={setDialogVisible} />
+            )}
+            {dialogContent === DialogContentType.TechnicalIndex && (
+              <TechnicalIndexForm setDialogVisible={setDialogVisible} />
+            )}
+          </CustomDialogContent>
+        )}
       </Dialog>
     </>
   );
