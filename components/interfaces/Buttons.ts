@@ -10,4 +10,5 @@ export interface ButtonsProps {
   setDrawedLineList: React.Dispatch<
     React.SetStateAction<DeepPartial<LineStyleOptions & SeriesOptionsCommon>[]>
   >;
+  setDialogVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }

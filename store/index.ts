@@ -1,11 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import commonReducer from "./commonSlice";
-import TChartReducer from "./TChartSlice";
+import dialogReducer from "./dialogSlice";
 
 export const store = configureStore({
   reducer: {
     common: commonReducer,
-    // TChart: TChartReducer,
+    dialog: dialogReducer,
   },
   middleware: (defaultMiddleware) =>
     defaultMiddleware({ serializableCheck: false }),

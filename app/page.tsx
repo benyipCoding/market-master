@@ -13,8 +13,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { throttle } from "@/utils/helpers";
 import { TChartRef } from "@/components/interfaces/TChart";
 import Buttons from "@/components/Buttons";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
 import {
   setMouseClickEventParam,
   setMouseDblClickEventParam,
@@ -24,21 +24,14 @@ import Tooltips from "@/components/Tooltips";
 import { Dialog } from "@/components/ui/dialog";
 import SeriesSettings from "@/components/SeriesSettings";
 import CustomDialogContent from "@/components/CustomDialogContent";
-import {
-  hasDefaultCandlestickOptions,
-  hasDefaultLineOptions,
-  setDefaultCandlestickOptions,
-  setDefaultLineOptions,
-} from "@/utils/storage";
-import {
-  defaultCandleStickOptions,
-  defaultLineOptions,
-} from "@/constants/seriesOptions";
+import { DialogContentType } from "@/store/dialogSlice";
+import TechnicalIndexForm from "@/components/TechnicalIndexForm";
 
 const Home = () => {
   // TChart component instance
   const tChartRef = useRef<TChartRef>(null);
   const dispatch = useDispatch<AppDispatch>();
+  const { dialogContent } = useSelector((state: RootState) => state.dialog);
 
   const [candlestickData, setCandlestickData] = useState<
     CandlestickData<Time>[]
@@ -88,7 +81,11 @@ const Home = () => {
   return (
     <>
       <div className="h-full flex bg-black">
-        <Buttons tChartRef={tChartRef} setDrawedLineList={setDrawedLineList} />
+        <Buttons
+          tChartRef={tChartRef}
+          setDrawedLineList={setDrawedLineList}
+          setDialogVisible={setDialogVisible}
+        />
         <TChart
           className="w-full h-full m-auto"
           setDrawedLineList={setDrawedLineList}
@@ -110,8 +107,14 @@ const Home = () => {
       <Dialog onOpenChange={setDialogVisible} open={dialogVisible}>
         <CustomDialogContent
           dragConstraints={tChartRef.current?.chartContainer!}
+          overlayClass="bg-transparent"
         >
-          <SeriesSettings setDialogVisible={setDialogVisible} />
+          {dialogContent === DialogContentType.DrawedLineSettings && (
+            <SeriesSettings setDialogVisible={setDialogVisible} />
+          )}
+          {dialogContent === DialogContentType.TechnicalIndex && (
+            <TechnicalIndexForm setDialogVisible={setDialogVisible} />
+          )}
         </CustomDialogContent>
       </Dialog>
     </>

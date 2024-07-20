@@ -1,14 +1,10 @@
-import { DialogTitle } from "@/components/ui/dialog";
-import React, { useContext, useEffect, useState } from "react";
-import { DialogHeader } from "./ui/dialog";
+import React, { useEffect, useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
-import { CustomDialogContentContext } from "./CustomDialogContent";
-import { AppDispatch, RootState } from "@/store";
-import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "@/store";
+import { useDispatch } from "react-redux";
 import { toggleMousePressing } from "@/store/commonSlice";
-import { cn } from "@/lib/utils";
 import PropertySettingsForm from "./PropertySettingsForm";
 import SeriesDataForm from "./SeriesDataForm";
 import { SeriesSettingsProps } from "./interfaces/SeriesSettings";
@@ -61,13 +57,11 @@ const TABS = [
     tabLabel: "Property",
     title: "Property settings",
     id: "property",
-    // com: PropertySettingsForm,
   },
   {
     tabLabel: "Series Data",
     title: "Data settings",
     id: "seriesData",
-    // com: SeriesDataForm ,
   },
 ];
 
@@ -75,13 +69,9 @@ const SeriesSettings: React.FC<SeriesSettingsProps> = ({
   setDialogVisible,
 }) => {
   const [currentTab, setCurrentTab] = useState("property");
-  const { dragControls } = useContext(CustomDialogContentContext);
-  const { mousePressing } = useSelector((state: RootState) => state.common);
+
   const dispatch = useDispatch<AppDispatch>();
-  const startDrag = (event: React.PointerEvent<HTMLDivElement>) => {
-    dragControls?.start(event);
-    dispatch(toggleMousePressing(true));
-  };
+
   const endDrag = () => dispatch(toggleMousePressing(false));
 
   useEffect(() => {
@@ -92,44 +82,33 @@ const SeriesSettings: React.FC<SeriesSettingsProps> = ({
   }, []);
 
   return (
-    <>
-      <DialogHeader
-        className={cn("py-6 cursor-grab", mousePressing && "cursor-grabbing")}
-        onPointerDown={startDrag}
-      >
-        <DialogTitle className="select-none">Series Settings</DialogTitle>
-      </DialogHeader>
-      <Tabs
-        className="cursor-auto"
-        value={currentTab}
-        onValueChange={setCurrentTab}
-      >
-        <TabsList className="grid w-full grid-cols-2">
-          {TABS.map((tab) => (
-            <TabsTrigger value={tab.id} key={`tab_${tab.id}`}>
-              {tab.tabLabel}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+    <Tabs
+      className="cursor-auto"
+      value={currentTab}
+      onValueChange={setCurrentTab}
+    >
+      <TabsList className="grid w-full grid-cols-2">
         {TABS.map((tab) => (
-          <TabsContent value={tab.id} key={`content_${tab.id}`}>
-            <Card className="w-full">
-              <CardHeader>
-                <CardTitle className="select-none">{tab.title}</CardTitle>
-              </CardHeader>
-              {tab.id === "property" ? (
-                <PropertySettingsForm setDialogVisible={setDialogVisible} />
-              ) : (
-                <SeriesDataForm setDialogVisible={setDialogVisible} />
-              )}
-            </Card>
-          </TabsContent>
+          <TabsTrigger value={tab.id} key={`tab_${tab.id}`}>
+            {tab.tabLabel}
+          </TabsTrigger>
         ))}
-      </Tabs>
-      {/* <DialogFooter className="mt-2">
-        <CommonFooter onConfirm={onConfirm} />
-      </DialogFooter> */}
-    </>
+      </TabsList>
+      {TABS.map((tab) => (
+        <TabsContent value={tab.id} key={`content_${tab.id}`}>
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle className="select-none">{tab.title}</CardTitle>
+            </CardHeader>
+            {tab.id === "property" ? (
+              <PropertySettingsForm setDialogVisible={setDialogVisible} />
+            ) : (
+              <SeriesDataForm setDialogVisible={setDialogVisible} />
+            )}
+          </Card>
+        </TabsContent>
+      ))}
+    </Tabs>
   );
 };
 

@@ -1,13 +1,13 @@
 "use client";
 import { useSeries } from "@/hooks/useSeries";
 import { CandlestickSeriesProps } from "./interfaces/CandlestickSeries";
-import { memo } from "react";
+import { memo, useEffect } from "react";
 
 const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   seriesData,
   customSeriesOptions,
 }) => {
-  useSeries("Candlestick", seriesData, customSeriesOptions);
+  const { series } = useSeries("Candlestick", seriesData, customSeriesOptions);
 
   return null;
 };

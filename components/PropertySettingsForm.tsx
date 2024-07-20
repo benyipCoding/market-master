@@ -35,6 +35,7 @@ import {
   OnApply,
 } from "@/providers/EmitteryProvider";
 import { cn } from "@/lib/utils";
+import { produce } from "immer";
 
 const PropertySettingsForm: React.FC<PropertySettingsFormProps> = ({
   setDialogVisible,
@@ -87,6 +88,14 @@ const PropertySettingsForm: React.FC<PropertySettingsFormProps> = ({
       showLabel: formValue.showLabel,
       eventName: OnApply.Property,
     };
+
+    if (!payload.customTitle && payload.showLabel) {
+      payload.showLabel = false;
+      setFormValue({
+        ...formValue,
+        showLabel: false,
+      });
+    }
 
     emittery?.emit(OnApply.Property, payload);
 

@@ -34,6 +34,7 @@ import { useTheme } from "next-themes";
 import { ContextMenu, ContextMenuTrigger } from "./ui/context-menu";
 import TChartContextMenu from "./TChartContextMenu";
 import { TChartContextMenuRef } from "./interfaces/TChartContextMenu";
+import { DialogContentType, setDialogContent } from "@/store/dialogSlice";
 
 export const ChartContext = createContext<IChartContext>({});
 
@@ -160,7 +161,8 @@ const TChart: React.ForwardRefRenderFunction<
   // Mouse double click events (exclusive to light weight chart)
   useEffect(() => {
     if (!selectedSeries) return;
-    setDialogVisible(true);
+    dispatch(setDialogContent(DialogContentType.DrawedLineSettings)); // Confirm dialog content type
+    Promise.resolve().then(() => setDialogVisible(true));
   }, [mouseDblClickEventParam]);
 
   // Toggle light or dark mode

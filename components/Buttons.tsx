@@ -1,12 +1,17 @@
 import { AppDispatch, RootState } from "@/store";
 import { setSelectedSeries, toggleDrawing } from "@/store/commonSlice";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ButtonsProps } from "./interfaces/Buttons";
 import hotkeys from "hotkeys-js";
 import { Button } from "./ui/button";
+import { DialogContentType, setDialogContent } from "@/store/dialogSlice";
 
-const Buttons: React.FC<ButtonsProps> = ({ tChartRef, setDrawedLineList }) => {
+const Buttons: React.FC<ButtonsProps> = ({
+  tChartRef,
+  setDrawedLineList,
+  setDialogVisible,
+}) => {
   const dispatch = useDispatch<AppDispatch>();
   const { isDrawing, selectedSeries } = useSelector(
     (state: RootState) => state.common
@@ -39,12 +44,19 @@ const Buttons: React.FC<ButtonsProps> = ({ tChartRef, setDrawedLineList }) => {
     }, 500);
   };
 
-  // l hotkeys
+  const openTechnicalIndexDialog = () => {
+    dispatch(setDialogContent(DialogContentType.TechnicalIndex));
+    Promise.resolve().then(() => setDialogVisible(true));
+  };
+
+  // hotkeys
   useEffect(() => {
     hotkeys("l", toggleDrawingState);
+    hotkeys("i", openTechnicalIndexDialog);
 
     return () => {
       hotkeys.unbind("l");
+      hotkeys.unbind("i");
     };
   }, []);
 
