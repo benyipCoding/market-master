@@ -34,6 +34,7 @@ import {
   EmitteryContext,
   OnApply,
 } from "@/providers/EmitteryProvider";
+import { cn } from "@/lib/utils";
 
 const PropertySettingsForm: React.FC<PropertySettingsFormProps> = ({
   setDialogVisible,
@@ -117,9 +118,15 @@ const PropertySettingsForm: React.FC<PropertySettingsFormProps> = ({
             <Label htmlFor="seriesLabel" className="py-1 flex justify-between">
               Series Label
               {/* Extra checkbox */}
-              <Label className="flex items-center gap-2 cursor-pointer">
+              <Label
+                className={cn(
+                  "flex items-center gap-2 cursor-pointer",
+                  !formValue.seriesLabel && "text-gray-500"
+                )}
+              >
                 Show Label
                 <Checkbox
+                  disabled={!formValue.seriesLabel}
                   checked={formValue.showLabel}
                   onCheckedChange={(checked) =>
                     setFormValue({

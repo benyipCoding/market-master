@@ -8,12 +8,15 @@ import {
   DeepPartial,
   LineSeriesPartialOptions,
   LineWidth,
+  SeriesMarker,
+  Time,
 } from "lightweight-charts";
 import {
   EmitterEventType,
   EmitteryContext,
   OnApply,
 } from "@/providers/EmitteryProvider";
+import dayjs from "dayjs";
 
 const LineSeries: React.FC<LineSeriesProps> = ({
   seriesData,
@@ -47,6 +50,26 @@ const LineSeries: React.FC<LineSeriesProps> = ({
     [currentSeriesOptions]
   );
 
+  const setLabel = (options: LineSeriesPartialOptions) => {
+    series?.setMarkers([]);
+    const date = dayjs(series?.data()[1].time as string);
+    const markers: SeriesMarker<Time>[] = [
+      {
+        color: options.color!,
+        id: `${options.id}_label`,
+        position: "inBar",
+        shape: "circle",
+        time: {
+          year: date.year(),
+          month: date.month(),
+          day: date.day(),
+        },
+        text: options.customTitle,
+      },
+    ];
+    series?.setMarkers(markers);
+  };
+
   const applyHandler = (
     payload: LineSeriesPartialOptions & EmitterEventType
   ) => {
@@ -62,7 +85,6 @@ const LineSeries: React.FC<LineSeriesProps> = ({
         };
 
         setCurrentSeriesOptions(newCurrentSeriesOptions);
-        console.log({ newCurrentSeriesOptions });
 
         series?.applyOptions({
           ...newCurrentSeriesOptions,
@@ -70,6 +92,10 @@ const LineSeries: React.FC<LineSeriesProps> = ({
             2) as DeepPartial<LineWidth>,
           pointMarkersVisible: true,
         });
+
+        if (newCurrentSeriesOptions.showLabel)
+          setLabel(newCurrentSeriesOptions);
+        else series?.setMarkers([]);
         break;
 
       default:
