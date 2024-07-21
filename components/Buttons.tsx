@@ -46,7 +46,7 @@ const Buttons: React.FC<ButtonsProps> = ({
 
   const openTechnicalIndexDialog = () => {
     dispatch(setDialogContent(DialogContentType.TechnicalIndex));
-    Promise.resolve().then(() => setDialogVisible(true));
+    Promise.resolve().then(() => setDialogVisible((prev) => !prev));
   };
 
   // hotkeys

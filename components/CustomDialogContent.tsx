@@ -17,7 +17,7 @@ import { toggleMousePressing } from "@/store/commonSlice";
 
 const CustomDialogContent: React.FC<
   PropsWithChildren<CustomDialogContentProps>
-> = ({ children, dragConstraints, overlayClass }) => {
+> = ({ children, dragConstraints, overlayClass, motionDivClass }) => {
   const dragControls = useDragControls();
   const { mousePressing } = useSelector((state: RootState) => state.common);
   const { dialogContent } = useSelector((state: RootState) => state.dialog);
@@ -53,7 +53,8 @@ const CustomDialogContent: React.FC<
         dragConstraints={dragConstraints}
         dragTransition={{ power: 0 }}
         className={cn(
-          "fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg border bg-background p-6 shadow-lg sm:rounded-lg opacity-100 pt-0"
+          "fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg border bg-background p-6 shadow-lg sm:rounded-lg opacity-100 pt-0",
+          motionDivClass
         )}
       >
         <DialogHeader

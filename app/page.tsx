@@ -33,8 +33,12 @@ const Home = () => {
   const tChartRef = useRef<TChartRef>(null);
   const dispatch = useDispatch<AppDispatch>();
   const { dialogContent } = useSelector((state: RootState) => state.dialog);
-  const hideOverlay = useMemo(
+  const isDrawedLineSettings = useMemo(
     () => dialogContent === DialogContentType.DrawedLineSettings,
+    [dialogContent]
+  );
+  const isTechnicalIndex = useMemo(
+    () => dialogContent === DialogContentType.TechnicalIndex,
     [dialogContent]
   );
 
@@ -112,12 +116,13 @@ const Home = () => {
         {dialogVisible && (
           <CustomDialogContent
             dragConstraints={tChartRef.current?.chartContainer!}
-            overlayClass={cn(hideOverlay && "bg-transparent")}
+            overlayClass={cn(isDrawedLineSettings && "bg-transparent")}
+            motionDivClass={cn(isTechnicalIndex && "max-w-none w-fit")}
           >
-            {dialogContent === DialogContentType.DrawedLineSettings && (
+            {isDrawedLineSettings && (
               <SeriesSettings setDialogVisible={setDialogVisible} />
             )}
-            {dialogContent === DialogContentType.TechnicalIndex && (
+            {isTechnicalIndex && (
               <TechnicalIndexForm setDialogVisible={setDialogVisible} />
             )}
           </CustomDialogContent>

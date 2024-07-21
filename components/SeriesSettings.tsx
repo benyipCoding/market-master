@@ -1,10 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
-import { AppDispatch } from "@/store";
-import { useDispatch } from "react-redux";
-import { toggleMousePressing } from "@/store/commonSlice";
 import PropertySettingsForm from "./PropertySettingsForm";
 import SeriesDataForm from "./SeriesDataForm";
 import { SeriesSettingsProps } from "./interfaces/SeriesSettings";
@@ -57,11 +54,13 @@ const TABS = [
     tabLabel: "Property",
     title: "Property settings",
     id: "property",
+    com: PropertySettingsForm,
   },
   {
     tabLabel: "Series Data",
     title: "Data settings",
     id: "seriesData",
+    com: SeriesDataForm,
   },
 ];
 
@@ -83,20 +82,19 @@ const SeriesSettings: React.FC<SeriesSettingsProps> = ({
           </TabsTrigger>
         ))}
       </TabsList>
-      {TABS.map((tab) => (
-        <TabsContent value={tab.id} key={`content_${tab.id}`}>
-          <Card className="w-full">
-            <CardHeader>
-              <CardTitle className="select-none">{tab.title}</CardTitle>
-            </CardHeader>
-            {tab.id === "property" ? (
-              <PropertySettingsForm setDialogVisible={setDialogVisible} />
-            ) : (
-              <SeriesDataForm setDialogVisible={setDialogVisible} />
-            )}
-          </Card>
-        </TabsContent>
-      ))}
+      {TABS.map((tab) => {
+        const DynamicCom = tab.com;
+        return (
+          <TabsContent value={tab.id} key={`content_${tab.id}`}>
+            <Card className="w-full">
+              <CardHeader>
+                <CardTitle className="select-none">{tab.title}</CardTitle>
+              </CardHeader>
+              <DynamicCom setDialogVisible={setDialogVisible} />
+            </Card>
+          </TabsContent>
+        );
+      })}
     </Tabs>
   );
 };
