@@ -17,34 +17,4 @@ export const SidebarNavItems: SidebarNavItemType[] = [
     subTitle: "Moving average",
     icon: BarChartBig,
   },
-  {
-    title: "MA",
-    subTitle: "Moving average",
-    icon: LineChart,
-  },
-  {
-    title: "EMA",
-    subTitle: "Moving average",
-    icon: LineChart,
-  },
-  {
-    title: "MACD",
-    subTitle: "Moving average",
-    icon: BarChartBig,
-  },
-  {
-    title: "MA",
-    subTitle: "Moving average",
-    icon: LineChart,
-  },
-  {
-    title: "EMA",
-    subTitle: "Moving average",
-    icon: LineChart,
-  },
-  {
-    title: "MACD",
-    subTitle: "Moving average",
-    icon: BarChartBig,
-  },
 ];

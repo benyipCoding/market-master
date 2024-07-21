@@ -112,7 +112,11 @@ const Home = () => {
         </TChart>
       </div>
 
-      <Dialog onOpenChange={setDialogVisible} open={dialogVisible}>
+      <Dialog
+        onOpenChange={setDialogVisible}
+        open={dialogVisible}
+        modal={!isTechnicalIndex}
+      >
         {dialogVisible && (
           <CustomDialogContent
             dragConstraints={tChartRef.current?.chartContainer!}

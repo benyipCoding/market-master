@@ -26,6 +26,10 @@ import {
 import { SidebarNavItems } from "@/constants/technicalIndexList";
 import { ScrollArea } from "./ui/scroll-area";
 
+const tags = Array.from({ length: 50 }).map(
+  (_, i, a) => `v1.2.0-beta.${a.length - i}`
+);
+
 const TechnicalIndexForm: React.FC<TechnicalIndexFormProps> = ({
   setDialogVisible,
 }) => {
@@ -38,10 +42,10 @@ const TechnicalIndexForm: React.FC<TechnicalIndexFormProps> = ({
   };
 
   return (
-    <div className="flex gap-3">
-      <aside className="flex flex-col gap-2 min-w-60 h-96">
+    <div className="flex gap-3 min-h-[50vh]">
+      <aside className="flex flex-col gap-2 min-w-72">
         <Input />
-        <ScrollArea>
+        <ScrollArea thumbClass="dark:bg-primary-foreground">
           <div
             className={cn(
               "flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1"
@@ -72,44 +76,42 @@ const TechnicalIndexForm: React.FC<TechnicalIndexFormProps> = ({
           </div>
         </ScrollArea>
       </aside>
-      <div className="flex-1 w-fit">
-        <Card className="min-w-96">
-          <CardHeader>
-            <CardTitle>Moving average</CardTitle>
-            <CardDescription>
-              Deploy your new project in one-click.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form>
-              <div className="grid w-full items-center gap-4">
-                <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="name">Name</Label>
-                  <Input id="name" placeholder="Name of your project" />
-                </div>
-                <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="framework">Framework</Label>
-                  <Select>
-                    <SelectTrigger id="framework">
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent position="popper">
-                      <SelectItem value="next">Next.js</SelectItem>
-                      <SelectItem value="sveltekit">SvelteKit</SelectItem>
-                      <SelectItem value="astro">Astro</SelectItem>
-                      <SelectItem value="nuxt">Nuxt.js</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+      <Card className="min-w-96">
+        <CardHeader>
+          <CardTitle>Moving average</CardTitle>
+          <CardDescription>
+            Deploy your new project in one-click.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form>
+            <div className="grid w-full items-center gap-4">
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="name">Name</Label>
+                <Input id="name" placeholder="Name of your project" />
               </div>
-            </form>
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="outline">Cancel</Button>
-            <Button>Deploy</Button>
-          </CardFooter>
-        </Card>
-      </div>
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="framework">Framework</Label>
+                <Select>
+                  <SelectTrigger id="framework">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    <SelectItem value="next">Next.js</SelectItem>
+                    <SelectItem value="sveltekit">SvelteKit</SelectItem>
+                    <SelectItem value="astro">Astro</SelectItem>
+                    <SelectItem value="nuxt">Nuxt.js</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </form>
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <Button variant="outline">Cancel</Button>
+          <Button>Deploy</Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 };
