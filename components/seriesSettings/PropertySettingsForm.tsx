@@ -18,8 +18,8 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import {
   PropertySettingsFormProps,
   PropertySettingsFormValueType,
-} from "./interfaces/SeriesSettings";
-import { CardContent, CardFooter } from "./ui/card";
+} from "../interfaces/SeriesSettings";
+import { CardContent, CardFooter } from "../ui/card";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import {
@@ -35,7 +35,6 @@ import {
   OnApply,
 } from "@/providers/EmitteryProvider";
 import { cn } from "@/lib/utils";
-import { produce } from "immer";
 
 const PropertySettingsForm: React.FC<PropertySettingsFormProps> = ({
   setDialogVisible,

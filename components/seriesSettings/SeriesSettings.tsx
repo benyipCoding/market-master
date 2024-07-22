@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Card, CardHeader, CardTitle } from "./ui/card";
-import { Button } from "./ui/button";
-import PropertySettingsForm from "./PropertySettingsForm";
-import SeriesDataForm from "./SeriesDataForm";
-import { SeriesSettingsProps } from "./interfaces/SeriesSettings";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import PropertySettingsForm from "@/components/seriesSettings/PropertySettingsForm";
+import SeriesDataForm from "@/components/seriesSettings/SeriesDataForm";
+import { SeriesSettingsProps } from "@/components/interfaces/SeriesSettings";
 
 interface CommonFooterProps {
   onCancel: () => void;

@@ -9,42 +9,12 @@ export const SidebarNavItems: SidebarNavItemType[] = [
   },
   {
     title: "EMA",
-    subTitle: "Moving average",
+    subTitle: "Exponential Moving Average",
     icon: LineChart,
   },
   {
     title: "MACD",
-    subTitle: "Moving average",
-    icon: BarChartBig,
-  },
-  {
-    title: "MA1",
-    subTitle: "Moving average",
-    icon: LineChart,
-  },
-  {
-    title: "EMA1",
-    subTitle: "Moving average",
-    icon: LineChart,
-  },
-  {
-    title: "MACD1",
-    subTitle: "Moving average",
-    icon: BarChartBig,
-  },
-  {
-    title: "MA2",
-    subTitle: "Moving average",
-    icon: LineChart,
-  },
-  {
-    title: "EMA2",
-    subTitle: "Moving average",
-    icon: LineChart,
-  },
-  {
-    title: "MACD2",
-    subTitle: "Moving average",
+    subTitle: "Moving Average Convergence/Divergence",
     icon: BarChartBig,
   },
 ];

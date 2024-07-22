@@ -22,10 +22,10 @@ import {
 } from "@/store/commonSlice";
 import Tooltips from "@/components/Tooltips";
 import { Dialog } from "@/components/ui/dialog";
-import SeriesSettings from "@/components/SeriesSettings";
+import SeriesSettings from "@/components/seriesSettings/SeriesSettings";
 import CustomDialogContent from "@/components/CustomDialogContent";
 import { DialogContentType } from "@/store/dialogSlice";
-import TechnicalIndexForm from "@/components/TechnicalIndexForm";
+import TechnicalIndexForm from "@/components/technicalIndex/TechnicalIndexForm";
 import { cn } from "@/lib/utils";
 
 const Playground = () => {
