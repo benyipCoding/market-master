@@ -8,12 +8,7 @@ import { Info } from "lucide-react";
 import React, { useState } from "react";
 import { CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-
-interface CommonHeaderProps {
-  title: string;
-  titleClass?: string;
-  description: string;
-}
+import { CommonHeaderProps } from "../interfaces/TechnicalIndexForm";
 
 const CommonHeader: React.FC<CommonHeaderProps> = ({
   title,
@@ -32,7 +27,7 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
               <span className="pointer-events-none absolute top-0 right-0"></span>
             </TooltipTrigger>
             <Info
-              className="absolute top-0 right-0 text-gray-400 cursor-pointer"
+              className="absolute top-0 right-0 text-gray-400 dark:text-gray-500 cursor-pointer"
               size={20}
               onClick={() => setTooltipOpen(true)}
             />

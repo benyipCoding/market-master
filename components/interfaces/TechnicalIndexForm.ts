@@ -11,3 +11,9 @@ export type SidebarNavItemType = {
     Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
   >;
 };
+
+export interface CommonHeaderProps {
+  title: string;
+  titleClass?: string;
+  description: string;
+}
