@@ -4,4 +4,5 @@ export interface TChartContextMenuRef {
 
 export interface TChartContextMenuProps {
   setDialogVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  dialogVisible: boolean;
 }

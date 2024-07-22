@@ -28,7 +28,7 @@ import { DialogContentType } from "@/store/dialogSlice";
 import TechnicalIndexForm from "@/components/TechnicalIndexForm";
 import { cn } from "@/lib/utils";
 
-const Home = () => {
+const Playground = () => {
   // TChart component instance
   const tChartRef = useRef<TChartRef>(null);
   const dispatch = useDispatch<AppDispatch>();
@@ -88,7 +88,7 @@ const Home = () => {
 
   return (
     <>
-      <div className="h-full flex bg-black">
+      <div className="h-full flex">
         <Buttons
           tChartRef={tChartRef}
           setDrawedLineList={setDrawedLineList}
@@ -100,6 +100,7 @@ const Home = () => {
           drawedLineList={drawedLineList}
           ref={tChartRef}
           setDialogVisible={setDialogVisible}
+          dialogVisible={dialogVisible}
         >
           <CandlestickSeries
             seriesData={candlestickData}
@@ -136,4 +137,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Playground;

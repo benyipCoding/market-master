@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-
 import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { Label } from "@/components/ui/label";
@@ -25,10 +24,7 @@ import {
 } from "./interfaces/TechnicalIndexForm";
 import { SidebarNavItems } from "@/constants/technicalIndexList";
 import { ScrollArea } from "./ui/scroll-area";
-
-const tags = Array.from({ length: 50 }).map(
-  (_, i, a) => `v1.2.0-beta.${a.length - i}`
-);
+import { Search } from "lucide-react";
 
 const TechnicalIndexForm: React.FC<TechnicalIndexFormProps> = ({
   setDialogVisible,
@@ -42,15 +38,22 @@ const TechnicalIndexForm: React.FC<TechnicalIndexFormProps> = ({
   };
 
   return (
-    <div className="flex gap-3 min-h-[50vh]">
+    <div className="flex gap-3 max-h-[60vh] min-h-[50vh]">
       <aside className="flex flex-col gap-2 min-w-72">
-        <Input />
-        <ScrollArea thumbClass="dark:bg-primary-foreground">
-          <div
-            className={cn(
-              "flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1"
-            )}
-          >
+        <div className="relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Search index..."
+            className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
+          />
+        </div>
+
+        <ScrollArea
+          thumbClass="dark:bg-primary-foreground"
+          className="border rounded-md"
+        >
+          <div className={cn("flex flex-col space-x-0 space-y-1")}>
             {SidebarNavItems.map((item, index) => {
               const IconComponent = item.icon;
               return (

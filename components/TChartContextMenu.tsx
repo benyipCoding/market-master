@@ -23,7 +23,7 @@ import { DialogContentType, setDialogContent } from "@/store/dialogSlice";
 const TChartContextMenu: React.ForwardRefRenderFunction<
   TChartContextMenuRef,
   TChartContextMenuProps
-> = ({ setDialogVisible }, ref) => {
+> = ({ setDialogVisible, dialogVisible }, ref) => {
   const [seriesSettingsDisable, setSeriesSettingsDisable] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -40,7 +40,7 @@ const TChartContextMenu: React.ForwardRefRenderFunction<
     <ContextMenuContent className="w-64">
       <ContextMenuItem
         inset
-        disabled={seriesSettingsDisable}
+        disabled={seriesSettingsDisable || dialogVisible}
         onSelect={openSeriesSettingsDialog}
       >
         Series Settings...

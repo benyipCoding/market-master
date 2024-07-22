@@ -17,6 +17,7 @@ export interface TChartProps {
   drawable?: boolean;
   drawedLineList: LineSeriesPartialOptions[];
   setDialogVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  dialogVisible: boolean;
 }
 
 export interface IChartContext {
@@ -30,4 +31,5 @@ export interface TChartRef {
   chart: IChartApi;
   childSeries: ISeriesApi<SeriesType, Time>[];
   chartContainer: React.RefObject<HTMLDivElement>;
+  dialogVisible: boolean;
 }

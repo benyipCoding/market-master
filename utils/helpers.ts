@@ -30,7 +30,7 @@ export const calcValue = (
   return [valueX, valueY, x, y, logic];
 };
 
-type AnyFunction = (...args: any[]) => any;
+export type AnyFunction = (...args: any[]) => any;
 
 export function throttle<T extends AnyFunction>(func: T, wait: number): T {
   let flag = true;

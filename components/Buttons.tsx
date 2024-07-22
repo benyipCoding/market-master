@@ -19,8 +19,8 @@ const Buttons: React.FC<ButtonsProps> = ({
 
   const onDeleteSeries = useCallback(() => {
     if (!tChartRef.current) return;
-    const { chart } = tChartRef.current;
-    if (!selectedSeries) return;
+    const { chart, dialogVisible } = tChartRef.current;
+    if (!selectedSeries || dialogVisible) return;
     chart.removeSeries(selectedSeries);
     const { id } = selectedSeries.options();
     setDrawedLineList((prev) =>
@@ -30,12 +30,18 @@ const Buttons: React.FC<ButtonsProps> = ({
   }, [selectedSeries]);
 
   const toggleDrawingState = useCallback(() => {
+    if (!tChartRef.current) return;
+    const { dialogVisible } = tChartRef.current;
+    if (dialogVisible) return;
     dispatch(setSelectedSeries(null));
     dispatch(toggleDrawing(!isDrawing));
   }, [isDrawing]);
 
   const contextmenuHandler = (e: MouseEvent) => {
     e.preventDefault();
+    if (!tChartRef.current) return;
+    const { dialogVisible } = tChartRef.current;
+    if (dialogVisible) return;
     dispatch(setSelectedSeries(null));
     dispatch(toggleDrawing(false));
 

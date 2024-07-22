@@ -42,7 +42,14 @@ const TChart: React.ForwardRefRenderFunction<
   TChartRef,
   PropsWithChildren<TChartProps>
 > = (
-  { children, className, setDrawedLineList, drawedLineList, setDialogVisible },
+  {
+    children,
+    className,
+    setDrawedLineList,
+    drawedLineList,
+    setDialogVisible,
+    dialogVisible,
+  },
   ref
 ) => {
   const container = useRef<HTMLDivElement>(null);
@@ -188,10 +195,11 @@ const TChart: React.ForwardRefRenderFunction<
     chart: chart!,
     childSeries: childSeries,
     chartContainer: container,
+    dialogVisible,
   }));
 
   return (
-    <ContextMenu onOpenChange={setContextMenuVisible} modal={false}>
+    <ContextMenu onOpenChange={setContextMenuVisible} modal={true}>
       <ContextMenuTrigger
         disabled={contextMenuTriggerDisable}
         className={clsx(
@@ -224,6 +232,7 @@ const TChart: React.ForwardRefRenderFunction<
       <TChartContextMenu
         ref={contextMenuRef}
         setDialogVisible={setDialogVisible}
+        dialogVisible={dialogVisible}
       />
     </ContextMenu>
   );
