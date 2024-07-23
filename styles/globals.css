@@ -59,6 +59,10 @@
   }
 }
 
+.form-item {
+  @apply flex flex-col space-y-1.5
+}
+
 html,
 body,
 :root {

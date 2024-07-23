@@ -1,18 +1,17 @@
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import CommonHeader from "./CommonHeader";
+import LinePattern from "../commonFormItem/LinePattern";
+import NameItem from "../commonFormItem/NameItem";
 
 const EMASettings = () => {
+  const [formValue, setFormValue] = useState({
+    name: "",
+    lineWidth: "",
+    lineStyle: "",
+  });
+
   return (
     <>
       <CommonHeader
@@ -22,24 +21,23 @@ const EMASettings = () => {
       <CardContent>
         <form>
           <div className="grid w-full items-center gap-4">
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" placeholder="Name of your project" />
-            </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="framework">Framework</Label>
-              <Select>
-                <SelectTrigger id="framework">
-                  <SelectValue placeholder="Select" />
-                </SelectTrigger>
-                <SelectContent position="popper">
-                  <SelectItem value="next">Next.js</SelectItem>
-                  <SelectItem value="sveltekit">SvelteKit</SelectItem>
-                  <SelectItem value="astro">Astro</SelectItem>
-                  <SelectItem value="nuxt">Nuxt.js</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <NameItem
+              itemLabel="Indicator Name"
+              placeholder="Name of the indicator"
+              inputValue={formValue.name}
+              setInputValue={(name) => setFormValue({ ...formValue, name })}
+            />
+
+            <LinePattern
+              lineWidth={formValue.lineWidth}
+              lineStyle={formValue.lineStyle}
+              setLineWidth={(lineWidth) =>
+                setFormValue({ ...formValue, lineWidth })
+              }
+              setLineStyle={(lineStyle) =>
+                setFormValue({ ...formValue, lineStyle })
+              }
+            />
           </div>
         </form>
       </CardContent>

@@ -78,7 +78,7 @@ const SeriesDataForm: React.FC<SeriesDataFormProps> = ({
         <div className="grid w-full items-center gap-2">
           {/* Start point & End point */}
           {FormItems.map((item) => (
-            <div className="flex flex-col space-y-1.5 gap-1" key={item.label}>
+            <div className="form-item gap-1" key={item.label}>
               {/* Label */}
               <Label
                 htmlFor="seriesLabel"

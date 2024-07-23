@@ -38,7 +38,7 @@ export const SeriesColors = [
 
   {
     label: "red",
-    value: "#dc2626",
+    value: "#ff0000",
   },
   {
     label: "orange",
