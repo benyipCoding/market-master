@@ -1,30 +1,41 @@
 import { cn } from "@/lib/utils";
 import React, { useMemo, useState } from "react";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "../ui/card";
+import { Card } from "@/components/ui/card";
+import { TechnicalIndexFormProps } from "@/components/interfaces/TechnicalIndexForm";
 import {
-  SidebarNavItemType,
-  TechnicalIndexFormProps,
-} from "../interfaces/TechnicalIndexForm";
-import { SidebarNavItems } from "@/constants/technicalIndexList";
-import { ScrollArea } from "../ui/scroll-area";
+  TechnicalIndexItemTitleType,
+  TechnicalIndexItemType,
+  TechnicalIndexList,
+} from "@/constants/technicalIndexList";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search } from "lucide-react";
-import MASettings from "./MASettings";
-import EMASettings from "./EMASettings";
-import MACDSettings from "./MACDSettings";
+import {
+  MASettings,
+  EMASettings,
+  MACDSettings,
+} from "@/components/technicalIndex";
+
+const EmptyState = () => {
+  return (
+    <div className="h-full flex justify-center items-center text-gray-400 dark:text-gray-500 text-xl font-semibold">
+      Select a technical indicator
+    </div>
+  );
+};
 
 const TechnicalIndexForm: React.FC<TechnicalIndexFormProps> = ({
   setDialogVisible,
 }) => {
-  const [currentTab, setCurrentTab] = useState<string>(
-    SidebarNavItems[0].title
-  );
+  const [currentTab, setCurrentTab] = useState<
+    TechnicalIndexItemTitleType | ""
+  >("");
   const [searchInput, setSearchInput] = useState("");
 
   const displayIndexList = useMemo(
     () =>
-      SidebarNavItems.filter(
+      TechnicalIndexList.filter(
         (item) =>
           item.title.includes(searchInput.toUpperCase()) ||
           item.subTitle.includes(searchInput.toUpperCase()) ||
@@ -34,12 +45,12 @@ const TechnicalIndexForm: React.FC<TechnicalIndexFormProps> = ({
     [searchInput]
   );
 
-  const onNavItemClick = (item: SidebarNavItemType) => {
+  const onNavItemClick = (item: TechnicalIndexItemType) => {
     setCurrentTab(item.title);
   };
 
   return (
-    <div className="flex gap-3 max-h-[60vh] min-h-[50vh]">
+    <div className="flex gap-3 h-[30rem] w-[50rem]">
       <aside className="flex flex-col gap-2">
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -85,7 +96,8 @@ const TechnicalIndexForm: React.FC<TechnicalIndexFormProps> = ({
           </div>
         )}
       </aside>
-      <Card className="min-w-[25vw]">
+      <Card className="w-full">
+        {!currentTab && <EmptyState />}
         {currentTab === "MA" && <MASettings />}
         {currentTab === "EMA" && <EMASettings />}
         {currentTab === "MACD" && <MACDSettings />}

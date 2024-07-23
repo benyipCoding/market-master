@@ -1,7 +1,6 @@
-import { SidebarNavItemType } from "@/components/interfaces/TechnicalIndexForm";
 import { LineChart, BarChartBig } from "lucide-react";
 
-export const SidebarNavItems: SidebarNavItemType[] = [
+export const TechnicalIndexList = [
   {
     title: "MA",
     subTitle: "Moving average",
@@ -17,4 +16,7 @@ export const SidebarNavItems: SidebarNavItemType[] = [
     subTitle: "Moving Average Convergence/Divergence",
     icon: BarChartBig,
   },
-];
+] as const;
+
+export type TechnicalIndexItemType = (typeof TechnicalIndexList)[number];
+export type TechnicalIndexItemTitleType = TechnicalIndexItemType["title"];
