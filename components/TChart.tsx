@@ -6,7 +6,6 @@ import {
 } from "@/constants/chartOptions";
 import { useEnableDrawingLine } from "@/hooks/useEnableDrawingLine";
 import { AppDispatch, RootState } from "@/store";
-import clsx from "clsx";
 import {
   createChart,
   IChartApi,
@@ -35,6 +34,7 @@ import { ContextMenu, ContextMenuTrigger } from "./ui/context-menu";
 import TChartContextMenu from "./TChartContextMenu";
 import { TChartContextMenuRef } from "./interfaces/TChartContextMenu";
 import { DialogContentType, setDialogContent } from "@/store/dialogSlice";
+import { cn } from "@/lib/utils";
 
 export const ChartContext = createContext<IChartContext>({});
 
@@ -202,7 +202,7 @@ const TChart: React.ForwardRefRenderFunction<
     <ContextMenu onOpenChange={setContextMenuVisible} modal={true}>
       <ContextMenuTrigger
         disabled={contextMenuTriggerDisable}
-        className={clsx(
+        className={cn(
           "relative block",
           className,
           isCanGrab && "cursor-grab",
@@ -212,7 +212,7 @@ const TChart: React.ForwardRefRenderFunction<
         ref={container}
         // Only unselected series can trigger the line drawing function
         onMouseDown={(e) =>
-          hoveringPoint
+          hoveringPoint && !isDrawing
             ? changeSelectedSeries(
                 e as MouseEvent | React.MouseEvent<HTMLDivElement, MouseEvent>
               )

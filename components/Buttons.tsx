@@ -1,5 +1,9 @@
 import { AppDispatch, RootState } from "@/store";
-import { setSelectedSeries, toggleDrawing } from "@/store/commonSlice";
+import {
+  setHoveringSeries,
+  setSelectedSeries,
+  toggleDrawing,
+} from "@/store/commonSlice";
 import React, { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ButtonsProps } from "./interfaces/Buttons";
@@ -34,6 +38,7 @@ const Buttons: React.FC<ButtonsProps> = ({
     const { dialogVisible } = tChartRef.current;
     if (dialogVisible) return;
     dispatch(setSelectedSeries(null));
+    dispatch(setHoveringSeries(null));
     dispatch(toggleDrawing(!isDrawing));
   }, [isDrawing]);
 

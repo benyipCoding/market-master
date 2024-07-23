@@ -50,7 +50,7 @@ export const SeriesColors = [
   },
   {
     label: "green",
-    value: "#22c55e",
+    value: "#00ff00",
   },
   {
     label: "aqua",
