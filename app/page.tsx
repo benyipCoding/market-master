@@ -9,13 +9,7 @@ import {
   MouseEventParams,
   Time,
 } from "lightweight-charts";
-import React, {
-  createContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { throttle } from "@/utils/helpers";
 import { TChartRef } from "@/components/interfaces/TChart";
 import Buttons from "@/components/Buttons";
@@ -33,14 +27,7 @@ import CustomDialogContent from "@/components/CustomDialogContent";
 import { DialogContentType } from "@/store/dialogSlice";
 import TechnicalIndexForm from "@/components/technicalIndex/TechnicalIndexForm";
 import { cn } from "@/lib/utils";
-
-interface IDialogContext {
-  setDialogVisible: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-export const DialogContext = createContext<IDialogContext>({
-  setDialogVisible: () => {},
-});
+import { DialogContext } from "@/context/Dialog";
 
 const Playground = () => {
   // TChart component instance

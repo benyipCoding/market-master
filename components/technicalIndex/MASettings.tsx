@@ -2,13 +2,13 @@ import React, { useContext, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import CommonHeader from "./CommonHeader";
-import { DialogContext } from "@/app/page";
 import ColorSelector from "../commonFormItem/ColorSelector";
 import LinePattern from "../commonFormItem/LinePattern";
 import NameItem from "../commonFormItem/NameItem";
 import PeriodItem, { CalculatePriceType } from "../commonFormItem/PeriodItem";
 import { EMAFormValue } from "../interfaces/TechnicalIndexForm";
 import { SeriesColorType } from "@/constants/seriesOptions";
+import { DialogContext } from "@/context/Dialog";
 
 const MASettings = () => {
   const { setDialogVisible } = useContext(DialogContext);

@@ -6,9 +6,9 @@ import LinePattern from "../commonFormItem/LinePattern";
 import NameItem from "../commonFormItem/NameItem";
 import PeriodItem, { CalculatePriceType } from "../commonFormItem/PeriodItem";
 import ColorSelector from "../commonFormItem/ColorSelector";
-import { DialogContext } from "@/app/page";
 import { EMAFormValue } from "../interfaces/TechnicalIndexForm";
 import { SeriesColorType } from "@/constants/seriesOptions";
+import { DialogContext } from "@/context/Dialog";
 
 const EMASettings = () => {
   const { setDialogVisible } = useContext(DialogContext);

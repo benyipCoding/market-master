@@ -22,7 +22,7 @@ import {
 import LinePattern from "../commonFormItem/LinePattern";
 import ColorSelector from "../commonFormItem/ColorSelector";
 import NameItem from "../commonFormItem/NameItem";
-import { DialogContext } from "@/app/page";
+import { DialogContext } from "@/context/Dialog";
 
 const PropertySettingsForm: React.FC<PropertySettingsFormProps> = () => {
   const { setDialogVisible } = useContext(DialogContext);

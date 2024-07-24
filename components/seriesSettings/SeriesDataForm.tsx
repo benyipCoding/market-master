@@ -14,7 +14,7 @@ import { LineData, Time } from "lightweight-charts";
 import { RootState } from "@/store";
 import { useSelector } from "react-redux";
 import { produce } from "immer";
-import { DialogContext } from "@/app/page";
+import { DialogContext } from "@/context/Dialog";
 
 const FormItems = [
   {
