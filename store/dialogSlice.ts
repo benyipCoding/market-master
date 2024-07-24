@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export enum DialogContentType {
   DrawedLineSettings = "Series Settings",
-  TechnicalIndex = "Technical Index",
+  TechnicalIndex = "Technical Indicator",
 }
 
 interface DialogSliceState {
