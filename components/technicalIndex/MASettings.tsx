@@ -1,53 +1,94 @@
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import React from "react";
+import React, { useContext, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
-
 import CommonHeader from "./CommonHeader";
+import { DialogContext } from "@/app/page";
+import ColorSelector from "../commonFormItem/ColorSelector";
+import LinePattern from "../commonFormItem/LinePattern";
+import NameItem from "../commonFormItem/NameItem";
+import PeriodItem, { CalculatePriceType } from "../commonFormItem/PeriodItem";
+import { EMAFormValue } from "../interfaces/TechnicalIndexForm";
+import { SeriesColorType } from "@/constants/seriesOptions";
 
 const MASettings = () => {
+  const { setDialogVisible } = useContext(DialogContext);
+
+  const [formValue, setFormValue] = useState<EMAFormValue>({
+    name: "",
+    lineWidth: "2",
+    lineStyle: "solid",
+    period: "20",
+    calculatePrice: "close",
+    seriesColor: "#ffff00",
+    indicator: "MA",
+  });
+
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log(formValue);
+  };
+
   return (
     <>
       <CommonHeader
         title="Moving Average"
         description="A moving average is a technical indicator that investors and traders use to determine the trend direction of securities."
       />
-      <CardContent>
-        <form>
+      <form onSubmit={onSubmit}>
+        <CardContent>
           <div className="grid w-full items-center gap-4">
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" placeholder="Name of your project" />
-            </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="framework">Framework</Label>
-              <Select>
-                <SelectTrigger id="framework">
-                  <SelectValue placeholder="Select" />
-                </SelectTrigger>
-                <SelectContent position="popper">
-                  <SelectItem value="next">Next.js</SelectItem>
-                  <SelectItem value="sveltekit">SvelteKit</SelectItem>
-                  <SelectItem value="astro">Astro</SelectItem>
-                  <SelectItem value="nuxt">Nuxt.js</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <NameItem
+              itemLabel="Indicator Name"
+              placeholder="Name of the indicator"
+              inputValue={formValue.name}
+              setInputValue={(name) => setFormValue({ ...formValue, name })}
+            />
+
+            <PeriodItem
+              period={formValue.period}
+              setPeriod={(period) => setFormValue({ ...formValue, period })}
+              calculatePrice={formValue.calculatePrice}
+              setCalculatePrice={(price) =>
+                setFormValue({
+                  ...formValue,
+                  calculatePrice: price as CalculatePriceType,
+                })
+              }
+            />
+
+            <ColorSelector
+              seriesColor={formValue.seriesColor}
+              setSeriesColor={(color) =>
+                setFormValue({
+                  ...formValue,
+                  seriesColor: color as SeriesColorType,
+                })
+              }
+            />
+
+            <LinePattern
+              lineWidth={formValue.lineWidth}
+              lineStyle={formValue.lineStyle}
+              setLineWidth={(lineWidth) =>
+                setFormValue({ ...formValue, lineWidth })
+              }
+              setLineStyle={(lineStyle) =>
+                setFormValue({ ...formValue, lineStyle })
+              }
+            />
           </div>
-        </form>
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline">Cancel</Button>
-        <Button>Deploy</Button>
-      </CardFooter>
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <Button
+            variant="outline"
+            type="button"
+            onClick={() => setDialogVisible(false)}
+          >
+            Cancel
+          </Button>
+          <Button>Confirm</Button>
+        </CardFooter>
+      </form>
     </>
   );
 };

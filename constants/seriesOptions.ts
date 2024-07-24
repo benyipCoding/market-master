@@ -76,8 +76,11 @@ export const SeriesColors = [
     label: "black",
     value: "#000",
   },
-];
+] as const;
 
-export const LineWidthOptions = [1, 2, 3, 4];
+export type SeriesColorItem = (typeof SeriesColors)[number];
+export type SeriesColorType = SeriesColorItem["value"];
+
+export const LineWidthOptions = [1, 2, 3, 4] as const;
 
 export const LineStyleOptions = ["solid", "dashed", "dotted"];

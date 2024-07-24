@@ -13,9 +13,7 @@ export interface SeriesDataFormValueType extends Record<string, any> {
   endPointTime: Date | string;
 }
 
-export interface CommonProps {
-  setDialogVisible: React.Dispatch<React.SetStateAction<boolean>>;
-}
+export interface CommonProps {}
 
 export interface SeriesSettingsProps extends CommonProps {}
 

@@ -64,9 +64,7 @@ const TABS = [
   },
 ];
 
-const SeriesSettings: React.FC<SeriesSettingsProps> = ({
-  setDialogVisible,
-}) => {
+const SeriesSettings: React.FC<SeriesSettingsProps> = () => {
   const [currentTab, setCurrentTab] = useState("property");
 
   return (
@@ -90,7 +88,7 @@ const SeriesSettings: React.FC<SeriesSettingsProps> = ({
               <CardHeader>
                 <CardTitle className="select-none">{tab.title}</CardTitle>
               </CardHeader>
-              <DynamicCom setDialogVisible={setDialogVisible} />
+              <DynamicCom />
             </Card>
           </TabsContent>
         );

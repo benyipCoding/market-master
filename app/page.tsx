@@ -9,7 +9,13 @@ import {
   MouseEventParams,
   Time,
 } from "lightweight-charts";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  createContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { throttle } from "@/utils/helpers";
 import { TChartRef } from "@/components/interfaces/TChart";
 import Buttons from "@/components/Buttons";
@@ -27,6 +33,14 @@ import CustomDialogContent from "@/components/CustomDialogContent";
 import { DialogContentType } from "@/store/dialogSlice";
 import TechnicalIndexForm from "@/components/technicalIndex/TechnicalIndexForm";
 import { cn } from "@/lib/utils";
+
+interface IDialogContext {
+  setDialogVisible: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export const DialogContext = createContext<IDialogContext>({
+  setDialogVisible: () => {},
+});
 
 const Playground = () => {
   // TChart component instance
@@ -118,20 +132,18 @@ const Playground = () => {
         open={dialogVisible}
         modal={!isTechnicalIndex}
       >
-        {dialogVisible && (
-          <CustomDialogContent
-            dragConstraints={tChartRef.current?.chartContainer!}
-            overlayClass={cn(isDrawedLineSettings && "bg-transparent")}
-            motionDivClass={cn(isTechnicalIndex && "max-w-none w-fit")}
-          >
-            {isDrawedLineSettings && (
-              <SeriesSettings setDialogVisible={setDialogVisible} />
-            )}
-            {isTechnicalIndex && (
-              <TechnicalIndexForm setDialogVisible={setDialogVisible} />
-            )}
-          </CustomDialogContent>
-        )}
+        <DialogContext.Provider value={{ setDialogVisible }}>
+          {dialogVisible && (
+            <CustomDialogContent
+              dragConstraints={tChartRef.current?.chartContainer!}
+              overlayClass={cn(isDrawedLineSettings && "bg-transparent")}
+              motionDivClass={cn(isTechnicalIndex && "max-w-none w-fit")}
+            >
+              {isDrawedLineSettings && <SeriesSettings />}
+              {isTechnicalIndex && <TechnicalIndexForm />}
+            </CustomDialogContent>
+          )}
+        </DialogContext.Provider>
       </Dialog>
     </>
   );

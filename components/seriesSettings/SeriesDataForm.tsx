@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Calendar as CalendarIcon, Minus, Plus } from "lucide-react";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CardContent, CardFooter } from "@/components/ui/card";
@@ -14,6 +14,7 @@ import { LineData, Time } from "lightweight-charts";
 import { RootState } from "@/store";
 import { useSelector } from "react-redux";
 import { produce } from "immer";
+import { DialogContext } from "@/app/page";
 
 const FormItems = [
   {
@@ -32,9 +33,8 @@ const FormItems = [
   },
 ];
 
-const SeriesDataForm: React.FC<SeriesDataFormProps> = ({
-  setDialogVisible,
-}) => {
+const SeriesDataForm: React.FC<SeriesDataFormProps> = () => {
+  const { setDialogVisible } = useContext(DialogContext);
   const { selectedSeries } = useSelector((state: RootState) => state.common);
 
   const [formValue, setFormValue] = useState<SeriesDataFormValueType>({

@@ -22,10 +22,10 @@ import {
 import LinePattern from "../commonFormItem/LinePattern";
 import ColorSelector from "../commonFormItem/ColorSelector";
 import NameItem from "../commonFormItem/NameItem";
+import { DialogContext } from "@/app/page";
 
-const PropertySettingsForm: React.FC<PropertySettingsFormProps> = ({
-  setDialogVisible,
-}) => {
+const PropertySettingsForm: React.FC<PropertySettingsFormProps> = () => {
+  const { setDialogVisible } = useContext(DialogContext);
   const { selectedSeries } = useSelector((state: RootState) => state.common);
   const [formValue, setFormValue] = useState<PropertySettingsFormValueType>({
     seriesLabel: "",

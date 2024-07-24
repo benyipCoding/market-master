@@ -25,12 +25,7 @@ const EmptyState = () => {
   );
 };
 
-const TechnicalIndexForm: React.FC<TechnicalIndexFormProps> = ({
-  setDialogVisible,
-}) => {
-  const [currentTab, setCurrentTab] = useState<
-    TechnicalIndexItemTitleType | ""
-  >("");
+const TechnicalIndexForm: React.FC<TechnicalIndexFormProps> = () => {
   const [searchInput, setSearchInput] = useState("");
 
   const displayIndexList = useMemo(
@@ -45,7 +40,11 @@ const TechnicalIndexForm: React.FC<TechnicalIndexFormProps> = ({
     [searchInput]
   );
 
-  const onNavItemClick = (item: TechnicalIndexItemType) => {
+  const [currentTab, setCurrentTab] = useState<
+    TechnicalIndexItemTitleType | ""
+  >(displayIndexList[0].title);
+
+  const onIndicatorItemClick = (item: TechnicalIndexItemType) => {
     setCurrentTab(item.title);
   };
 
@@ -56,7 +55,7 @@ const TechnicalIndexForm: React.FC<TechnicalIndexFormProps> = ({
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search index..."
+            placeholder="Search indicator..."
             className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
@@ -75,7 +74,7 @@ const TechnicalIndexForm: React.FC<TechnicalIndexFormProps> = ({
                     "h-fit justify-start active:scale-100",
                     currentTab === item.title && "bg-muted hover:bg-muted"
                   )}
-                  onClick={() => onNavItemClick(item)}
+                  onClick={() => onIndicatorItemClick(item)}
                 >
                   <div className="text-start flex flex-col pl-8 relative">
                     {item.title}
