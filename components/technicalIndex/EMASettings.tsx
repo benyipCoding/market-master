@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import CommonHeader from "./CommonHeader";
@@ -9,24 +9,38 @@ import ColorSelector from "../commonFormItem/ColorSelector";
 import { EMAFormValue } from "../interfaces/TechnicalIndexForm";
 import { SeriesColorType } from "@/constants/seriesOptions";
 import { DialogContext } from "@/context/Dialog";
+import { TechnicalIndexFormContext } from "./TechnicalIndexForm";
 
 const EMASettings = () => {
-  const { setDialogVisible } = useContext(DialogContext);
-
+  const { setDialogVisible, tChartRef } = useContext(DialogContext);
+  const { currentTab } = useContext(TechnicalIndexFormContext);
+  const mainSeries = useMemo(
+    () => tChartRef?.current?.childSeries[0],
+    [tChartRef]
+  );
   const [formValue, setFormValue] = useState<EMAFormValue>({
+    id: "",
     name: "",
     lineWidth: "2",
     lineStyle: "solid",
     period: "20",
     calculatePrice: "close",
     seriesColor: "#ffff00",
-    indicator: "EMA",
+    indicator: currentTab,
   });
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(formValue);
   };
+
+  useEffect(() => {
+    setFormValue({
+      ...formValue,
+      id: `${formValue.indicator}_${mainSeries?.options().id}_${Date.now()}`,
+      name: `${formValue.indicator}_${mainSeries?.options().id}`,
+    });
+  }, []);
 
   return (
     <>

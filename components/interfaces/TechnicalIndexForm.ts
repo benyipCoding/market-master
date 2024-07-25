@@ -20,6 +20,7 @@ export interface CommonHeaderProps {
 }
 
 export interface BaseFormValue {
+  id: string;
   indicator: TechnicalIndexItemTitleType;
   name: string;
 }

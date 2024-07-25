@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import React, { useMemo, useState } from "react";
+import React, { createContext, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -25,6 +25,15 @@ const EmptyState = () => {
   );
 };
 
+interface ITechnicalIndexFormContext {
+  currentTab: TechnicalIndexItemTitleType;
+}
+
+export const TechnicalIndexFormContext =
+  createContext<ITechnicalIndexFormContext>({
+    currentTab: "EMA",
+  });
+
 const TechnicalIndexForm: React.FC<TechnicalIndexFormProps> = () => {
   const [searchInput, setSearchInput] = useState("");
 
@@ -40,9 +49,9 @@ const TechnicalIndexForm: React.FC<TechnicalIndexFormProps> = () => {
     [searchInput]
   );
 
-  const [currentTab, setCurrentTab] = useState<
-    TechnicalIndexItemTitleType | ""
-  >(displayIndexList[0].title);
+  const [currentTab, setCurrentTab] = useState<TechnicalIndexItemTitleType>(
+    displayIndexList[0]?.title
+  );
 
   const onIndicatorItemClick = (item: TechnicalIndexItemType) => {
     setCurrentTab(item.title);
@@ -96,10 +105,12 @@ const TechnicalIndexForm: React.FC<TechnicalIndexFormProps> = () => {
         )}
       </aside>
       <Card className="w-full">
-        {!currentTab && <EmptyState />}
-        {currentTab === "MA" && <MASettings />}
-        {currentTab === "EMA" && <EMASettings />}
-        {currentTab === "MACD" && <MACDSettings />}
+        <TechnicalIndexFormContext.Provider value={{ currentTab }}>
+          {!currentTab && <EmptyState />}
+          {currentTab === "MA" && <MASettings />}
+          {currentTab === "EMA" && <EMASettings />}
+          {currentTab === "MACD" && <MACDSettings />}
+        </TechnicalIndexFormContext.Provider>
       </Card>
     </div>
   );

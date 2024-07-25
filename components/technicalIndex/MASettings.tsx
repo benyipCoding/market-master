@@ -14,6 +14,7 @@ const MASettings = () => {
   const { setDialogVisible } = useContext(DialogContext);
 
   const [formValue, setFormValue] = useState<EMAFormValue>({
+    id: "",
     name: "",
     lineWidth: "2",
     lineStyle: "solid",

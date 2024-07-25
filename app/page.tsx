@@ -119,7 +119,7 @@ const Playground = () => {
         open={dialogVisible}
         modal={!isTechnicalIndex}
       >
-        <DialogContext.Provider value={{ setDialogVisible }}>
+        <DialogContext.Provider value={{ setDialogVisible, tChartRef }}>
           {dialogVisible && (
             <CustomDialogContent
               dragConstraints={tChartRef.current?.chartContainer!}

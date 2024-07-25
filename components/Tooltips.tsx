@@ -115,8 +115,8 @@ const Tooltips: React.FC<TooltipsProps> = ({ productName, tChartRef }) => {
       ref={tooltipsWrapper}
     >
       {currentCandlestick && (
-        <div className="w-fit bg-black text-white p-2 rounded-sm">
-          <h1 className="mb-2">{productName}</h1>
+        <div className="w-fit bg-white text-black dark:bg-black dark:text-white p-2 rounded-sm">
+          <h1 className="mb-2 font-semibold">{productName}</h1>
           <p className="text-sm mb-1">{currentCandlestick?.time.toString()}</p>
           {["open", "high", "low", "close"].map((label) => (
             <p className="flex text-sm pointer-events-none" key={label}>
