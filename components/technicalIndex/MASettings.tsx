@@ -26,7 +26,8 @@ const MASettings = () => {
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formValue);
+    // TODO
+    // console.log(formValue);
   };
 
   return (
@@ -39,7 +40,7 @@ const MASettings = () => {
         <CardContent>
           <div className="grid w-full items-center gap-4">
             <NameItem
-              itemLabel="Indicator Name"
+              itemLabel="Name"
               placeholder="Name of the indicator"
               inputValue={formValue.name}
               setInputValue={(name) => setFormValue({ ...formValue, name })}

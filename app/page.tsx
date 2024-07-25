@@ -52,6 +52,11 @@ const Playground = () => {
     LineSeriesPartialOptions[]
   >([]);
 
+  // The list of technical indicator lines
+  const [technicalIndicatorLines, setTechnicalIndicatorLines] = useState<
+    LineSeriesPartialOptions[]
+  >([]);
+
   // dialog trigger
   const [dialogVisible, setDialogVisible] = useState(false);
 
@@ -108,6 +113,10 @@ const Playground = () => {
             customSeriesOptions={{ id: "XAU/USD", toFixedNum: 2 }}
           />
           {drawedLineList.map((lineOption) => (
+            <LineSeries customSeriesOptions={lineOption} key={lineOption.id} />
+          ))}
+
+          {technicalIndicatorLines.map((lineOption) => (
             <LineSeries customSeriesOptions={lineOption} key={lineOption.id} />
           ))}
           <Tooltips productName="XAU/USD" tChartRef={tChartRef} />

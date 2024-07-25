@@ -1,15 +1,20 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import CommonHeader from "./CommonHeader";
 import LinePattern from "../commonFormItem/LinePattern";
 import NameItem from "../commonFormItem/NameItem";
-import PeriodItem, { CalculatePriceType } from "../commonFormItem/PeriodItem";
+import PeriodItem, {
+  CalculatePriceType,
+  PeriodItemRef,
+} from "../commonFormItem/PeriodItem";
 import ColorSelector from "../commonFormItem/ColorSelector";
 import { EMAFormValue } from "../interfaces/TechnicalIndexForm";
 import { SeriesColorType } from "@/constants/seriesOptions";
 import { DialogContext } from "@/context/Dialog";
 import { TechnicalIndexFormContext } from "./TechnicalIndexForm";
+import { CandlestickData, Time } from "lightweight-charts";
+import { calculateEMA } from "@/utils/formulas";
 
 const EMASettings = () => {
   const { setDialogVisible, tChartRef } = useContext(DialogContext);
@@ -18,6 +23,8 @@ const EMASettings = () => {
     () => tChartRef?.current?.childSeries[0],
     [tChartRef]
   );
+  const periodItemRef = useRef<PeriodItemRef>(null);
+
   const [formValue, setFormValue] = useState<EMAFormValue>({
     id: "",
     name: "",
@@ -31,7 +38,17 @@ const EMASettings = () => {
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formValue);
+    // Validate period
+    const valid = periodItemRef.current?.validate(formValue.period);
+    if (!valid) return;
+
+    const prices = (mainSeries?.data() as CandlestickData<Time>[]).map(
+      (item) => item[formValue.calculatePrice]
+    );
+    const emaData = calculateEMA(prices, +formValue.period).map(
+      (num) => +num.toFixed(mainSeries?.options().toFixedNum)
+    );
+    console.log({ emaData });
   };
 
   useEffect(() => {
@@ -68,6 +85,7 @@ const EMASettings = () => {
                   calculatePrice: price as CalculatePriceType,
                 })
               }
+              ref={periodItemRef}
             />
 
             <ColorSelector
