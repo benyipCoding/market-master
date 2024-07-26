@@ -69,7 +69,9 @@ const EMASettings = () => {
     );
 
     const options: LineSeriesPartialOptions = {
-      id: formValue.id,
+      id: `${formValue.indicator}_${mainSeries?.options().id}_${
+        formValue.period
+      }_${Date.now()}`,
       customTitle: formValue.name,
       lineWidth: +formValue.lineWidth as LineWidth,
       lineStyle: LineStyle[
@@ -79,13 +81,15 @@ const EMASettings = () => {
       color: formValue.seriesColor,
     };
 
+    console.log({ options });
+
     setTechnicalIndicatorLines((prev) => [...prev, { options, data: emaData }]);
+    setDialogVisible(false);
   };
 
   useEffect(() => {
     setFormValue({
       ...formValue,
-      id: `${formValue.indicator}_${mainSeries?.options().id}_${Date.now()}`,
       name: `${formValue.indicator}_${mainSeries?.options().id}`,
     });
   }, []);
