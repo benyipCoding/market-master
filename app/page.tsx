@@ -28,6 +28,7 @@ import { DialogContentType } from "@/store/dialogSlice";
 import TechnicalIndexForm from "@/components/technicalIndex/TechnicalIndexForm";
 import { cn } from "@/lib/utils";
 import { DialogContext } from "@/context/Dialog";
+import { TechnicalIndicatorLine } from "@/components/interfaces/TechnicalIndexForm";
 
 const Playground = () => {
   // TChart component instance
@@ -54,7 +55,7 @@ const Playground = () => {
 
   // The list of technical indicator lines
   const [technicalIndicatorLines, setTechnicalIndicatorLines] = useState<
-    LineSeriesPartialOptions[]
+    TechnicalIndicatorLine[]
   >([]);
 
   // dialog trigger
@@ -116,8 +117,12 @@ const Playground = () => {
             <LineSeries customSeriesOptions={lineOption} key={lineOption.id} />
           ))}
 
-          {technicalIndicatorLines.map((lineOption) => (
-            <LineSeries customSeriesOptions={lineOption} key={lineOption.id} />
+          {technicalIndicatorLines.map((line) => (
+            <LineSeries
+              customSeriesOptions={line.options}
+              key={line.options.id}
+              seriesData={line.data}
+            />
           ))}
           <Tooltips productName="XAU/USD" tChartRef={tChartRef} />
         </TChart>
@@ -128,7 +133,9 @@ const Playground = () => {
         open={dialogVisible}
         modal={!isTechnicalIndex}
       >
-        <DialogContext.Provider value={{ setDialogVisible, tChartRef }}>
+        <DialogContext.Provider
+          value={{ setDialogVisible, tChartRef, setTechnicalIndicatorLines }}
+        >
           {dialogVisible && (
             <CustomDialogContent
               dragConstraints={tChartRef.current?.chartContainer!}

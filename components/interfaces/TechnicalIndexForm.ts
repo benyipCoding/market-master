@@ -2,6 +2,7 @@ import { SeriesColorType } from "@/constants/seriesOptions";
 import { TechnicalIndexItemTitleType } from "@/constants/technicalIndexList";
 import { LucideProps } from "lucide-react";
 import { CalculatePriceType } from "../commonFormItem/PeriodItem";
+import { LineData, LineSeriesPartialOptions, Time } from "lightweight-charts";
 
 export interface TechnicalIndexFormProps {}
 
@@ -31,4 +32,9 @@ export interface EMAFormValue extends BaseFormValue {
   period: string;
   calculatePrice: CalculatePriceType;
   seriesColor: SeriesColorType;
+}
+
+export interface TechnicalIndicatorLine {
+  options: LineSeriesPartialOptions;
+  data: LineData<Time>[];
 }

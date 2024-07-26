@@ -9,15 +9,28 @@ import PeriodItem, {
   PeriodItemRef,
 } from "../commonFormItem/PeriodItem";
 import ColorSelector from "../commonFormItem/ColorSelector";
-import { EMAFormValue } from "../interfaces/TechnicalIndexForm";
+import {
+  EMAFormValue,
+  TechnicalIndicatorLine,
+} from "../interfaces/TechnicalIndexForm";
 import { SeriesColorType } from "@/constants/seriesOptions";
 import { DialogContext } from "@/context/Dialog";
 import { TechnicalIndexFormContext } from "./TechnicalIndexForm";
-import { CandlestickData, Time } from "lightweight-charts";
+import {
+  CandlestickData,
+  DeepPartial,
+  LineData,
+  LineSeriesPartialOptions,
+  LineStyle,
+  LineWidth,
+  Time,
+} from "lightweight-charts";
 import { calculateEMA } from "@/utils/formulas";
+import { titleCase } from "@/utils/helpers";
 
 const EMASettings = () => {
-  const { setDialogVisible, tChartRef } = useContext(DialogContext);
+  const { setDialogVisible, tChartRef, setTechnicalIndicatorLines } =
+    useContext(DialogContext);
   const { currentTab } = useContext(TechnicalIndexFormContext);
   const mainSeries = useMemo(
     () => tChartRef?.current?.childSeries[0],
@@ -28,7 +41,7 @@ const EMASettings = () => {
   const [formValue, setFormValue] = useState<EMAFormValue>({
     id: "",
     name: "",
-    lineWidth: "2",
+    lineWidth: "1",
     lineStyle: "solid",
     period: "20",
     calculatePrice: "close",
@@ -42,13 +55,31 @@ const EMASettings = () => {
     const valid = periodItemRef.current?.validate(formValue.period);
     if (!valid) return;
 
-    const prices = (mainSeries?.data() as CandlestickData<Time>[]).map(
-      (item) => item[formValue.calculatePrice]
+    const prices: LineData<Time>[] = (
+      mainSeries?.data() as CandlestickData<Time>[]
+    ).map((item) => ({
+      time: item.time,
+      value: item[formValue.calculatePrice],
+    }));
+
+    const emaData = calculateEMA(
+      prices,
+      +formValue.period,
+      mainSeries?.options().toFixedNum!
     );
-    const emaData = calculateEMA(prices, +formValue.period).map(
-      (num) => +num.toFixed(mainSeries?.options().toFixedNum)
-    );
-    console.log({ emaData });
+
+    const options: LineSeriesPartialOptions = {
+      id: formValue.id,
+      customTitle: formValue.name,
+      lineWidth: +formValue.lineWidth as LineWidth,
+      lineStyle: LineStyle[
+        titleCase(formValue.lineStyle) as any
+      ] as unknown as DeepPartial<LineStyle>,
+      showLabel: false,
+      color: formValue.seriesColor,
+    };
+
+    setTechnicalIndicatorLines((prev) => [...prev, { options, data: emaData }]);
   };
 
   useEffect(() => {
