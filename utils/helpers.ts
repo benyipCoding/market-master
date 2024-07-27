@@ -1,3 +1,4 @@
+import { CustomLineSeriesType } from "@/hooks/interfaces";
 import {
   ISeriesApi,
   SeriesType,
@@ -142,6 +143,42 @@ export const findHoveringSeries = ({
 
     return isHoveringOverLine;
   });
+};
+
+export interface IFindHoveringIndicator {
+  childSeries: ISeriesApi<SeriesType, Time>[];
+  x: number;
+  y: number;
+  chart: IChartApi;
+}
+
+export const findHoveringIndicator = ({
+  childSeries,
+  x,
+  y,
+  chart,
+}: IFindHoveringIndicator): ISeriesApi<SeriesType, Time> | null => {
+  const hoveringPrice = childSeries[0].coordinateToPrice(y);
+  const hoveringTime = chart.timeScale().coordinateToTime(x);
+  const allIndicatorSeries = childSeries.filter(
+    (series) => series.options().customType === CustomLineSeriesType.Indicator
+  );
+  const price_series = new Map<number, ISeriesApi<SeriesType, Time>>();
+  const references = allIndicatorSeries.reduce<number[]>((numArr, current) => {
+    const price = (
+      current
+        .data()
+        .find((data) => data.time === hoveringTime) as LineData<Time>
+    )?.value;
+    if (price) {
+      price_series.set(price, current);
+      return [...numArr, price];
+    }
+    return numArr;
+  }, []);
+  const closestPrice = findClosestPrice(hoveringPrice as number, references);
+  if (closestPrice) return price_series.get(closestPrice) || null;
+  return null;
 };
 
 export const makeLineData = (

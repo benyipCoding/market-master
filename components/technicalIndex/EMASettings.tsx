@@ -27,6 +27,7 @@ import {
 } from "lightweight-charts";
 import { calculateEMA } from "@/utils/formulas";
 import { titleCase } from "@/utils/helpers";
+import { CustomLineSeriesType } from "@/hooks/interfaces";
 
 const EMASettings = () => {
   const { setDialogVisible, tChartRef, setTechnicalIndicatorLines } =
@@ -80,6 +81,7 @@ const EMASettings = () => {
       showLabel: false,
       color: formValue.seriesColor,
       crosshairMarkerVisible: false,
+      customType: CustomLineSeriesType.Indicator,
     };
 
     console.log({ options });

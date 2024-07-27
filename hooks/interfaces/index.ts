@@ -11,12 +11,18 @@ import {
   LineData,
 } from "lightweight-charts";
 
+export enum CustomLineSeriesType {
+  Drawed = "drawed",
+  Indicator = "indicator",
+}
+
 declare module "lightweight-charts" {
   interface SeriesOptionsCommon {
     id: string;
     showLabel: boolean;
     toFixedNum: number;
     customTitle: string;
+    customType?: CustomLineSeriesType;
   }
 }
 export interface IEnableDrawingLine {

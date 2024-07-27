@@ -26,8 +26,16 @@ import React, {
 } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { TChartRef, TChartProps, IChartContext } from "./interfaces/TChart";
-import { Equation, findHoveringSeries } from "@/utils/helpers";
-import { setHoveringSeries, setSelectedSeries } from "@/store/commonSlice";
+import {
+  Equation,
+  findHoveringIndicator,
+  findHoveringSeries,
+} from "@/utils/helpers";
+import {
+  setHoveringIndicator,
+  setHoveringSeries,
+  setSelectedSeries,
+} from "@/store/commonSlice";
 import { useDragLineSeries } from "@/hooks/useDragLineSeries";
 import { useTheme } from "next-themes";
 import { ContextMenu, ContextMenuTrigger } from "./ui/context-menu";
@@ -78,7 +86,6 @@ const TChart: React.ForwardRefRenderFunction<
   const dispatch = useDispatch<AppDispatch>();
   const { theme } = useTheme();
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
-
   const contextMenuTriggerDisable = useMemo(() => isDrawing, [isDrawing]);
   const contextMenuRef = useRef<TChartContextMenuRef>(null);
 
@@ -123,7 +130,7 @@ const TChart: React.ForwardRefRenderFunction<
   // Mouse movement event (exclusive to light weight chart)
   useEffect(() => {
     if (!chart) return;
-
+    // Logic of selectedSeries existed
     if (selectedSeries) {
       const point = mouseMovingEventParam?.seriesData.get(
         selectedSeries
@@ -133,6 +140,7 @@ const TChart: React.ForwardRefRenderFunction<
       else setHoveringPoint(null);
     }
 
+    // Logic of hoveringSeries
     const hoveringSeries = findHoveringSeries({
       childSeries,
       chart,
@@ -144,6 +152,19 @@ const TChart: React.ForwardRefRenderFunction<
       dispatch(setHoveringSeries(hoveringSeries));
     } else {
       dispatch(setHoveringSeries(null));
+    }
+
+    // Logic of hoveringIndicator
+    const hoveringIndicator = findHoveringIndicator({
+      childSeries,
+      chart,
+      x: mouseMovingEventParam?.point?.x!,
+      y: mouseMovingEventParam?.point?.y!,
+    });
+    if (hoveringIndicator) {
+      dispatch(setHoveringIndicator(hoveringIndicator));
+    } else {
+      dispatch(setHoveringIndicator(null));
     }
   }, [mouseMovingEventParam, selectedSeries]);
 

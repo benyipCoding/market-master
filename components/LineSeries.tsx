@@ -22,7 +22,7 @@ const LineSeries: React.FC<LineSeriesProps> = ({
   seriesData,
   customSeriesOptions,
 }) => {
-  const { selectedSeries, hoveringSeries } = useSelector(
+  const { selectedSeries, hoveringSeries, hoveringIndicator } = useSelector(
     (state: RootState) => state.common
   );
   const { series } = useSeries("Line", seriesData, customSeriesOptions);
@@ -46,6 +46,16 @@ const LineSeries: React.FC<LineSeriesProps> = ({
       lineWidth: (currentSeriesOptions?.lineWidth! +
         2) as DeepPartial<LineWidth>,
       pointMarkersVisible: true,
+    }),
+    [currentSeriesOptions]
+  );
+
+  const hoveringIndicatorOption = useMemo(
+    () => ({
+      ...currentSeriesOptions,
+      lineWidth: (currentSeriesOptions?.lineWidth! +
+        1) as DeepPartial<LineWidth>,
+      pointMarkersVisible: false,
     }),
     [currentSeriesOptions]
   );
@@ -105,14 +115,17 @@ const LineSeries: React.FC<LineSeriesProps> = ({
 
   useEffect(() => {
     if (!series) return;
+
     if (series === selectedSeries) {
       series?.applyOptions(selectedOptions);
     } else if (series === hoveringSeries) {
       series?.applyOptions(hoveringOptions);
+    } else if (series === hoveringIndicator) {
+      series?.applyOptions(hoveringIndicatorOption);
     } else {
       series?.applyOptions(currentSeriesOptions!);
     }
-  }, [selectedSeries, hoveringSeries]);
+  }, [selectedSeries, hoveringSeries, hoveringIndicator]);
 
   useEffect(() => {
     if (!series) return;

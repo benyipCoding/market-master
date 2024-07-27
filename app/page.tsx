@@ -88,7 +88,7 @@ const Playground = () => {
 
     const { chart } = tChartRef.current!;
     // Subscribe event when chart init
-    chart.subscribeCrosshairMove(throttle(crosshairMoveHandler, 0));
+    chart.subscribeCrosshairMove(throttle(crosshairMoveHandler, 100));
     chart.subscribeClick(chartClickHandler);
     chart.subscribeDblClick(chartDblClickHandler);
   }, [tChartRef.current?.chart]);

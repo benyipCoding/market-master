@@ -15,7 +15,7 @@ import {
 } from "lightweight-charts";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { IEnableDrawingLine } from "./interfaces";
+import { CustomLineSeriesType, IEnableDrawingLine } from "./interfaces";
 
 // Use for activating the function of drawing straight lines
 export const useEnableDrawingLine = ({
@@ -53,7 +53,12 @@ export const useEnableDrawingLine = ({
     setDrawingLineId(lineId);
     setDrawedLineList([
       ...drawedLineList,
-      { id: lineId, showLabel: false, customTitle: "" },
+      {
+        id: lineId,
+        showLabel: false,
+        customTitle: "",
+        customType: CustomLineSeriesType.Drawed,
+      },
     ]);
 
     const currentCandlestick = mouseMovingEventParam?.seriesData.get(
