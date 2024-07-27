@@ -1,5 +1,6 @@
 import { AppDispatch, RootState } from "@/store";
 import {
+  setHoveringIndicator,
   setHoveringSeries,
   setSelectedIndicator,
   setSelectedSeries,
@@ -65,19 +66,27 @@ const Buttons: React.FC<ButtonsProps> = ({
   };
 
   const openTechnicalIndexDialog = () => {
+    dispatch(setSelectedIndicator(null));
     dispatch(setDialogContent(DialogContentType.TechnicalIndex));
     Promise.resolve().then(() => setDialogVisible((prev) => !prev));
+  };
+
+  const closeDialogByESC = (e: KeyboardEvent) => {
+    e.preventDefault();
+    setDialogVisible(false);
   };
 
   // hotkeys
   useEffect(() => {
     hotkeys("l", toggleDrawingState);
     hotkeys("i", openTechnicalIndexDialog);
+    hotkeys("Esc", closeDialogByESC);
     document.addEventListener("contextmenu", contextmenuHandler);
 
     return () => {
       hotkeys.unbind("l");
       hotkeys.unbind("i");
+      hotkeys.unbind("Esc");
       document.removeEventListener("contextmenu", contextmenuHandler);
     };
   }, []);

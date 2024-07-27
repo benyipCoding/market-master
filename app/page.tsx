@@ -29,6 +29,7 @@ import TechnicalIndexForm from "@/components/technicalIndex/TechnicalIndexForm";
 import { cn } from "@/lib/utils";
 import { DialogContext } from "@/context/Dialog";
 import { TechnicalIndicatorLine } from "@/components/interfaces/TechnicalIndexForm";
+import IndicatorSettings from "@/components/technicalIndex/IndicatorSettings";
 
 const Playground = () => {
   // TChart component instance
@@ -41,6 +42,10 @@ const Playground = () => {
   );
   const isTechnicalIndex = useMemo(
     () => dialogContent === DialogContentType.TechnicalIndex,
+    [dialogContent]
+  );
+  const isIndicatorSettings = useMemo(
+    () => dialogContent === DialogContentType.IndicatorSettings,
     [dialogContent]
   );
 
@@ -144,7 +149,9 @@ const Playground = () => {
               motionDivClass={cn(isTechnicalIndex && "max-w-none w-fit")}
             >
               {isDrawedLineSettings && <SeriesSettings />}
-              {isTechnicalIndex && <TechnicalIndexForm />}
+              {(isTechnicalIndex || isIndicatorSettings) && (
+                <TechnicalIndexForm />
+              )}
             </CustomDialogContent>
           )}
         </DialogContext.Provider>

@@ -71,6 +71,7 @@ const TChart: React.ForwardRefRenderFunction<
     selectedSeries,
     hoveringSeries,
     hoveringIndicator,
+    selectedIndicator,
   } = useSelector((state: RootState) => state.common);
   const [chart, setChart] = useState<IChartApi>();
   const [lineId_equation, setLineId_equation] = useState<
@@ -196,8 +197,12 @@ const TChart: React.ForwardRefRenderFunction<
 
   // Mouse double click events (exclusive to light weight chart)
   useEffect(() => {
-    if (!selectedSeries) return;
-    dispatch(setDialogContent(DialogContentType.DrawedLineSettings)); // Confirm dialog content type
+    if (!hoveringSeries && !hoveringIndicator) return;
+    if (hoveringSeries) {
+      dispatch(setDialogContent(DialogContentType.DrawedLineSettings)); // Confirm dialog content type
+    } else if (hoveringIndicator) {
+      dispatch(setDialogContent(DialogContentType.IndicatorSettings)); // Confirm dialog content type
+    }
     Promise.resolve().then(() => setDialogVisible(true));
   }, [mouseDblClickEventParam]);
 

@@ -23,13 +23,16 @@ import {
   Time,
 } from "lightweight-charts";
 import { calculateEMA } from "@/utils/formulas";
-import { titleCase } from "@/utils/helpers";
+import { textCase, titleCase } from "@/utils/helpers";
 import { CustomLineSeriesType } from "@/hooks/interfaces";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 const EMASettings = () => {
   const { setDialogVisible, tChartRef, setTechnicalIndicatorLines } =
     useContext(DialogContext);
   const { currentTab } = useContext(TechnicalIndexFormContext);
+  const { selectedIndicator } = useSelector((state: RootState) => state.common);
   const mainSeries = useMemo(
     () => tChartRef?.current?.childSeries[0],
     [tChartRef]
@@ -47,12 +50,7 @@ const EMASettings = () => {
     indicator: currentTab,
   });
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // Validate period
-    const valid = periodItemRef.current?.validate(formValue.period);
-    if (!valid) return;
-
+  const addIndicator = () => {
     const prices: LineData<Time>[] = (
       mainSeries?.data() as CandlestickData<Time>[]
     ).map((item) => ({
@@ -79,18 +77,54 @@ const EMASettings = () => {
       color: formValue.seriesColor,
       crosshairMarkerVisible: false,
       customType: CustomLineSeriesType.Indicator,
+      indicator: formValue.indicator,
+      period: +formValue.period,
+      calculatePrice: formValue.calculatePrice,
     };
-
     setTechnicalIndicatorLines((prev) => [...prev, { options, data: emaData }]);
+  };
+
+  const editIndicator = () => {
+    // TODO
+    console.log("Edit current indicator");
+  };
+
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // Validate period
+    const valid = periodItemRef.current?.validate(formValue.period);
+    if (!valid) return;
+
+    if (!selectedIndicator) addIndicator();
+    else editIndicator();
+
     setDialogVisible(false);
   };
 
   useEffect(() => {
-    setFormValue({
-      ...formValue,
-      name: `${formValue.indicator}_${mainSeries?.options().id}`,
-    });
-  }, []);
+    if (!selectedIndicator) {
+      setFormValue({
+        ...formValue,
+        name: `${formValue.indicator}_${mainSeries?.options().id}`,
+      });
+    } else {
+      const options = selectedIndicator.options() as LineSeriesPartialOptions;
+      console.log(options.color);
+
+      Promise.resolve().then(() => {
+        setFormValue({
+          id: options.id!,
+          name: options.customTitle!,
+          lineWidth: `${(options.lineWidth as number) - 2}`,
+          lineStyle: textCase(LineStyle[options.lineStyle!]),
+          period: `${options.period!}`,
+          calculatePrice: options.calculatePrice!,
+          seriesColor: options.color! as SeriesColorType,
+          indicator: options.indicator!,
+        });
+      });
+    }
+  }, [selectedIndicator]);
 
   return (
     <>

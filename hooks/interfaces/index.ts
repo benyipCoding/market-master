@@ -1,3 +1,5 @@
+import { CalculatePriceType } from "@/components/commonFormItem/PeriodItem";
+import { TechnicalIndexItemTitleType } from "@/constants/technicalIndexList";
 import { Equation } from "@/utils/helpers";
 import {
   ISeriesApi,
@@ -23,6 +25,9 @@ declare module "lightweight-charts" {
     toFixedNum: number;
     customTitle: string;
     customType?: CustomLineSeriesType;
+    indicator?: TechnicalIndexItemTitleType;
+    period?: number;
+    calculatePrice?: CalculatePriceType;
   }
 }
 export interface IEnableDrawingLine {

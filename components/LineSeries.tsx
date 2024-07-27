@@ -128,7 +128,6 @@ const LineSeries: React.FC<LineSeriesProps> = ({
 
   useEffect(() => {
     if (!series) return;
-
     if (series === selectedSeries) {
       series?.applyOptions(selectedOptions);
     } else if (series === selectedIndicator) {
