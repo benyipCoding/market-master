@@ -1,6 +1,7 @@
 import { AppDispatch, RootState } from "@/store";
 import {
   setHoveringSeries,
+  setSelectedIndicator,
   setSelectedSeries,
   toggleDrawing,
 } from "@/store/commonSlice";
@@ -15,23 +16,39 @@ const Buttons: React.FC<ButtonsProps> = ({
   tChartRef,
   setDrawedLineList,
   setDialogVisible,
+  setTechnicalIndicatorLines,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { isDrawing, selectedSeries } = useSelector(
+  const { isDrawing, selectedSeries, selectedIndicator } = useSelector(
     (state: RootState) => state.common
   );
 
   const onDeleteSeries = useCallback(() => {
     if (!tChartRef.current) return;
+    console.log("onDeleteSeries");
+
     const { chart, dialogVisible } = tChartRef.current;
-    if (!selectedSeries || dialogVisible) return;
-    chart.removeSeries(selectedSeries);
-    const { id } = selectedSeries.options();
-    setDrawedLineList((prev) =>
-      prev.filter((lineOptions) => lineOptions.id !== id)
-    );
-    dispatch(setSelectedSeries(null));
-  }, [selectedSeries]);
+    if (dialogVisible) return;
+    if (selectedSeries) {
+      chart.removeSeries(selectedSeries);
+      const { id } = selectedSeries.options();
+      setDrawedLineList((prev) =>
+        prev.filter((lineOptions) => lineOptions.id !== id)
+      );
+      dispatch(setSelectedSeries(null));
+    }
+
+    if (selectedIndicator) {
+      console.log("有进来吗？");
+
+      chart.removeSeries(selectedIndicator);
+      const { id } = selectedIndicator.options();
+      setTechnicalIndicatorLines((prev) =>
+        prev.filter((item) => item.options.id !== id)
+      );
+      dispatch(setSelectedIndicator(null));
+    }
+  }, [selectedSeries, selectedIndicator]);
 
   const toggleDrawingState = useCallback(() => {
     if (!tChartRef.current) return;
@@ -49,10 +66,6 @@ const Buttons: React.FC<ButtonsProps> = ({
     if (dialogVisible) return;
     dispatch(setSelectedSeries(null));
     dispatch(toggleDrawing(false));
-
-    setTimeout(() => {
-      document.removeEventListener("contextmenu", contextmenuHandler);
-    }, 50);
   };
 
   const openTechnicalIndexDialog = () => {
@@ -64,29 +77,23 @@ const Buttons: React.FC<ButtonsProps> = ({
   useEffect(() => {
     hotkeys("l", toggleDrawingState);
     hotkeys("i", openTechnicalIndexDialog);
+    document.addEventListener("contextmenu", contextmenuHandler);
 
     return () => {
       hotkeys.unbind("l");
       hotkeys.unbind("i");
+      document.removeEventListener("contextmenu", contextmenuHandler);
     };
   }, []);
 
   // Delete hotkeys
   useEffect(() => {
-    if (selectedSeries) {
+    if (selectedSeries || selectedIndicator) {
       hotkeys("Delete", onDeleteSeries);
-
-      document.addEventListener("contextmenu", contextmenuHandler);
     } else {
       hotkeys.unbind("Delete");
     }
-  }, [selectedSeries]);
-
-  useEffect(() => {
-    if (!isDrawing) return;
-
-    document.addEventListener("contextmenu", contextmenuHandler);
-  }, [isDrawing]);
+  }, [selectedSeries, selectedIndicator]);
 
   return (
     <>

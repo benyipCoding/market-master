@@ -100,6 +100,7 @@ const Playground = () => {
           tChartRef={tChartRef}
           setDrawedLineList={setDrawedLineList}
           setDialogVisible={setDialogVisible}
+          setTechnicalIndicatorLines={setTechnicalIndicatorLines}
         />
         <TChart
           className="w-full h-full m-auto"

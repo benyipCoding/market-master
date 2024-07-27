@@ -4,6 +4,7 @@ import {
   SeriesOptionsCommon,
 } from "lightweight-charts";
 import { TChartRef } from "./TChart";
+import { TechnicalIndicatorLine } from "./TechnicalIndexForm";
 
 export interface ButtonsProps {
   tChartRef: React.RefObject<TChartRef>;
@@ -11,4 +12,7 @@ export interface ButtonsProps {
     React.SetStateAction<DeepPartial<LineStyleOptions & SeriesOptionsCommon>[]>
   >;
   setDialogVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  setTechnicalIndicatorLines: React.Dispatch<
+    React.SetStateAction<TechnicalIndicatorLine[]>
+  >;
 }
