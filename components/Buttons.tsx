@@ -25,8 +25,6 @@ const Buttons: React.FC<ButtonsProps> = ({
 
   const onDeleteSeries = useCallback(() => {
     if (!tChartRef.current) return;
-    console.log("onDeleteSeries");
-
     const { chart, dialogVisible } = tChartRef.current;
     if (dialogVisible) return;
     if (selectedSeries) {
@@ -39,8 +37,6 @@ const Buttons: React.FC<ButtonsProps> = ({
     }
 
     if (selectedIndicator) {
-      console.log("有进来吗？");
-
       chart.removeSeries(selectedIndicator);
       const { id } = selectedIndicator.options();
       setTechnicalIndicatorLines((prev) =>
