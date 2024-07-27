@@ -39,7 +39,9 @@ export const TechnicalIndexFormContext =
 
 const TechnicalIndexForm: React.FC<TechnicalIndexFormProps> = () => {
   const [searchInput, setSearchInput] = useState("");
-  const { dialogContent } = useSelector((state: RootState) => state.dialog);
+  const { dialogContent, recentlyIndicator } = useSelector(
+    (state: RootState) => state.dialog
+  );
   const { selectedIndicator } = useSelector((state: RootState) => state.common);
   const displayIndexList = useMemo(
     () =>
@@ -54,7 +56,7 @@ const TechnicalIndexForm: React.FC<TechnicalIndexFormProps> = () => {
   );
 
   const [currentTab, setCurrentTab] = useState<TechnicalIndexItemTitleType>(
-    displayIndexList[0]?.title
+    recentlyIndicator || displayIndexList[0]?.title
   );
 
   const onIndicatorItemClick = (item: TechnicalIndexItemType) => {

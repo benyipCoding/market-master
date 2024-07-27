@@ -25,9 +25,10 @@ import {
 import { calculateEMA } from "@/utils/formulas";
 import { textCase, titleCase } from "@/utils/helpers";
 import { CustomLineSeriesType } from "@/hooks/interfaces";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
 import { EmitteryContext, OnApply } from "@/providers/EmitteryProvider";
+import { setRecentlyIndicator } from "@/store/dialogSlice";
 
 const EMASettings = () => {
   const { setDialogVisible, tChartRef, setTechnicalIndicatorLines } =
@@ -51,6 +52,7 @@ const EMASettings = () => {
     indicator: currentTab,
   });
   const { emittery } = useContext(EmitteryContext);
+  const dispatch = useDispatch<AppDispatch>();
 
   const generateOptions = (): LineSeriesPartialOptions => ({
     id: selectedIndicator
@@ -141,7 +143,7 @@ const EMASettings = () => {
 
     if (!selectedIndicator) addIndicator();
     else editIndicator();
-
+    dispatch(setRecentlyIndicator(currentTab));
     setDialogVisible(false);
   };
 

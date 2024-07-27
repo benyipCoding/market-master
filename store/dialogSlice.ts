@@ -1,3 +1,4 @@
+import { TechnicalIndexItemTitleType } from "@/constants/technicalIndexList";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export enum DialogContentType {
@@ -8,10 +9,12 @@ export enum DialogContentType {
 
 interface DialogSliceState {
   dialogContent: DialogContentType | undefined;
+  recentlyIndicator: TechnicalIndexItemTitleType | undefined;
 }
 
 const initialState: DialogSliceState = {
   dialogContent: undefined,
+  recentlyIndicator: undefined,
 };
 
 const dialogSlice = createSlice({
@@ -21,9 +24,15 @@ const dialogSlice = createSlice({
     setDialogContent(state, action: PayloadAction<DialogContentType>) {
       state.dialogContent = action.payload;
     },
+    setRecentlyIndicator(
+      state,
+      action: PayloadAction<TechnicalIndexItemTitleType>
+    ) {
+      state.recentlyIndicator = action.payload;
+    },
   },
 });
 
-export const { setDialogContent } = dialogSlice.actions;
+export const { setDialogContent, setRecentlyIndicator } = dialogSlice.actions;
 
 export default dialogSlice.reducer;
