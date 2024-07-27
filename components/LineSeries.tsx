@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import {
   DeepPartial,
+  LineData,
   LineSeriesPartialOptions,
   LineWidth,
   SeriesMarker,
@@ -94,7 +95,8 @@ const LineSeries: React.FC<LineSeriesProps> = ({
   };
 
   const applyHandler = (
-    payload: LineSeriesPartialOptions & EmitterEventType
+    payload: LineSeriesPartialOptions &
+      EmitterEventType & { data: LineData<Time>[] }
   ) => {
     const curOptions = series?.options()!;
     if (curOptions.id !== payload.id) return;
@@ -121,6 +123,9 @@ const LineSeries: React.FC<LineSeriesProps> = ({
         else series?.setMarkers([]);
         break;
 
+      case OnApply.Data:
+        series?.setData(payload.data);
+
       default:
         break;
     }
@@ -144,6 +149,7 @@ const LineSeries: React.FC<LineSeriesProps> = ({
   useEffect(() => {
     if (!series) return;
     emittery?.on(OnApply.Property, applyHandler);
+    emittery?.on(OnApply.Data, applyHandler);
 
     setCurrentSeriesOptions(series.options());
   }, [series]);
@@ -151,6 +157,7 @@ const LineSeries: React.FC<LineSeriesProps> = ({
   useEffect(() => {
     return () => {
       emittery?.off(OnApply.Property, applyHandler);
+      emittery?.off(OnApply.Data, applyHandler);
     };
   }, []);
 

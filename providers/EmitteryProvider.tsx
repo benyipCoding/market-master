@@ -30,4 +30,5 @@ export type EmitterEventType = {
 
 export enum OnApply {
   Property = "apply_property",
+  Data = "apply_data",
 }

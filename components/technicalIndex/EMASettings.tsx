@@ -27,6 +27,7 @@ import { textCase, titleCase } from "@/utils/helpers";
 import { CustomLineSeriesType } from "@/hooks/interfaces";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { EmitteryContext, OnApply } from "@/providers/EmitteryProvider";
 
 const EMASettings = () => {
   const { setDialogVisible, tChartRef, setTechnicalIndicatorLines } =
@@ -49,6 +50,26 @@ const EMASettings = () => {
     seriesColor: "#ffff00",
     indicator: currentTab,
   });
+  const { emittery } = useContext(EmitteryContext);
+
+  const generateOptions = (): LineSeriesPartialOptions => ({
+    id: selectedIndicator
+      ? selectedIndicator.options().id
+      : `${formValue.indicator}_${mainSeries?.options().id}_${Date.now()}`,
+    customTitle: formValue.name,
+    lineWidth: +formValue.lineWidth as LineWidth,
+    lineStyle: LineStyle[
+      titleCase(formValue.lineStyle) as any
+    ] as unknown as DeepPartial<LineStyle>,
+    showLabel: false,
+    color: formValue.seriesColor,
+    crosshairMarkerVisible: false,
+    customType: CustomLineSeriesType.Indicator,
+    indicator: formValue.indicator,
+    period: +formValue.period,
+    calculatePrice: formValue.calculatePrice,
+    pointMarkersVisible: false,
+  });
 
   const addIndicator = () => {
     const prices: LineData<Time>[] = (
@@ -64,29 +85,53 @@ const EMASettings = () => {
       mainSeries?.options().toFixedNum!
     );
 
-    const options: LineSeriesPartialOptions = {
-      id: `${formValue.indicator}_${mainSeries?.options().id}_${
-        formValue.period
-      }_${Date.now()}`,
-      customTitle: formValue.name,
-      lineWidth: +formValue.lineWidth as LineWidth,
-      lineStyle: LineStyle[
-        titleCase(formValue.lineStyle) as any
-      ] as unknown as DeepPartial<LineStyle>,
-      showLabel: false,
-      color: formValue.seriesColor,
-      crosshairMarkerVisible: false,
-      customType: CustomLineSeriesType.Indicator,
-      indicator: formValue.indicator,
-      period: +formValue.period,
-      calculatePrice: formValue.calculatePrice,
-    };
+    const options = generateOptions();
+
     setTechnicalIndicatorLines((prev) => [...prev, { options, data: emaData }]);
   };
 
   const editIndicator = () => {
-    // TODO
-    console.log("Edit current indicator");
+    if (!selectedIndicator) return;
+    let emaData: LineData<Time>[] =
+      selectedIndicator.data() as LineData<Time>[];
+
+    const options = generateOptions();
+    emittery?.emit(OnApply.Property, {
+      ...options,
+      eventName: OnApply.Property,
+    });
+
+    if (
+      selectedIndicator.options().period !== +formValue.period ||
+      selectedIndicator.options().calculatePrice !== formValue.calculatePrice
+    ) {
+      const prices: LineData<Time>[] = (
+        mainSeries?.data() as CandlestickData<Time>[]
+      ).map((item) => ({
+        time: item.time,
+        value: item[formValue.calculatePrice],
+      }));
+
+      emaData = calculateEMA(
+        prices,
+        +formValue.period,
+        mainSeries?.options().toFixedNum!
+      );
+
+      emittery?.emit(OnApply.Data, {
+        id: selectedIndicator.options().id,
+        data: emaData,
+        eventName: OnApply.Data,
+      });
+    }
+
+    setTechnicalIndicatorLines((prev) =>
+      prev.map((item) =>
+        item.options.id === options.id
+          ? { options, data: emaData }
+          : { ...item }
+      )
+    );
   };
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -109,7 +154,6 @@ const EMASettings = () => {
       });
     } else {
       const options = selectedIndicator.options() as LineSeriesPartialOptions;
-      console.log(options.color);
 
       Promise.resolve().then(() => {
         setFormValue({
