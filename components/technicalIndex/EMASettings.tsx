@@ -79,6 +79,7 @@ const EMASettings = () => {
       ] as unknown as DeepPartial<LineStyle>,
       showLabel: false,
       color: formValue.seriesColor,
+      crosshairMarkerVisible: false,
     };
 
     console.log({ options });
