@@ -86,7 +86,6 @@ const EMASettings = () => {
     );
 
     const options = generateOptions();
-
     setTechnicalIndicatorLines((prev) => [...prev, { options, data: emaData }]);
   };
 

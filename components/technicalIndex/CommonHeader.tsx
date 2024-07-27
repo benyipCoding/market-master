@@ -19,7 +19,7 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
 
   return (
     <CardHeader>
-      <CardTitle className={cn("relative", titleClass)}>
+      <CardTitle className={cn("relative pr-8", titleClass)}>
         {title}
         <TooltipProvider disableHoverableContent={true}>
           <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
