@@ -34,6 +34,7 @@ import {
 import {
   setHoveringIndicator,
   setHoveringSeries,
+  setSelectedIndicator,
   setSelectedSeries,
 } from "@/store/commonSlice";
 import { useDragLineSeries } from "@/hooks/useDragLineSeries";
@@ -69,6 +70,7 @@ const TChart: React.ForwardRefRenderFunction<
     mousePressing,
     selectedSeries,
     hoveringSeries,
+    hoveringIndicator,
   } = useSelector((state: RootState) => state.common);
   const [chart, setChart] = useState<IChartApi>();
   const [lineId_equation, setLineId_equation] = useState<
@@ -183,6 +185,12 @@ const TChart: React.ForwardRefRenderFunction<
       dispatch(setSelectedSeries(hoveringSeries));
     } else {
       dispatch(setSelectedSeries(null));
+    }
+
+    if (hoveringIndicator) {
+      dispatch(setSelectedIndicator(hoveringIndicator));
+    } else {
+      dispatch(setSelectedIndicator(null));
     }
   }, [mouseClickEventParam]);
 

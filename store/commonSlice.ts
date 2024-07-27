@@ -15,6 +15,7 @@ interface CommonState {
   selectedSeries: ISeriesApi<SeriesType, Time> | null;
   hoveringSeries: ISeriesApi<SeriesType, Time> | null;
   hoveringIndicator: ISeriesApi<SeriesType, Time> | null;
+  selectedIndicator: ISeriesApi<SeriesType, Time> | null;
 }
 
 const initState: CommonState = {
@@ -23,6 +24,7 @@ const initState: CommonState = {
   selectedSeries: null,
   hoveringSeries: null,
   hoveringIndicator: null,
+  selectedIndicator: null,
 };
 
 export const commonSlice = createSlice({
@@ -71,6 +73,12 @@ export const commonSlice = createSlice({
     ) {
       state.hoveringIndicator = action.payload;
     },
+    setSelectedIndicator(
+      state,
+      action: PayloadAction<ISeriesApi<SeriesType, Time> | null>
+    ) {
+      state.selectedIndicator = action.payload;
+    },
   },
 });
 
@@ -83,6 +91,7 @@ export const {
   setHoveringSeries,
   setMouseDblClickEventParam,
   setHoveringIndicator,
+  setSelectedIndicator,
 } = commonSlice.actions;
 
 export default commonSlice.reducer;
