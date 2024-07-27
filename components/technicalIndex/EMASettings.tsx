@@ -9,10 +9,7 @@ import PeriodItem, {
   PeriodItemRef,
 } from "../commonFormItem/PeriodItem";
 import ColorSelector from "../commonFormItem/ColorSelector";
-import {
-  EMAFormValue,
-  TechnicalIndicatorLine,
-} from "../interfaces/TechnicalIndexForm";
+import { EMAFormValue } from "../interfaces/TechnicalIndexForm";
 import { SeriesColorType } from "@/constants/seriesOptions";
 import { DialogContext } from "@/context/Dialog";
 import { TechnicalIndexFormContext } from "./TechnicalIndexForm";
@@ -83,8 +80,6 @@ const EMASettings = () => {
       crosshairMarkerVisible: false,
       customType: CustomLineSeriesType.Indicator,
     };
-
-    console.log({ options });
 
     setTechnicalIndicatorLines((prev) => [...prev, { options, data: emaData }]);
     setDialogVisible(false);
