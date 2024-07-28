@@ -118,7 +118,7 @@ const TechnicalIndexForm: React.FC<TechnicalIndexFormProps> = () => {
           )}
         </aside>
       )}
-      <Card className="w-full">
+      <Card className="min-w-[28rem]">
         <TechnicalIndexFormContext.Provider value={{ currentTab }}>
           {!currentTab && <EmptyState />}
           {currentTab === "MA" && <MASettings />}
