@@ -144,7 +144,6 @@ const Playground = () => {
           {dialogVisible && (
             <CustomDialogContent
               dragConstraints={tChartRef.current?.chartContainer!}
-              overlayClass={cn(isDrawedLineSettings && "bg-transparent")}
               motionDivClass={cn(isTechnicalIndex && "max-w-none w-fit")}
             >
               {isDrawedLineSettings && <SeriesSettings />}

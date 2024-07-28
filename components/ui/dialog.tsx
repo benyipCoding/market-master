@@ -30,16 +30,16 @@ const DialogOverlay = React.forwardRef<
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 interface CustomOverlayProps {
-  hideOverlay?: boolean;
+  // hideOverlay?: boolean;
 }
 
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> &
     CustomOverlayProps
->(({ className, children, hideOverlay = false, ...props }, ref) => (
+>(({ className, children, ...props }, ref) => (
   <DialogPortal>
-    <DialogOverlay className={cn(hideOverlay && "bg-transparent")} />
+    <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(

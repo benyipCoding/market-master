@@ -42,7 +42,7 @@ const CustomDialogContent: React.FC<
 
   return (
     <DialogPortal>
-      <DialogOverlay className={cn(overlayClass)} />
+      <DialogOverlay className={cn("bg-transparent", overlayClass)} />
       <motion.div
         variants={customDialogContentPopIn()}
         initial="hidden"
