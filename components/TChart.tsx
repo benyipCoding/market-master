@@ -71,7 +71,6 @@ const TChart: React.ForwardRefRenderFunction<
     selectedSeries,
     hoveringSeries,
     hoveringIndicator,
-    selectedIndicator,
   } = useSelector((state: RootState) => state.common);
   const [chart, setChart] = useState<IChartApi>();
   const [lineId_equation, setLineId_equation] = useState<
@@ -219,9 +218,13 @@ const TChart: React.ForwardRefRenderFunction<
   // When ContextMenu visible
   useEffect(() => {
     if (!contextMenuVisible) return;
-    if (hoveringSeries) {
+    if (hoveringSeries || hoveringIndicator) {
       contextMenuRef.current?.setSeriesSettingsDisable(false);
-      setTimeout(() => dispatch(setSelectedSeries(hoveringSeries)));
+      setTimeout(() => {
+        if (hoveringSeries) dispatch(setSelectedSeries(hoveringSeries));
+        else if (hoveringIndicator)
+          dispatch(setSelectedIndicator(hoveringIndicator));
+      });
     } else contextMenuRef.current?.setSeriesSettingsDisable(true);
   }, [contextMenuVisible]);
 

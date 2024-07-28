@@ -16,8 +16,8 @@ import {
   TChartContextMenuRef,
   TChartContextMenuProps,
 } from "./interfaces/TChartContextMenu";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
 import { DialogContentType, setDialogContent } from "@/store/dialogSlice";
 
 const TChartContextMenu: React.ForwardRefRenderFunction<
@@ -25,10 +25,14 @@ const TChartContextMenu: React.ForwardRefRenderFunction<
   TChartContextMenuProps
 > = ({ setDialogVisible, dialogVisible }, ref) => {
   const [seriesSettingsDisable, setSeriesSettingsDisable] = useState(true);
+  const { selectedSeries } = useSelector((state: RootState) => state.common);
   const dispatch = useDispatch<AppDispatch>();
 
   const openSeriesSettingsDialog = () => {
-    dispatch(setDialogContent(DialogContentType.DrawedLineSettings));
+    if (selectedSeries)
+      dispatch(setDialogContent(DialogContentType.DrawedLineSettings));
+    else dispatch(setDialogContent(DialogContentType.IndicatorSettings));
+
     Promise.resolve().then(() => setDialogVisible(true));
   };
 

@@ -29,7 +29,6 @@ import TechnicalIndexForm from "@/components/technicalIndex/TechnicalIndexForm";
 import { cn } from "@/lib/utils";
 import { DialogContext } from "@/context/Dialog";
 import { TechnicalIndicatorLine } from "@/components/interfaces/TechnicalIndexForm";
-import IndicatorSettings from "@/components/technicalIndex/IndicatorSettings";
 
 const Playground = () => {
   // TChart component instance
