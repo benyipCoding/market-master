@@ -11,7 +11,7 @@ import {
 export const defaultChartOptions: DeepPartial<ChartOptions> = {
   autoSize: true,
   layout: {
-    background: { type: ColorType.Solid, color: "black" },
+    background: { type: ColorType.Solid, color: "transparent" },
     textColor: "white", // 文本颜色
   },
   grid: {
@@ -53,14 +53,14 @@ export const defaultChartOptions: DeepPartial<ChartOptions> = {
 
 export const lightModeOptions: DeepPartial<ChartOptions> = {
   layout: {
-    background: { type: ColorType.Solid, color: "white" },
+    // background: { type: ColorType.Solid, color: "white" },
     textColor: "black", // 文本颜色
   },
 };
 
 export const darkModeOptions: DeepPartial<ChartOptions> = {
   layout: {
-    background: { type: ColorType.Solid, color: "black" },
+    // background: { type: ColorType.Solid, color: "black" },
     textColor: "white", // 文本颜色
   },
 };

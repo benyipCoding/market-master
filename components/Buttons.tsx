@@ -103,14 +103,14 @@ const Buttons: React.FC<ButtonsProps> = ({
   return (
     <>
       <Button
-        className="absolute left-2 top-2 z-10"
+        className="absolute left-2 top-2 z-10 hidden"
         variant="default"
         onClick={toggleDrawingState}
       >
         {isDrawing && !selectedSeries ? "Finish Draw" : "Start Draw"}
       </Button>
       <Button
-        className="absolute left-32 top-2 z-10"
+        className="absolute left-32 top-2 z-10 hidden"
         variant="destructive"
         onClick={onDeleteSeries}
       >

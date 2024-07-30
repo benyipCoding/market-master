@@ -29,6 +29,10 @@ import TechnicalIndexForm from "@/components/technicalIndex/TechnicalIndexForm";
 import { cn } from "@/lib/utils";
 import { DialogContext } from "@/context/Dialog";
 import { TechnicalIndicatorLine } from "@/components/interfaces/TechnicalIndexForm";
+import Navbar from "@/components/playground/Navbar";
+import LeftAsideBtns from "@/components/playground/LeftAsideBtns";
+import RightAsideBtns from "@/components/playground/RightAsideBtns";
+import Aside from "@/components/playground/Aside";
 
 const Playground = () => {
   // TChart component instance
@@ -99,38 +103,48 @@ const Playground = () => {
 
   return (
     <>
-      <div className="h-full flex">
+      <div className="h-full flex bg-slate-100 dark:bg-black flex-col gap-2">
+        <Navbar />
+        <main className="flex-1 gap-2 flex overflow-hidden">
+          <LeftAsideBtns />
+          <TChart
+            className="bg-background flex-1 rounded-md"
+            setDrawedLineList={setDrawedLineList}
+            drawedLineList={drawedLineList}
+            ref={tChartRef}
+            setDialogVisible={setDialogVisible}
+            dialogVisible={dialogVisible}
+          >
+            <CandlestickSeries
+              seriesData={candlestickData}
+              customSeriesOptions={{ id: "XAU/USD", toFixedNum: 2 }}
+            />
+            {drawedLineList.map((lineOption) => (
+              <LineSeries
+                customSeriesOptions={lineOption}
+                key={lineOption.id}
+              />
+            ))}
+
+            {technicalIndicatorLines.map((line) => (
+              <LineSeries
+                customSeriesOptions={line.options}
+                key={line.options.id}
+                seriesData={line.data}
+              />
+            ))}
+            <Tooltips productName="XAU/USD" tChartRef={tChartRef} />
+          </TChart>
+          <Aside />
+          <RightAsideBtns />
+        </main>
+
         <Buttons
           tChartRef={tChartRef}
           setDrawedLineList={setDrawedLineList}
           setDialogVisible={setDialogVisible}
           setTechnicalIndicatorLines={setTechnicalIndicatorLines}
         />
-        <TChart
-          className="w-full h-full m-auto"
-          setDrawedLineList={setDrawedLineList}
-          drawedLineList={drawedLineList}
-          ref={tChartRef}
-          setDialogVisible={setDialogVisible}
-          dialogVisible={dialogVisible}
-        >
-          <CandlestickSeries
-            seriesData={candlestickData}
-            customSeriesOptions={{ id: "XAU/USD", toFixedNum: 2 }}
-          />
-          {drawedLineList.map((lineOption) => (
-            <LineSeries customSeriesOptions={lineOption} key={lineOption.id} />
-          ))}
-
-          {technicalIndicatorLines.map((line) => (
-            <LineSeries
-              customSeriesOptions={line.options}
-              key={line.options.id}
-              seriesData={line.data}
-            />
-          ))}
-          <Tooltips productName="XAU/USD" tChartRef={tChartRef} />
-        </TChart>
       </div>
 
       <Dialog

@@ -80,6 +80,12 @@ const config = {
         "conic-gradient":
           "conic-gradient(#FFC876, #79FFF7, #9F53FF, #FF98E2, #FFC876)",
       },
+      gridTemplateColumns: {
+        "24": "repeat(24,minmax(0,1fr))",
+      },
+      gridColumn: {
+        "span-18": "span 18 / span 18",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
