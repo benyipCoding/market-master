@@ -162,7 +162,7 @@ const Playground = () => {
             <div
               className="w-2 bg-transparent cursor-col-resize"
               ref={dividerRef}
-              onClick={toggleAsideOpen}
+              onPointerDown={toggleAsideOpen}
             ></div>
             <Aside
               className="bg-background rounded-md overflow-auto"
