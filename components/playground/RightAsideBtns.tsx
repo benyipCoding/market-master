@@ -1,12 +1,9 @@
 import { cn } from "@/lib/utils";
 import React from "react";
-
-interface RightAsideBtnsProps {
-  className?: string;
-}
+import { RightAsideBtnsProps } from "../interfaces/Playground";
 
 const RightAsideBtns: React.FC<RightAsideBtnsProps> = ({ className }) => {
-  return <div className={cn(className)}>RightAsideBtns</div>;
+  return <div className={cn(className)}></div>;
 };
 
 export default RightAsideBtns;

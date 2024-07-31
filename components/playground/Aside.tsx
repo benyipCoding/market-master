@@ -1,14 +1,6 @@
 import { cn } from "@/lib/utils";
 import React, { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
-
-interface AsideProps {
-  className?: string;
-  asideOpen: boolean;
-}
-
-export interface AsideRef {
-  container: HTMLDivElement | null;
-}
+import { AsideRef, AsideProps } from "../interfaces/Playground";
 
 const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   { className, asideOpen },

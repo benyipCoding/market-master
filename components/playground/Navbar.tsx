@@ -1,9 +1,6 @@
 import { cn } from "@/lib/utils";
 import React from "react";
-
-interface NavbarProps {
-  className?: string;
-}
+import { NavbarProps } from "../interfaces/Playground";
 
 const Navbar: React.FC<NavbarProps> = ({ className }) => {
   return <nav className={cn(className)}>Navbar</nav>;
