@@ -21,7 +21,7 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
     <CardHeader>
       <CardTitle className={cn("relative pr-8", titleClass)}>
         {title}
-        <TooltipProvider disableHoverableContent={true}>
+        <TooltipProvider disableHoverableContent={true} delayDuration={0}>
           <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
             <TooltipTrigger asChild>
               <span className="pointer-events-none absolute top-0 right-0"></span>

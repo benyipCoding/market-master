@@ -17,11 +17,7 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     container: asideRef.current,
   }));
 
-  return (
-    <div className={cn(className)} ref={asideRef} style={{ width }}>
-      Aside
-    </div>
-  );
+  return <div className={cn(className)} ref={asideRef} style={{ width }}></div>;
 };
 
 export default forwardRef(Aside);

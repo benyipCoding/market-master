@@ -127,7 +127,7 @@ const Playground = () => {
       <div className="h-full flex bg-slate-100 dark:bg-black flex-col gap-2">
         <Navbar className="h-10 flex items-center bg-background w-full rounded-md" />
         <main className="flex-1 flex overflow-hidden">
-          <LeftAsideBtns className="bg-background w-12 rounded-md flex-shrink-0 mr-2" />
+          <LeftAsideBtns className="w-12 mr-2" />
           <div
             className="flex-1 flex bg-slate-100 dark:bg-black rounded-md overflow-hidden"
             ref={mainWrapper}
