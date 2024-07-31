@@ -32,11 +32,14 @@ import { TechnicalIndicatorLine } from "@/components/interfaces/TechnicalIndexFo
 import Navbar from "@/components/playground/Navbar";
 import LeftAsideBtns from "@/components/playground/LeftAsideBtns";
 import RightAsideBtns from "@/components/playground/RightAsideBtns";
-import Aside from "@/components/playground/Aside";
+import Aside, { AsideRef } from "@/components/playground/Aside";
 
 const Playground = () => {
   // TChart component instance
   const tChartRef = useRef<TChartRef>(null);
+  const asideRef = useRef<AsideRef>(null);
+  const dividerRef = useRef<HTMLDivElement>(null);
+  const [asideOpen, setAsideOpen] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
   const { dialogContent } = useSelector((state: RootState) => state.dialog);
   const isDrawedLineSettings = useMemo(
@@ -88,10 +91,24 @@ const Playground = () => {
     dispatch(setMouseDblClickEventParam(param));
   };
 
+  const calculateTChartWidth = () => {
+    const width =
+      mainWrapper.current?.offsetWidth! -
+      asideRef.current?.container?.offsetWidth! -
+      dividerRef.current?.offsetWidth!;
+
+    tChartRef.current?.setWidth(`${width}px`);
+  };
+
+  const toggleAsideOpen = () => {
+    tChartRef.current?.setWidth("0px");
+    setAsideOpen((prev) => !prev);
+    Promise.resolve().then(() => calculateTChartWidth());
+  };
+
   // get dummy candlestick data
   useEffect(() => {
     getCandlestickData();
-    console.log("mainWrapper width:", mainWrapper.current?.offsetWidth);
   }, []);
 
   useEffect(() => {
@@ -108,14 +125,14 @@ const Playground = () => {
     <>
       <div className="h-full flex bg-slate-100 dark:bg-black flex-col gap-2">
         <Navbar className="h-10 flex items-center bg-background w-full rounded-md" />
-        <main className="flex-1 gap-2 flex overflow-hidden">
-          <LeftAsideBtns className="bg-background w-12 rounded-md flex-shrink-0" />
+        <main className="flex-1 flex overflow-hidden">
+          <LeftAsideBtns className="bg-background w-12 rounded-md flex-shrink-0 mr-2" />
           <div
-            className="flex-1 flex gap-2 bg-slate-100 dark:bg-black rounded-md"
+            className="flex-1 flex bg-slate-100 dark:bg-black rounded-md overflow-hidden"
             ref={mainWrapper}
           >
             <TChart
-              className="bg-background flex-1 rounded-md"
+              className="bg-background rounded-md z-10"
               setDrawedLineList={setDrawedLineList}
               drawedLineList={drawedLineList}
               ref={tChartRef}
@@ -142,9 +159,23 @@ const Playground = () => {
               ))}
               <Tooltips productName="XAU/USD" tChartRef={tChartRef} />
             </TChart>
-            <Aside className="bg-background rounded-md overflow-auto" />
+            <div
+              className="w-2 bg-transparent cursor-col-resize"
+              ref={dividerRef}
+              onClick={toggleAsideOpen}
+            ></div>
+            <Aside
+              className="bg-background rounded-md overflow-auto"
+              ref={asideRef}
+              asideOpen={asideOpen}
+            />
           </div>
-          <RightAsideBtns className="bg-background w-12 rounded-md flex-shrink-0" />
+          <RightAsideBtns
+            className={cn(
+              "bg-background w-12 rounded-md flex-shrink-0 ml-2",
+              !asideOpen && "ml-0"
+            )}
+          />
         </main>
 
         <Buttons

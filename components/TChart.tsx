@@ -61,6 +61,7 @@ const TChart: React.ForwardRefRenderFunction<
   },
   ref
 ) => {
+  const [width, setWidth] = useState("");
   const container = useRef<HTMLDivElement>(null);
   const {
     isDrawing,
@@ -233,6 +234,7 @@ const TChart: React.ForwardRefRenderFunction<
     childSeries: childSeries,
     chartContainer: container,
     dialogVisible,
+    setWidth,
   }));
 
   return (
@@ -244,8 +246,10 @@ const TChart: React.ForwardRefRenderFunction<
           className,
           isCanGrab && "cursor-grab",
           mousePressing && "cursor-grabbing",
-          isDrawing && !mousePressing && "cursor-crosshair"
+          isDrawing && !mousePressing && "cursor-crosshair",
+          !width && "flex-1"
         )}
+        style={{ width }}
         ref={container}
         // Only unselected series can trigger the line drawing function
         onMouseDown={(e) =>

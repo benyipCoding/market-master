@@ -32,4 +32,5 @@ export interface TChartRef {
   childSeries: ISeriesApi<SeriesType, Time>[];
   chartContainer: React.RefObject<HTMLDivElement>;
   dialogVisible: boolean;
+  setWidth: React.Dispatch<React.SetStateAction<string>>;
 }

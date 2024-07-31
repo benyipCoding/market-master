@@ -1,28 +1,35 @@
 import { cn } from "@/lib/utils";
-import React, { useEffect, useRef, useState } from "react";
+import React, { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
 
 interface AsideProps {
   className?: string;
+  asideOpen: boolean;
 }
 
-const Aside: React.FC<AsideProps> = ({ className }) => {
+export interface AsideRef {
+  container: HTMLDivElement | null;
+}
+
+const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
+  { className, asideOpen },
+  ref
+) => {
   const asideRef = useRef<HTMLDivElement>(null);
 
-  const [width, setWidth] = useState<string>("19rem");
+  const width = useMemo<string>(
+    () => (asideOpen ? "19rem" : "0rem"),
+    [asideOpen]
+  );
 
-  useEffect(() => {
-    console.log("asideRef:", asideRef.current?.offsetWidth);
-  }, []);
+  useImperativeHandle(ref, () => ({
+    container: asideRef.current,
+  }));
 
   return (
-    <div
-      className={cn(className)}
-      style={{ width, resize: "horizontal" }}
-      ref={asideRef}
-    >
+    <div className={cn(className)} ref={asideRef} style={{ width }}>
       Aside
     </div>
   );
 };
 
-export default Aside;
+export default forwardRef(Aside);
