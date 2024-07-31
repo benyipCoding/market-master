@@ -69,6 +69,8 @@ const Playground = () => {
   // dialog trigger
   const [dialogVisible, setDialogVisible] = useState(false);
 
+  const mainWrapper = useRef<HTMLDivElement>(null);
+
   const getCandlestickData = async () => {
     const res = await getDummyData();
     setCandlestickData(res.data);
@@ -89,6 +91,7 @@ const Playground = () => {
   // get dummy candlestick data
   useEffect(() => {
     getCandlestickData();
+    console.log("mainWrapper width:", mainWrapper.current?.offsetWidth);
   }, []);
 
   useEffect(() => {
@@ -104,39 +107,44 @@ const Playground = () => {
   return (
     <>
       <div className="h-full flex bg-slate-100 dark:bg-black flex-col gap-2">
-        <Navbar />
+        <Navbar className="h-10 flex items-center bg-background w-full rounded-md" />
         <main className="flex-1 gap-2 flex overflow-hidden">
-          <LeftAsideBtns />
-          <TChart
-            className="bg-background flex-1 rounded-md"
-            setDrawedLineList={setDrawedLineList}
-            drawedLineList={drawedLineList}
-            ref={tChartRef}
-            setDialogVisible={setDialogVisible}
-            dialogVisible={dialogVisible}
+          <LeftAsideBtns className="bg-background w-12 rounded-md flex-shrink-0" />
+          <div
+            className="flex-1 flex gap-2 bg-slate-100 dark:bg-black rounded-md"
+            ref={mainWrapper}
           >
-            <CandlestickSeries
-              seriesData={candlestickData}
-              customSeriesOptions={{ id: "XAU/USD", toFixedNum: 2 }}
-            />
-            {drawedLineList.map((lineOption) => (
-              <LineSeries
-                customSeriesOptions={lineOption}
-                key={lineOption.id}
+            <TChart
+              className="bg-background flex-1 rounded-md"
+              setDrawedLineList={setDrawedLineList}
+              drawedLineList={drawedLineList}
+              ref={tChartRef}
+              setDialogVisible={setDialogVisible}
+              dialogVisible={dialogVisible}
+            >
+              <CandlestickSeries
+                seriesData={candlestickData}
+                customSeriesOptions={{ id: "XAU/USD", toFixedNum: 2 }}
               />
-            ))}
+              {drawedLineList.map((lineOption) => (
+                <LineSeries
+                  customSeriesOptions={lineOption}
+                  key={lineOption.id}
+                />
+              ))}
 
-            {technicalIndicatorLines.map((line) => (
-              <LineSeries
-                customSeriesOptions={line.options}
-                key={line.options.id}
-                seriesData={line.data}
-              />
-            ))}
-            <Tooltips productName="XAU/USD" tChartRef={tChartRef} />
-          </TChart>
-          <Aside />
-          <RightAsideBtns />
+              {technicalIndicatorLines.map((line) => (
+                <LineSeries
+                  customSeriesOptions={line.options}
+                  key={line.options.id}
+                  seriesData={line.data}
+                />
+              ))}
+              <Tooltips productName="XAU/USD" tChartRef={tChartRef} />
+            </TChart>
+            <Aside className="bg-background rounded-md overflow-auto" />
+          </div>
+          <RightAsideBtns className="bg-background w-12 rounded-md flex-shrink-0" />
         </main>
 
         <Buttons

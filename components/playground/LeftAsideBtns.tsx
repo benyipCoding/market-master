@@ -1,7 +1,12 @@
+import { cn } from "@/lib/utils";
 import React from "react";
 
-const LeftAsideBtns = () => {
-  return <div className="bg-background w-12 rounded-md">LeftAsideBtns</div>;
+interface LeftAsideBtnsProps {
+  className?: string;
+}
+
+const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({ className }) => {
+  return <div className={cn(className)}>LeftAsideBtns</div>;
 };
 
 export default LeftAsideBtns;

@@ -1,7 +1,12 @@
+import { cn } from "@/lib/utils";
 import React from "react";
 
-const RightAsideBtns = () => {
-  return <div className="bg-background w-12 rounded-md">RightAsideBtns</div>;
+interface RightAsideBtnsProps {
+  className?: string;
+}
+
+const RightAsideBtns: React.FC<RightAsideBtnsProps> = ({ className }) => {
+  return <div className={cn(className)}>RightAsideBtns</div>;
 };
 
 export default RightAsideBtns;

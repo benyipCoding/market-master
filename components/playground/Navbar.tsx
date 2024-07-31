@@ -1,11 +1,12 @@
+import { cn } from "@/lib/utils";
 import React from "react";
 
-const Navbar = () => {
-  return (
-    <nav className="h-10 flex items-center bg-background w-full rounded-md">
-      Navbar
-    </nav>
-  );
+interface NavbarProps {
+  className?: string;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ className }) => {
+  return <nav className={cn(className)}>Navbar</nav>;
 };
 
 export default Navbar;
