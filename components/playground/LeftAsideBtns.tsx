@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import { LeftAsideBtnsProps } from "../interfaces/Playground";
 import { PiLineSegment } from "react-icons/pi";
 import { Button } from "../ui/button";
@@ -9,11 +9,97 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
+import {
+  setSelectedSeries,
+  setHoveringSeries,
+  toggleDrawing,
+  setSelectedIndicator,
+} from "@/store/commonSlice";
+import hotkeys from "hotkeys-js";
 
-const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({ className }) => {
-  const { isDrawing } = useSelector((state: RootState) => state.common);
+const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
+  className,
+  tChartRef,
+  setDialogVisible,
+  setDrawedLineList,
+  setTechnicalIndicatorLines,
+}) => {
+  const { isDrawing, selectedSeries, selectedIndicator } = useSelector(
+    (state: RootState) => state.common
+  );
+  const dispatch = useDispatch<AppDispatch>();
+
+  const toggleDrawingState = useCallback(() => {
+    if (!tChartRef.current) return;
+    const { dialogVisible } = tChartRef.current;
+    if (dialogVisible) return;
+    dispatch(setSelectedSeries(null));
+    dispatch(setHoveringSeries(null));
+    dispatch(toggleDrawing(!isDrawing));
+  }, [isDrawing]);
+
+  const contextmenuHandler = (e: MouseEvent) => {
+    e.preventDefault();
+    if (!tChartRef.current) return;
+    const { dialogVisible } = tChartRef.current;
+    if (dialogVisible) return;
+    dispatch(setSelectedSeries(null));
+    dispatch(toggleDrawing(false));
+  };
+
+  const closeDialogByESC = (e: KeyboardEvent) => {
+    e.preventDefault();
+    setDialogVisible(false);
+  };
+
+  const onDeleteSeries = useCallback(() => {
+    if (!tChartRef.current) return;
+    const { chart, dialogVisible } = tChartRef.current;
+    if (dialogVisible) return;
+    if (selectedSeries) {
+      chart.removeSeries(selectedSeries);
+      const { id } = selectedSeries.options();
+      setDrawedLineList((prev) =>
+        prev.filter((lineOptions) => lineOptions.id !== id)
+      );
+      dispatch(setSelectedSeries(null));
+    }
+
+    if (selectedIndicator) {
+      chart.removeSeries(selectedIndicator);
+      const { id } = selectedIndicator.options();
+      setTechnicalIndicatorLines((prev) =>
+        prev.filter((item) => item.options.id !== id)
+      );
+      dispatch(setSelectedIndicator(null));
+    }
+  }, [selectedSeries, selectedIndicator]);
+
+  // hotkeys
+  useEffect(() => {
+    hotkeys("l", toggleDrawingState);
+    // hotkeys("i", openTechnicalIndexDialog);
+    hotkeys("Esc", closeDialogByESC);
+    document.addEventListener("contextmenu", contextmenuHandler);
+
+    return () => {
+      hotkeys.unbind("l");
+      // hotkeys.unbind("i");
+      hotkeys.unbind("Esc");
+      document.removeEventListener("contextmenu", contextmenuHandler);
+    };
+  }, []);
+
+  // Delete hotkeys
+  useEffect(() => {
+    if (selectedSeries || selectedIndicator) {
+      hotkeys("Delete", onDeleteSeries);
+    } else {
+      hotkeys.unbind("Delete");
+    }
+  }, [selectedSeries, selectedIndicator]);
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -32,12 +118,15 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({ className }) => {
                 "hover:bg-muted p-1",
                 isDrawing && "bg-primary hover:bg-primary"
               )}
+              onClick={toggleDrawingState}
             >
               <PiLineSegment className="w-full h-full" />
               <span className="sr-only">Draw Line</span>
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="right">Draw Line (L)</TooltipContent>
+          <TooltipContent side="right">
+            Draw Line ( <span className="text-primary">L</span> )
+          </TooltipContent>
         </Tooltip>
       </div>
     </TooltipProvider>

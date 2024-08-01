@@ -38,6 +38,7 @@ import { AsideRef } from "@/components/interfaces/Playground";
 const Playground = () => {
   // TChart component instance
   const tChartRef = useRef<TChartRef>(null);
+  const mainWrapper = useRef<HTMLDivElement>(null);
   const asideRef = useRef<AsideRef>(null);
   const dividerRef = useRef<HTMLDivElement>(null);
   const [asideOpen, setAsideOpen] = useState(true);
@@ -72,8 +73,6 @@ const Playground = () => {
 
   // dialog trigger
   const [dialogVisible, setDialogVisible] = useState(false);
-
-  const mainWrapper = useRef<HTMLDivElement>(null);
 
   const getCandlestickData = async () => {
     const res = await getDummyData();
@@ -127,7 +126,13 @@ const Playground = () => {
       <div className="h-full flex bg-slate-100 dark:bg-black flex-col gap-2">
         <Navbar className="h-10 flex items-center bg-background w-full rounded-md" />
         <main className="flex-1 flex overflow-hidden">
-          <LeftAsideBtns className="w-12 mr-2" />
+          <LeftAsideBtns
+            className="w-12 mr-2"
+            tChartRef={tChartRef}
+            setDrawedLineList={setDrawedLineList}
+            setDialogVisible={setDialogVisible}
+            setTechnicalIndicatorLines={setTechnicalIndicatorLines}
+          />
           <div
             className="flex-1 flex bg-slate-100 dark:bg-black rounded-md overflow-hidden"
             ref={mainWrapper}
@@ -197,7 +202,7 @@ const Playground = () => {
         >
           {dialogVisible && (
             <CustomDialogContent
-              dragConstraints={tChartRef.current?.chartContainer!}
+              dragConstraints={mainWrapper}
               motionDivClass={cn(isTechnicalIndex && "max-w-none w-fit")}
             >
               {isDrawedLineSettings && <SeriesSettings />}

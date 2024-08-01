@@ -20,50 +20,50 @@ const Buttons: React.FC<ButtonsProps> = ({
   setTechnicalIndicatorLines,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { isDrawing, selectedSeries, selectedIndicator } = useSelector(
-    (state: RootState) => state.common
-  );
+  // const { isDrawing, selectedSeries, selectedIndicator } = useSelector(
+  //   (state: RootState) => state.common
+  // );
 
-  const onDeleteSeries = useCallback(() => {
-    if (!tChartRef.current) return;
-    const { chart, dialogVisible } = tChartRef.current;
-    if (dialogVisible) return;
-    if (selectedSeries) {
-      chart.removeSeries(selectedSeries);
-      const { id } = selectedSeries.options();
-      setDrawedLineList((prev) =>
-        prev.filter((lineOptions) => lineOptions.id !== id)
-      );
-      dispatch(setSelectedSeries(null));
-    }
+  // const onDeleteSeries = useCallback(() => {
+  //   if (!tChartRef.current) return;
+  //   const { chart, dialogVisible } = tChartRef.current;
+  //   if (dialogVisible) return;
+  //   if (selectedSeries) {
+  //     chart.removeSeries(selectedSeries);
+  //     const { id } = selectedSeries.options();
+  //     setDrawedLineList((prev) =>
+  //       prev.filter((lineOptions) => lineOptions.id !== id)
+  //     );
+  //     dispatch(setSelectedSeries(null));
+  //   }
 
-    if (selectedIndicator) {
-      chart.removeSeries(selectedIndicator);
-      const { id } = selectedIndicator.options();
-      setTechnicalIndicatorLines((prev) =>
-        prev.filter((item) => item.options.id !== id)
-      );
-      dispatch(setSelectedIndicator(null));
-    }
-  }, [selectedSeries, selectedIndicator]);
+  //   if (selectedIndicator) {
+  //     chart.removeSeries(selectedIndicator);
+  //     const { id } = selectedIndicator.options();
+  //     setTechnicalIndicatorLines((prev) =>
+  //       prev.filter((item) => item.options.id !== id)
+  //     );
+  //     dispatch(setSelectedIndicator(null));
+  //   }
+  // }, [selectedSeries, selectedIndicator]);
 
-  const toggleDrawingState = useCallback(() => {
-    if (!tChartRef.current) return;
-    const { dialogVisible } = tChartRef.current;
-    if (dialogVisible) return;
-    dispatch(setSelectedSeries(null));
-    dispatch(setHoveringSeries(null));
-    dispatch(toggleDrawing(!isDrawing));
-  }, [isDrawing]);
+  // const toggleDrawingState = useCallback(() => {
+  //   if (!tChartRef.current) return;
+  //   const { dialogVisible } = tChartRef.current;
+  //   if (dialogVisible) return;
+  //   dispatch(setSelectedSeries(null));
+  //   dispatch(setHoveringSeries(null));
+  //   dispatch(toggleDrawing(!isDrawing));
+  // }, [isDrawing]);
 
-  const contextmenuHandler = (e: MouseEvent) => {
-    e.preventDefault();
-    if (!tChartRef.current) return;
-    const { dialogVisible } = tChartRef.current;
-    if (dialogVisible) return;
-    dispatch(setSelectedSeries(null));
-    dispatch(toggleDrawing(false));
-  };
+  // const contextmenuHandler = (e: MouseEvent) => {
+  //   e.preventDefault();
+  //   if (!tChartRef.current) return;
+  //   const { dialogVisible } = tChartRef.current;
+  //   if (dialogVisible) return;
+  //   dispatch(setSelectedSeries(null));
+  //   dispatch(toggleDrawing(false));
+  // };
 
   const openTechnicalIndexDialog = () => {
     dispatch(setSelectedIndicator(null));
@@ -71,51 +71,51 @@ const Buttons: React.FC<ButtonsProps> = ({
     Promise.resolve().then(() => setDialogVisible((prev) => !prev));
   };
 
-  const closeDialogByESC = (e: KeyboardEvent) => {
-    e.preventDefault();
-    setDialogVisible(false);
-  };
+  // const closeDialogByESC = (e: KeyboardEvent) => {
+  //   e.preventDefault();
+  //   setDialogVisible(false);
+  // };
 
   // hotkeys
   useEffect(() => {
-    hotkeys("l", toggleDrawingState);
+    // hotkeys("l", toggleDrawingState);
     hotkeys("i", openTechnicalIndexDialog);
-    hotkeys("Esc", closeDialogByESC);
-    document.addEventListener("contextmenu", contextmenuHandler);
+    // hotkeys("Esc", closeDialogByESC);
+    // document.addEventListener("contextmenu", contextmenuHandler);
 
     return () => {
-      hotkeys.unbind("l");
+      // hotkeys.unbind("l");
       hotkeys.unbind("i");
-      hotkeys.unbind("Esc");
-      document.removeEventListener("contextmenu", contextmenuHandler);
+      // hotkeys.unbind("Esc");
+      // document.removeEventListener("contextmenu", contextmenuHandler);
     };
   }, []);
 
   // Delete hotkeys
-  useEffect(() => {
-    if (selectedSeries || selectedIndicator) {
-      hotkeys("Delete", onDeleteSeries);
-    } else {
-      hotkeys.unbind("Delete");
-    }
-  }, [selectedSeries, selectedIndicator]);
+  // useEffect(() => {
+  //   if (selectedSeries || selectedIndicator) {
+  //     hotkeys("Delete", onDeleteSeries);
+  //   } else {
+  //     hotkeys.unbind("Delete");
+  //   }
+  // }, [selectedSeries, selectedIndicator]);
 
   return (
     <>
-      <Button
+      {/* <Button
         className="absolute left-2 top-2 z-10 hidden"
         variant="default"
         onClick={toggleDrawingState}
       >
         {isDrawing && !selectedSeries ? "Finish Draw" : "Start Draw"}
-      </Button>
-      <Button
+      </Button> */}
+      {/* <Button
         className="absolute left-32 top-2 z-10 hidden"
         variant="destructive"
         onClick={onDeleteSeries}
       >
         Delete
-      </Button>
+      </Button> */}
     </>
   );
 };
