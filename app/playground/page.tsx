@@ -106,9 +106,20 @@ const Playground = () => {
     Promise.resolve().then(() => calculateTChartWidth());
   };
 
+  const resizeHandler = () => {
+    tChartRef.current?.setWidth("0px");
+    Promise.resolve().then(() => calculateTChartWidth());
+  };
+
   // get dummy candlestick data
   useEffect(() => {
     getCandlestickData();
+
+    window.addEventListener("resize", throttle(resizeHandler, 100));
+
+    return () => {
+      window.removeEventListener("resize", throttle(resizeHandler, 100));
+    };
   }, []);
 
   useEffect(() => {
@@ -119,6 +130,12 @@ const Playground = () => {
     chart.subscribeCrosshairMove(throttle(crosshairMoveHandler, 100));
     chart.subscribeClick(chartClickHandler);
     chart.subscribeDblClick(chartDblClickHandler);
+
+    return () => {
+      chart.unsubscribeCrosshairMove(throttle(crosshairMoveHandler, 100));
+      chart.unsubscribeClick(chartClickHandler);
+      chart.unsubscribeDblClick(chartDblClickHandler);
+    };
   }, [tChartRef.current?.chart]);
 
   return (
