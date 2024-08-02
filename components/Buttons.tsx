@@ -1,3 +1,5 @@
+"use client";
+// Deprecated
 import { AppDispatch, RootState } from "@/store";
 import {
   setHoveringIndicator,
@@ -65,11 +67,11 @@ const Buttons: React.FC<ButtonsProps> = ({
   //   dispatch(toggleDrawing(false));
   // };
 
-  const openTechnicalIndexDialog = () => {
-    dispatch(setSelectedIndicator(null));
-    dispatch(setDialogContent(DialogContentType.TechnicalIndex));
-    Promise.resolve().then(() => setDialogVisible((prev) => !prev));
-  };
+  // const openTechnicalIndexDialog = () => {
+  //   dispatch(setSelectedIndicator(null));
+  //   dispatch(setDialogContent(DialogContentType.TechnicalIndex));
+  //   Promise.resolve().then(() => setDialogVisible((prev) => !prev));
+  // };
 
   // const closeDialogByESC = (e: KeyboardEvent) => {
   //   e.preventDefault();
@@ -79,13 +81,13 @@ const Buttons: React.FC<ButtonsProps> = ({
   // hotkeys
   useEffect(() => {
     // hotkeys("l", toggleDrawingState);
-    hotkeys("i", openTechnicalIndexDialog);
+    // hotkeys("i", openTechnicalIndexDialog);
     // hotkeys("Esc", closeDialogByESC);
     // document.addEventListener("contextmenu", contextmenuHandler);
 
     return () => {
       // hotkeys.unbind("l");
-      hotkeys.unbind("i");
+      // hotkeys.unbind("i");
       // hotkeys.unbind("Esc");
       // document.removeEventListener("contextmenu", contextmenuHandler);
     };

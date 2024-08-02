@@ -35,7 +35,9 @@ const Tooltips: React.FC<TooltipsProps> = ({ productName, tChartRef }) => {
 
   const [visible, setVisible] = useState(false);
   const tooltipsWrapper = useRef<HTMLDivElement>(null);
-  const { selectedSeries } = useSelector((state: RootState) => state.common);
+  const { selectedSeries, selectedIndicator } = useSelector(
+    (state: RootState) => state.common
+  );
 
   const closeByWheel = useCallback(() => {
     setVisible(false);
@@ -71,7 +73,7 @@ const Tooltips: React.FC<TooltipsProps> = ({ productName, tChartRef }) => {
 
   useEffect(() => {
     setVisible(false);
-  }, [selectedSeries]);
+  }, [selectedSeries, selectedIndicator]);
 
   useLayoutEffect(() => {
     if (!tooltipsWrapper.current || !mouseClickEventParam?.point) return;

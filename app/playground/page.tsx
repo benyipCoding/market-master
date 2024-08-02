@@ -124,7 +124,10 @@ const Playground = () => {
   return (
     <>
       <div className="h-full flex bg-slate-100 dark:bg-black flex-col gap-2">
-        <Navbar className="h-10 flex items-center bg-background w-full rounded-md" />
+        <Navbar
+          className="h-10 flex items-center bg-background w-full rounded-md"
+          setDialogVisible={setDialogVisible}
+        />
         <main className="flex-1 flex overflow-hidden">
           <LeftAsideBtns
             className="w-12 mr-2"
@@ -183,13 +186,6 @@ const Playground = () => {
             )}
           />
         </main>
-
-        <Buttons
-          tChartRef={tChartRef}
-          setDrawedLineList={setDrawedLineList}
-          setDialogVisible={setDialogVisible}
-          setTechnicalIndicatorLines={setTechnicalIndicatorLines}
-        />
       </div>
 
       <Dialog
