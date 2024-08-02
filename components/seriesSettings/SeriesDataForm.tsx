@@ -137,7 +137,7 @@ const SeriesDataForm: React.FC<SeriesDataFormProps> = () => {
           formValueHasChanged={formValueHasChanged}
           onCancel={() => setDialogVisible(false)}
           onApply={() => {}}
-          onSetDefault={() => {}}
+          onReset={() => {}}
         />
       </CardFooter>
     </form>

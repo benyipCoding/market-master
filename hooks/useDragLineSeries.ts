@@ -1,5 +1,9 @@
 import { AppDispatch, RootState } from "@/store";
-import { toggleDrawing, toggleMousePressing } from "@/store/commonSlice";
+import {
+  setGraphType,
+  toggleDrawing,
+  toggleMousePressing,
+} from "@/store/commonSlice";
 import {
   calcValue,
   findClosestPrice,
@@ -79,6 +83,7 @@ export const useDragLineSeries = ({
 
   const dragEnd = (e: MouseEvent) => {
     dispatch(toggleDrawing(false));
+    dispatch(setGraphType(""));
     dispatch(toggleMousePressing(false));
     Promise.resolve().then(cleanUp);
   };

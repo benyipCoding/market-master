@@ -6,8 +6,14 @@ import {
   Time,
 } from "lightweight-charts";
 
+export enum GraphType {
+  LineSegment = "line_segment",
+  Horizontal = "horizontal_line",
+}
+
 interface CommonState {
   isDrawing: boolean;
+  graphType: GraphType | "";
   mousePressing: boolean;
   mouseMovingEventParam?: MouseEventParams<Time>;
   mouseClickEventParam?: MouseEventParams<Time>;
@@ -25,6 +31,7 @@ const initState: CommonState = {
   hoveringSeries: null,
   hoveringIndicator: null,
   selectedIndicator: null,
+  graphType: "",
 };
 
 export const commonSlice = createSlice({
@@ -79,6 +86,9 @@ export const commonSlice = createSlice({
     ) {
       state.selectedIndicator = action.payload;
     },
+    setGraphType(state, action: PayloadAction<GraphType | "">) {
+      state.graphType = action.payload;
+    },
   },
 });
 
@@ -92,6 +102,7 @@ export const {
   setMouseDblClickEventParam,
   setHoveringIndicator,
   setSelectedIndicator,
+  setGraphType,
 } = commonSlice.actions;
 
 export default commonSlice.reducer;

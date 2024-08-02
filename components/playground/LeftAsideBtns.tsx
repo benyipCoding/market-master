@@ -16,6 +16,8 @@ import {
   setHoveringSeries,
   toggleDrawing,
   setSelectedIndicator,
+  GraphType,
+  setGraphType,
 } from "@/store/commonSlice";
 import hotkeys from "hotkeys-js";
 
@@ -26,33 +28,35 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
   setDrawedLineList,
   setTechnicalIndicatorLines,
 }) => {
-  const { isDrawing, selectedSeries, selectedIndicator } = useSelector(
-    (state: RootState) => state.common
-  );
+  const { isDrawing, selectedSeries, selectedIndicator, graphType } =
+    useSelector((state: RootState) => state.common);
   const dispatch = useDispatch<AppDispatch>();
 
-  const toggleDrawingState = useCallback(() => {
+  const toggleDrawingLineSegment = useCallback(() => {
     if (!tChartRef.current) return;
     const { dialogVisible } = tChartRef.current;
     if (dialogVisible) return;
     dispatch(setSelectedSeries(null));
     dispatch(setHoveringSeries(null));
     dispatch(toggleDrawing(!isDrawing));
+    if (!isDrawing) dispatch(setGraphType(GraphType.LineSegment));
+    else dispatch(setGraphType(""));
   }, [isDrawing]);
 
-  const contextmenuHandler = (e: MouseEvent) => {
+  const contextmenuHandler = useCallback((e: MouseEvent) => {
     e.preventDefault();
     if (!tChartRef.current) return;
     const { dialogVisible } = tChartRef.current;
     if (dialogVisible) return;
     dispatch(setSelectedSeries(null));
     dispatch(toggleDrawing(false));
-  };
+    dispatch(setGraphType(""));
+  }, []);
 
-  const closeDialogByESC = (e: KeyboardEvent) => {
+  const closeDialogByESC = useCallback((e: KeyboardEvent) => {
     e.preventDefault();
     setDialogVisible(false);
-  };
+  }, []);
 
   const onDeleteSeries = useCallback(() => {
     if (!tChartRef.current) return;
@@ -77,35 +81,38 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
     }
   }, [selectedSeries, selectedIndicator]);
 
-  // hotkeys
+  // L key
   useEffect(() => {
-    hotkeys("l", toggleDrawingState);
+    hotkeys("l", toggleDrawingLineSegment);
+    return () => {
+      hotkeys.unbind("l");
+    };
+  }, [toggleDrawingLineSegment]);
+
+  // Delete key
+  useEffect(() => {
+    hotkeys("Delete", onDeleteSeries);
+    return () => {
+      hotkeys.unbind("Delete");
+    };
+  }, [onDeleteSeries]);
+
+  useEffect(() => {
     // hotkeys("i", openTechnicalIndexDialog);
     hotkeys("Esc", closeDialogByESC);
     document.addEventListener("contextmenu", contextmenuHandler);
-
     return () => {
-      hotkeys.unbind("l");
       // hotkeys.unbind("i");
       hotkeys.unbind("Esc");
       document.removeEventListener("contextmenu", contextmenuHandler);
     };
   }, []);
 
-  // Delete hotkeys
-  useEffect(() => {
-    if (selectedSeries || selectedIndicator) {
-      hotkeys("Delete", onDeleteSeries);
-    } else {
-      hotkeys.unbind("Delete");
-    }
-  }, [selectedSeries, selectedIndicator]);
-
   return (
     <TooltipProvider delayDuration={0}>
       <div
         className={cn(
-          "bg-background rounded-md flex-shrink-0 flex flex-col p-1",
+          "bg-background rounded-md flex-shrink-0 flex flex-col p-1 gap-3",
           className
         )}
       >
@@ -116,9 +123,10 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
               variant={"ghost"}
               className={cn(
                 "hover:bg-muted p-1",
-                isDrawing && "bg-primary hover:bg-primary"
+                graphType === GraphType.LineSegment &&
+                  "bg-primary hover:bg-primary"
               )}
-              onClick={toggleDrawingState}
+              onClick={toggleDrawingLineSegment}
             >
               <PiLineSegment className="w-full h-full" />
               <span className="sr-only">Draw Line</span>
@@ -126,6 +134,25 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
           </TooltipTrigger>
           <TooltipContent side="right">
             Draw Line ( <span className="text-primary">L</span> )
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              type="button"
+              variant={"ghost"}
+              className={cn(
+                "hover:bg-muted p-1",
+                graphType === GraphType.Horizontal &&
+                  "bg-primary hover:bg-primary"
+              )}
+            >
+              <PiLineSegment className="w-full h-full rotate-45" />
+              <span className="sr-only">Horizontal Line</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">
+            Horizontal Line ( <span className="text-primary">H</span> )
           </TooltipContent>
         </Tooltip>
       </div>

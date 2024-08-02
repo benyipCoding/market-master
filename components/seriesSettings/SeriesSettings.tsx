@@ -9,7 +9,8 @@ import { SeriesSettingsProps } from "@/components/interfaces/SeriesSettings";
 interface CommonFooterProps {
   onCancel: () => void;
   onApply: () => void;
-  onSetDefault: () => void;
+  onSetDefault?: () => void;
+  onReset?: () => void;
   formValueHasChanged: boolean;
 }
 
@@ -18,19 +19,34 @@ export const CommonFooter: React.FC<CommonFooterProps> = ({
   onCancel,
   onApply,
   onSetDefault,
+  onReset,
 }) => {
   return (
     <>
       <div className="absolute left-6 flex gap-2">
-        <Button
-          type="button"
-          variant={"ghost"}
-          size="sm"
-          disabled={!formValueHasChanged}
-          onClick={onSetDefault}
-        >
-          Set Default
-        </Button>
+        {onSetDefault && (
+          <Button
+            type="button"
+            variant={"ghost"}
+            size="sm"
+            disabled={!formValueHasChanged}
+            onClick={onSetDefault}
+          >
+            Set Default
+          </Button>
+        )}
+
+        {onReset && (
+          <Button
+            type="button"
+            variant={"ghost"}
+            size="sm"
+            disabled={!formValueHasChanged}
+            onClick={onReset}
+          >
+            Reset
+          </Button>
+        )}
       </div>
       <Button
         type="button"

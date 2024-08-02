@@ -1,4 +1,8 @@
-import { toggleDrawing, toggleMousePressing } from "@/store/commonSlice";
+import {
+  setGraphType,
+  toggleDrawing,
+  toggleMousePressing,
+} from "@/store/commonSlice";
 import {
   Point,
   calcValue,
@@ -112,6 +116,7 @@ export const useEnableDrawingLine = ({
 
   const drawEnd = () => {
     dispatch(toggleDrawing(false));
+    dispatch(setGraphType(""));
     dispatch(toggleMousePressing(false));
     Promise.resolve().then(cleanUp);
   };
