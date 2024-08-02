@@ -12,7 +12,6 @@ import {
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { throttle } from "@/utils/helpers";
 import { TChartRef } from "@/components/interfaces/TChart";
-import Buttons from "@/components/Buttons";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import {
@@ -141,10 +140,7 @@ const Playground = () => {
   return (
     <>
       <div className="h-full flex bg-slate-100 dark:bg-black flex-col gap-2">
-        <Navbar
-          className="h-10 flex items-center bg-background w-full rounded-md"
-          setDialogVisible={setDialogVisible}
-        />
+        <Navbar className="h-11" setDialogVisible={setDialogVisible} />
         <main className="flex-1 flex overflow-hidden">
           <LeftAsideBtns
             className="w-12 mr-2"

@@ -63,6 +63,22 @@
   @apply flex flex-col space-y-1.5
 }
 
+.nav-item {
+  @apply h-full rounded-md flex justify-center items-center hover:bg-muted cursor-pointer relative
+}
+
+.nav-item-divider::after {
+  content: '';
+  position: absolute;
+  height: 70%;
+  top: 50%;
+  right: -0.5rem;
+  width: 1px;
+  background-color: #434651;
+  transform: translateY(-50%);
+}
+
+
 html,
 body,
 :root {
