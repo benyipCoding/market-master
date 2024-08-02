@@ -30,6 +30,7 @@ export interface LeftAsideBtnsProps {
 export interface NavbarProps {
   className?: string;
   setDialogVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  dialogVisible: boolean;
 }
 
 export interface RightAsideBtnsProps {

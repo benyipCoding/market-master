@@ -3,8 +3,8 @@ import React, { useEffect } from "react";
 import { NavbarProps } from "../interfaces/Playground";
 import { setSelectedIndicator } from "@/store/commonSlice";
 import { setDialogContent, DialogContentType } from "@/store/dialogSlice";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
 import hotkeys from "hotkeys-js";
 import { Badge } from "../ui/badge";
 import { Hourglass, Search } from "lucide-react";
@@ -12,9 +12,13 @@ import { FcComboChart } from "react-icons/fc";
 import { Button } from "../ui/button";
 import { BiCandles } from "react-icons/bi";
 
-const Navbar: React.FC<NavbarProps> = ({ className, setDialogVisible }) => {
+const Navbar: React.FC<NavbarProps> = ({
+  className,
+  setDialogVisible,
+  dialogVisible,
+}) => {
   const dispatch = useDispatch<AppDispatch>();
-
+  const { dialogContent } = useSelector((state: RootState) => state.dialog);
   const openTechnicalIndexDialog = () => {
     dispatch(setSelectedIndicator(null));
     dispatch(setDialogContent(DialogContentType.TechnicalIndex));
@@ -77,7 +81,12 @@ const Navbar: React.FC<NavbarProps> = ({ className, setDialogVisible }) => {
 
       {/* Indicators */}
       <Button
-        className="nav-item px-2 gap-2 active:scale-100 nav-item-divider"
+        className={cn(
+          "nav-item px-2 gap-2 active:scale-100 nav-item-divider",
+          dialogVisible &&
+            dialogContent === DialogContentType.TechnicalIndex &&
+            "bg-muted"
+        )}
         variant={"ghost"}
       >
         <FcComboChart size={24} />

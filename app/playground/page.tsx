@@ -140,7 +140,11 @@ const Playground = () => {
   return (
     <>
       <div className="h-full flex bg-slate-100 dark:bg-black flex-col gap-2">
-        <Navbar className="h-11" setDialogVisible={setDialogVisible} />
+        <Navbar
+          className="h-11"
+          setDialogVisible={setDialogVisible}
+          dialogVisible={dialogVisible}
+        />
         <main className="flex-1 flex overflow-hidden">
           <LeftAsideBtns
             className="w-12 mr-2"
