@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import React, { useCallback, useEffect } from "react";
 import { NavbarProps } from "../interfaces/Playground";
-import { setSelectedIndicator } from "@/store/commonSlice";
+import { setSelectedIndicator, setSelectedSeries } from "@/store/commonSlice";
 import { setDialogContent, DialogContentType } from "@/store/dialogSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
@@ -25,24 +25,31 @@ const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { dialogContent } = useSelector((state: RootState) => state.dialog);
-  const openTechnicalIndexDialog = useCallback(() => {
-    if (dialogVisible && dialogContent !== DialogContentType.TechnicalIndex)
-      return;
+
+  const openDialogHandler = (type: DialogContentType) => {
+    if (dialogVisible && dialogContent !== type) return;
     dispatch(setSelectedIndicator(null));
-    dispatch(setDialogContent(DialogContentType.TechnicalIndex));
+    dispatch(setSelectedSeries(null));
+    if (dialogVisible) dispatch(setDialogContent(undefined));
+    else dispatch(setDialogContent(type));
     Promise.resolve().then(() => setDialogVisible((prev) => !prev));
+  };
+
+  const openTechnicalIndexDialog = useCallback(() => {
+    openDialogHandler(DialogContentType.TechnicalIndex);
   }, [dialogVisible, dialogContent]);
 
-  const openSymbolSearch = () => {
-    setDialogVisible(true);
-    dispatch(setDialogContent(DialogContentType.SymbolSearch));
-  };
+  const openSymbolSearch = useCallback(() => {
+    openDialogHandler(DialogContentType.SymbolSearch);
+  }, [dialogVisible, dialogContent]);
 
   useEffect(() => {
     hotkeys("i", openTechnicalIndexDialog);
+    hotkeys("s", openSymbolSearch);
 
     return () => {
       hotkeys.unbind("i");
+      hotkeys.unbind("s");
     };
   }, [openTechnicalIndexDialog]);
 
@@ -71,7 +78,10 @@ const Navbar: React.FC<NavbarProps> = ({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              className="nav-item px-2 gap-2 active:scale-100 nav-item-divider"
+              className={cn(
+                "nav-item px-2 gap-2 active:scale-100 nav-item-divider",
+                dialogContent === DialogContentType.SymbolSearch && "bg-muted"
+              )}
               variant={"ghost"}
               onClick={openSymbolSearch}
             >
@@ -115,9 +125,7 @@ const Navbar: React.FC<NavbarProps> = ({
             <Button
               className={cn(
                 "nav-item px-2 gap-2 active:scale-100 nav-item-divider",
-                dialogVisible &&
-                  dialogContent === DialogContentType.TechnicalIndex &&
-                  "bg-muted"
+                dialogContent === DialogContentType.TechnicalIndex && "bg-muted"
               )}
               variant={"ghost"}
               onClick={openTechnicalIndexDialog}

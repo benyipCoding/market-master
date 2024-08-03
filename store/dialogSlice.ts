@@ -22,7 +22,10 @@ const dialogSlice = createSlice({
   name: "dialog",
   initialState,
   reducers: {
-    setDialogContent(state, action: PayloadAction<DialogContentType>) {
+    setDialogContent(
+      state,
+      action: PayloadAction<DialogContentType | undefined>
+    ) {
       state.dialogContent = action.payload;
     },
     setRecentlyIndicator(

@@ -20,6 +20,7 @@ import {
   setGraphType,
 } from "@/store/commonSlice";
 import hotkeys from "hotkeys-js";
+import { setDialogContent } from "@/store/dialogSlice";
 
 const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
   className,

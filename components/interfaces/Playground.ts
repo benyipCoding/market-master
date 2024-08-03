@@ -35,4 +35,6 @@ export interface NavbarProps {
 
 export interface RightAsideBtnsProps {
   className?: string;
+  asideOpen: boolean;
+  toggleAsideOpen: () => void;
 }

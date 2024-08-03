@@ -5,8 +5,8 @@ import {
   PropertySettingsFormValueType,
 } from "../interfaces/SeriesSettings";
 import { CardContent, CardFooter } from "../ui/card";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
 import {
   DeepPartial,
   LineSeriesPartialOptions,
@@ -23,10 +23,12 @@ import LinePattern from "../commonFormItem/LinePattern";
 import ColorSelector from "../commonFormItem/ColorSelector";
 import NameItem from "../commonFormItem/NameItem";
 import { DialogContext } from "@/context/Dialog";
+import { setDialogContent } from "@/store/dialogSlice";
 
 const PropertySettingsForm: React.FC<PropertySettingsFormProps> = () => {
   const { setDialogVisible } = useContext(DialogContext);
   const { selectedSeries } = useSelector((state: RootState) => state.common);
+  const dispatch = useDispatch<AppDispatch>();
   const [formValue, setFormValue] = useState<PropertySettingsFormValueType>({
     seriesLabel: "",
     showLabel: false,

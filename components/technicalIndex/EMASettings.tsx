@@ -28,7 +28,7 @@ import { CustomLineSeriesType } from "@/hooks/interfaces";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { EmitteryContext, OnApply } from "@/providers/EmitteryProvider";
-import { setRecentlyIndicator } from "@/store/dialogSlice";
+import { setDialogContent, setRecentlyIndicator } from "@/store/dialogSlice";
 
 const EMASettings = () => {
   const { setDialogVisible, tChartRef, setTechnicalIndicatorLines } =

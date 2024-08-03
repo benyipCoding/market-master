@@ -23,7 +23,7 @@ import Tooltips from "@/components/Tooltips";
 import { Dialog } from "@/components/ui/dialog";
 import SeriesSettings from "@/components/seriesSettings/SeriesSettings";
 import CustomDialogContent from "@/components/CustomDialogContent";
-import { DialogContentType } from "@/store/dialogSlice";
+import { DialogContentType, setDialogContent } from "@/store/dialogSlice";
 import TechnicalIndexForm from "@/components/technicalIndex/TechnicalIndexForm";
 import { cn } from "@/lib/utils";
 import { DialogContext } from "@/context/Dialog";
@@ -141,6 +141,11 @@ const Playground = () => {
     };
   }, [tChartRef.current?.chart]);
 
+  // Clear dialog content when dialog close
+  useEffect(() => {
+    if (!dialogVisible) dispatch(setDialogContent(undefined));
+  }, [dialogVisible]);
+
   return (
     <>
       <div className="h-full flex bg-slate-100 dark:bg-black flex-col gap-2">
@@ -201,10 +206,9 @@ const Playground = () => {
             />
           </div>
           <RightAsideBtns
-            className={cn(
-              "bg-background w-12 rounded-md flex-shrink-0 ml-2 max-md:ml-0",
-              !asideOpen && "ml-0"
-            )}
+            className={cn("w-12 ml-2 max-md:ml-0", !asideOpen && "ml-0")}
+            asideOpen={asideOpen}
+            toggleAsideOpen={toggleAsideOpen}
           />
         </main>
       </div>
