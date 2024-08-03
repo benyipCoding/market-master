@@ -33,6 +33,7 @@ import LeftAsideBtns from "@/components/playground/LeftAsideBtns";
 import RightAsideBtns from "@/components/playground/RightAsideBtns";
 import Aside from "@/components/playground/Aside";
 import { AsideRef } from "@/components/interfaces/Playground";
+import SymbolSearch from "@/components/SymbolSearch";
 
 const Playground = () => {
   // TChart component instance
@@ -55,8 +56,7 @@ const Playground = () => {
     () => dialogContent === DialogContentType.IndicatorSettings,
     [dialogContent]
   );
-
-  const showOverlay = useMemo(
+  const isSymbolSearch = useMemo(
     () => dialogContent === DialogContentType.SymbolSearch,
     [dialogContent]
   );
@@ -104,15 +104,14 @@ const Playground = () => {
     tChartRef.current?.setWidth(`${width}px`);
   };
 
-  const toggleAsideOpen = () => {
-    tChartRef.current?.setWidth("0px");
-    setAsideOpen((prev) => !prev);
-    Promise.resolve().then(() => calculateTChartWidth());
-  };
-
   const resizeHandler = () => {
     tChartRef.current?.setWidth("0px");
     Promise.resolve().then(() => calculateTChartWidth());
+  };
+
+  const toggleAsideOpen = () => {
+    resizeHandler();
+    setAsideOpen((prev) => !prev);
   };
 
   // get dummy candlestick data
@@ -224,13 +223,16 @@ const Playground = () => {
           {dialogVisible && (
             <CustomDialogContent
               dragConstraints={mainWrapper}
-              motionDivClass={cn(isTechnicalIndex && "max-w-none w-fit")}
-              overlayClass={cn(showOverlay && "bg-black/80")}
+              motionDivClass={cn(
+                (isTechnicalIndex || isSymbolSearch) && "max-w-none w-fit"
+              )}
+              overlayClass={cn(isSymbolSearch && "bg-black/80")}
             >
               {isDrawedLineSettings && <SeriesSettings />}
               {(isTechnicalIndex || isIndicatorSettings) && (
                 <TechnicalIndexForm />
               )}
+              {isSymbolSearch && <SymbolSearch />}
             </CustomDialogContent>
           )}
         </DialogContext.Provider>
