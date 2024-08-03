@@ -98,11 +98,9 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
   }, [onDeleteSeries]);
 
   useEffect(() => {
-    // hotkeys("i", openTechnicalIndexDialog);
     hotkeys("Esc", closeDialogByESC);
     document.addEventListener("contextmenu", contextmenuHandler);
     return () => {
-      // hotkeys.unbind("i");
       hotkeys.unbind("Esc");
       document.removeEventListener("contextmenu", contextmenuHandler);
     };
@@ -132,8 +130,9 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
               <span className="sr-only">Draw Line</span>
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="right">
-            Draw Line ( <span className="text-primary">L</span> )
+          <TooltipContent side="right" className="flex">
+            <p className="nav-item-divider">Draw Line</p>
+            <span className="short-cut">L</span>
           </TooltipContent>
         </Tooltip>
         <Tooltip>
@@ -151,8 +150,9 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
               <span className="sr-only">Horizontal Line</span>
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="right">
-            Horizontal Line ( <span className="text-primary">H</span> )
+          <TooltipContent side="right" className="flex">
+            <p className="nav-item-divider">Horizontal Line</p>
+            <span className="short-cut">H</span>
           </TooltipContent>
         </Tooltip>
       </div>

@@ -64,13 +64,17 @@
 }
 
 .nav-item {
-  @apply h-full rounded-md flex justify-center items-center hover:bg-muted cursor-pointer relative
+  @apply h-full rounded-md flex justify-center items-center hover:bg-muted cursor-pointer
+}
+
+.nav-item-divider {
+  position: relative;
 }
 
 .nav-item-divider::after {
   content: '';
   position: absolute;
-  height: 70%;
+  height: 65%;
   top: 50%;
   right: -0.5rem;
   width: 1px;
@@ -78,6 +82,9 @@
   transform: translateY(-50%);
 }
 
+.short-cut {
+  @apply text-orange-600 dark:text-orange-300 border font-serif flex justify-center items-center border-orange-600 dark:border-orange-300 text-center min-w-5 rounded-sm ml-4 text-xs
+}
 
 html,
 body,

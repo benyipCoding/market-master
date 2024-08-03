@@ -56,6 +56,11 @@ const Playground = () => {
     [dialogContent]
   );
 
+  const showOverlay = useMemo(
+    () => dialogContent === DialogContentType.SymbolSearch,
+    [dialogContent]
+  );
+
   const [candlestickData, setCandlestickData] = useState<
     CandlestickData<Time>[]
   >([]);
@@ -113,7 +118,6 @@ const Playground = () => {
   // get dummy candlestick data
   useEffect(() => {
     getCandlestickData();
-
     window.addEventListener("resize", throttle(resizeHandler, 100));
 
     return () => {
@@ -191,14 +195,14 @@ const Playground = () => {
               onPointerDown={toggleAsideOpen}
             ></div>
             <Aside
-              className="bg-background rounded-md overflow-auto"
+              className="bg-background rounded-md overflow-auto max-md:hidden"
               ref={asideRef}
               asideOpen={asideOpen}
             />
           </div>
           <RightAsideBtns
             className={cn(
-              "bg-background w-12 rounded-md flex-shrink-0 ml-2",
+              "bg-background w-12 rounded-md flex-shrink-0 ml-2 max-md:ml-0",
               !asideOpen && "ml-0"
             )}
           />
@@ -217,6 +221,7 @@ const Playground = () => {
             <CustomDialogContent
               dragConstraints={mainWrapper}
               motionDivClass={cn(isTechnicalIndex && "max-w-none w-fit")}
+              overlayClass={cn(showOverlay && "bg-black/80")}
             >
               {isDrawedLineSettings && <SeriesSettings />}
               {(isTechnicalIndex || isIndicatorSettings) && (

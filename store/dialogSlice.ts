@@ -5,6 +5,7 @@ export enum DialogContentType {
   DrawedLineSettings = "Series Settings",
   TechnicalIndex = "Technical Indicator",
   IndicatorSettings = "Indicator Settings",
+  SymbolSearch = "Symbol Search",
 }
 
 interface DialogSliceState {
