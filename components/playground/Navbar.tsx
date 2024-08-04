@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import hotkeys from "hotkeys-js";
 import { Badge } from "../ui/badge";
-import { Hourglass, Search } from "lucide-react";
+import { Hourglass, Search, Upload } from "lucide-react";
 import { FcComboChart } from "react-icons/fc";
 import { Button } from "../ui/button";
 import { BiCandles } from "react-icons/bi";
@@ -17,6 +17,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+import axios from "axios";
 
 const Navbar: React.FC<NavbarProps> = ({
   className,
@@ -42,6 +43,18 @@ const Navbar: React.FC<NavbarProps> = ({
   const openSymbolSearch = useCallback(() => {
     openDialogHandler(DialogContentType.SymbolSearch);
   }, [dialogVisible, dialogContent]);
+
+  const uploadHandler = async () => {
+    const data = {
+      msg: "test",
+    };
+    const res = await axios.request({
+      url: "/api/upload",
+      method: "post",
+      data,
+    });
+    console.log(res.data);
+  };
 
   useEffect(() => {
     hotkeys("i", openTechnicalIndexDialog);
@@ -138,6 +151,26 @@ const Navbar: React.FC<NavbarProps> = ({
           <TooltipContent className="flex">
             <p className="nav-item-divider">Indicators, Metrics</p>
             <span className="short-cut">I</span>
+          </TooltipContent>
+        </Tooltip>
+
+        {/* Upload data */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className={cn(
+                "nav-item px-2 gap-2 active:scale-100 nav-item-divider"
+              )}
+              variant={"ghost"}
+              onClick={uploadHandler}
+            >
+              <Upload size={20} />
+              <span className="sr-only">Upload Data</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="flex">
+            <p className="nav-item-divider">Upload Data</p>
+            <span className="short-cut">U</span>
           </TooltipContent>
         </Tooltip>
       </nav>
