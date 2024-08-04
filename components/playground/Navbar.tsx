@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import hotkeys from "hotkeys-js";
 import { Badge } from "../ui/badge";
-import { Hourglass, Search, Upload } from "lucide-react";
+import { Download, Hourglass, Search, Upload } from "lucide-react";
 import { FcComboChart } from "react-icons/fc";
 import { Button } from "../ui/button";
 import { BiCandles } from "react-icons/bi";
@@ -48,11 +48,7 @@ const Navbar: React.FC<NavbarProps> = ({
     const data = {
       msg: "test",
     };
-    const res = await axios.request({
-      url: "/api/upload",
-      method: "post",
-      data,
-    });
+    const res = await axios.post("/api/upload", data);
     console.log(res.data);
   };
 
@@ -71,7 +67,7 @@ const Navbar: React.FC<NavbarProps> = ({
       <nav
         className={cn(
           className,
-          "flex items-center bg-background w-full rounded-md p-1 gap-4"
+          "flex items-center bg-background w-full rounded-md p-1 gap-4 relative"
         )}
       >
         {/* Google Avatar */}
@@ -154,25 +150,25 @@ const Navbar: React.FC<NavbarProps> = ({
           </TooltipContent>
         </Tooltip>
 
-        {/* Upload data */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              className={cn(
-                "nav-item px-2 gap-2 active:scale-100 nav-item-divider"
-              )}
-              variant={"ghost"}
-              onClick={uploadHandler}
-            >
-              <Upload size={20} />
-              <span className="sr-only">Upload Data</span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent className="flex">
-            <p className="nav-item-divider">Upload Data</p>
-            <span className="short-cut">U</span>
-          </TooltipContent>
-        </Tooltip>
+        <div className="absolute right-14 h-full flex py-1 gap-4 items-center">
+          {/* Upload data */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className={cn("nav-item px-2 active:scale-100")}
+                variant={"ghost"}
+                onClick={uploadHandler}
+              >
+                <Upload size={20} />
+                <span className="sr-only">Upload Data</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="flex">
+              <p className="nav-item-divider">Upload Data</p>
+              <span className="short-cut">U</span>
+            </TooltipContent>
+          </Tooltip>
+        </div>
       </nav>
     </TooltipProvider>
   );
