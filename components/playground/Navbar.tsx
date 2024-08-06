@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import hotkeys from "hotkeys-js";
 import { Badge } from "../ui/badge";
-import { Download, Hourglass, Search, Upload } from "lucide-react";
+import { Hourglass, Search, Upload } from "lucide-react";
 import { FcComboChart } from "react-icons/fc";
 import { Button } from "../ui/button";
 import { BiCandles } from "react-icons/bi";
@@ -18,6 +18,10 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 import axios from "axios";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { validateFileExtension, validateFileType } from "@/utils/helpers";
+import { analyzeExcelData } from "@/utils/excel";
 
 const Navbar: React.FC<NavbarProps> = ({
   className,
@@ -50,6 +54,24 @@ const Navbar: React.FC<NavbarProps> = ({
     };
     const res = await axios.post("/api/upload", data);
     console.log(res.data);
+  };
+
+  const onUploadFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      const file = event.target?.files![0];
+
+      if (!validateFileType(file) || !validateFileExtension(file))
+        throw new Error(
+          "The uploaded file format must be an Excel or CSV file"
+        );
+
+      const data = await analyzeExcelData(file);
+      console.log("@@@", data);
+    } catch (error) {
+      console.log("####");
+
+      console.log(error);
+    }
   };
 
   useEffect(() => {
@@ -152,16 +174,24 @@ const Navbar: React.FC<NavbarProps> = ({
 
         <div className="absolute right-14 h-full flex py-1 gap-4 items-center">
           {/* Upload data */}
+          <Input
+            type="file"
+            className="hidden"
+            id="uploadExcel"
+            accept=".xls, .xlsx"
+            onChange={onUploadFile}
+          />
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
+              <Label
+                htmlFor="uploadExcel"
                 className={cn("nav-item px-2 active:scale-100")}
-                variant={"ghost"}
-                onClick={uploadHandler}
+                // onClick={uploadHandler}
               >
                 <Upload size={20} />
                 <span className="sr-only">Upload Data</span>
-              </Button>
+              </Label>
+              {/* <Input className="" type="file" /> */}
             </TooltipTrigger>
             <TooltipContent className="flex">
               <p className="nav-item-divider">Upload Data</p>

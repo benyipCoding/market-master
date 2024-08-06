@@ -243,3 +243,29 @@ export const textCase = (str: string): string => {
   const result = str[0].toLowerCase() + str.slice(1);
   return result;
 };
+
+// Extension name
+export const getFileExtension = (filename: string): string => {
+  const lastDotIndex = filename.lastIndexOf(".");
+  if (lastDotIndex === -1 || lastDotIndex === 0) return "";
+  return filename.slice(lastDotIndex + 1);
+};
+
+// Validate MIME
+export const validateFileType = (file: File) => {
+  const validMimeTypes = [
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "text/csv",
+  ];
+
+  return validMimeTypes.includes(file.type);
+};
+
+// Validate excel or csv file
+export const validateFileExtension = (file: File) => {
+  const validExtensions = ["xls", "xlsx", "csv"];
+  const fileExtension = getFileExtension(file.name);
+
+  return validExtensions.includes(fileExtension);
+};

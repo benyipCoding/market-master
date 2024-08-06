@@ -29,6 +29,7 @@
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.11",
     "emittery": "^1.0.3",
+    "exceljs": "^4.4.0",
     "framer-motion": "^11.3.2",
     "hotkeys-js": "^3.13.7",
     "immer": "^10.1.1",
