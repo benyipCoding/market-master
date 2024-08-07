@@ -48,13 +48,13 @@ const Navbar: React.FC<NavbarProps> = ({
     openDialogHandler(DialogContentType.SymbolSearch);
   }, [dialogVisible, dialogContent]);
 
-  const uploadHandler = async () => {
-    const data = {
-      msg: "test",
-    };
-    const res = await axios.post("/api/upload", data);
-    console.log(res.data);
-  };
+  // const uploadHandler = async () => {
+  //   const data = {
+  //     msg: "test",
+  //   };
+  //   const res = await axios.post("/api/upload", data);
+  //   console.log(res.data);
+  // };
 
   const onUploadFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -69,7 +69,7 @@ const Navbar: React.FC<NavbarProps> = ({
       console.log("@@@", data);
     } catch (error) {
       console.log("####");
-
+      // TODO:Add some notification logic
       console.log(error);
     }
   };
