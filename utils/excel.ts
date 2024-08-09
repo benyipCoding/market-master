@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import ExcelJS from "exceljs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { parse as csvParse } from "papaparse";
 
 dayjs.extend(customParseFormat);
 
@@ -45,38 +46,34 @@ export function analyzeExcelData(
             (item) => item
           );
 
-          try {
-            // Related to column headers
-            const row: Record<string, any> = {};
-            rowData.forEach((cell, index) => {
-              if (rowNumber === 1) {
-                // Validate headers name
-                if (!COLUMN_HEADERS.includes((cell as string).toLowerCase()))
-                  throw new Error("The header name of the table is incorrect");
+          // Related to column headers
+          const processRow: Record<string, any> = {};
+          rowData.forEach((cell, index) => {
+            if (rowNumber === 1) {
+              // Validate headers name
+              if (!COLUMN_HEADERS.includes((cell as string).toLowerCase()))
+                reject(new Error("The header name of the table is incorrect"));
 
-                headerMap.set(index, (cell as string).toLowerCase());
-              } else {
-                let key = headerMap.get(index) as string;
-                key = ["date", "time"].includes(key) ? "time" : key;
-                const value =
-                  key !== "time"
-                    ? cell
-                    : dayjs(cell as string).isValid()
-                    ? dayjs(cell as string).format(FORMAT_DATE_STR)
-                    : dayjs(cell as string, SPECIAL_DATE_STR).format(
-                        FORMAT_DATE_STR
-                      );
+              headerMap.set(index, (cell as string).toLowerCase());
+            } else {
+              let key = headerMap.get(index) as string;
+              key = ["date", "time"].includes(key) ? "time" : key;
+              const value =
+                key !== "time"
+                  ? cell
+                  : dayjs(cell as string).isValid()
+                  ? dayjs(cell as string).format(FORMAT_DATE_STR)
+                  : dayjs(cell as string, SPECIAL_DATE_STR).format(
+                      FORMAT_DATE_STR
+                    );
 
-                if (key === "time" && !dayjs(value as string).isValid())
-                  throw new Error("The date format is incorrect");
+              if (key === "time" && !dayjs(value as string).isValid())
+                reject(new Error("The date format is incorrect"));
 
-                row[key] = value;
-              }
-            });
-            rowNumber !== 1 && data.push(row);
-          } catch (error) {
-            reject(error);
-          }
+              processRow[key] = value;
+            }
+          });
+          rowNumber !== 1 && data.push(processRow);
         });
 
         resolve(data);
@@ -87,5 +84,41 @@ export function analyzeExcelData(
       console.log("Error in reading file.", error);
       reject(error);
     }
+  });
+}
+
+export function analyzeCSVData(file: File) {
+  return new Promise((resolve, reject) => {
+    csvParse(file, {
+      header: true, // Use the first row as the header
+      complete: function (results) {
+        const headers = results.meta.fields!;
+        const invalid = headers.some((item) => !COLUMN_HEADERS.includes(item));
+        if (invalid)
+          reject(new Error("The header name of the table is incorrect"));
+        const processData: Record<string, any>[] = [];
+
+        (results.data as Record<string, any>[]).forEach((item) => {
+          const processItem: Record<string, any> = {};
+          for (const k in item) {
+            const key = ["date", "time"].includes(k) ? "time" : k;
+            processItem[key] =
+              key !== "time"
+                ? +item[k]
+                : dayjs(item[k] as string).isValid()
+                ? dayjs(item[k] as string).format(FORMAT_DATE_STR)
+                : dayjs(item[k] as string, SPECIAL_DATE_STR).format(
+                    FORMAT_DATE_STR
+                  );
+          }
+          processData.push(processItem);
+        });
+        resolve(processData);
+      },
+      error: function (error) {
+        console.error("Something wrong with parsing csv file."); // Error Handler
+        reject(error);
+      },
+    });
   });
 }

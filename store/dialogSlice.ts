@@ -6,6 +6,7 @@ export enum DialogContentType {
   TechnicalIndex = "Technical Indicator",
   IndicatorSettings = "Indicator Settings",
   SymbolSearch = "Symbol Search",
+  UploadData = "Upload Data",
 }
 
 interface DialogSliceState {

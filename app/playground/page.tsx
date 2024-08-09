@@ -60,6 +60,10 @@ const Playground = () => {
     () => dialogContent === DialogContentType.SymbolSearch,
     [dialogContent]
   );
+  const isUploadData = useMemo(
+    () => dialogContent === DialogContentType.UploadData,
+    [dialogContent]
+  );
 
   const [candlestickData, setCandlestickData] = useState<
     CandlestickData<Time>[]
@@ -226,7 +230,9 @@ const Playground = () => {
               motionDivClass={cn(
                 (isTechnicalIndex || isSymbolSearch) && "max-w-none w-fit"
               )}
-              overlayClass={cn(isSymbolSearch && "bg-black/80")}
+              overlayClass={cn(
+                (isSymbolSearch || isUploadData) && "bg-black/80"
+              )}
             >
               {isDrawedLineSettings && <SeriesSettings />}
               {(isTechnicalIndex || isIndicatorSettings) && (

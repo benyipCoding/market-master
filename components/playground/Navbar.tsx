@@ -17,11 +17,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
-import axios from "axios";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { validateFileExtension, validateFileType } from "@/utils/helpers";
-import { analyzeExcelData } from "@/utils/excel";
+import {
+  getFileExtension,
+  validateFileExtension,
+  validateFileType,
+} from "@/utils/helpers";
+import { analyzeExcelData, analyzeCSVData } from "@/utils/excel";
 
 const Navbar: React.FC<NavbarProps> = ({
   className,
@@ -48,14 +51,6 @@ const Navbar: React.FC<NavbarProps> = ({
     openDialogHandler(DialogContentType.SymbolSearch);
   }, [dialogVisible, dialogContent]);
 
-  // const uploadHandler = async () => {
-  //   const data = {
-  //     msg: "test",
-  //   };
-  //   const res = await axios.post("/api/upload", data);
-  //   console.log(res.data);
-  // };
-
   const onUploadFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       const file = event.target?.files![0];
@@ -65,11 +60,15 @@ const Navbar: React.FC<NavbarProps> = ({
           "The uploaded file format must be an Excel or CSV file"
         );
 
-      const data = await analyzeExcelData(file);
+      const extname = getFileExtension(file.name);
+
+      const data =
+        extname === "csv"
+          ? await analyzeCSVData(file)
+          : await analyzeExcelData(file);
+
       console.log("@@@", data);
     } catch (error) {
-      console.log("####");
-      // TODO:Add some notification logic
       console.log(error);
     }
   };
@@ -178,7 +177,7 @@ const Navbar: React.FC<NavbarProps> = ({
             type="file"
             className="hidden"
             id="uploadExcel"
-            accept=".xls, .xlsx"
+            accept=".xls, .xlsx, .csv"
             onChange={onUploadFile}
           />
           <Tooltip>
