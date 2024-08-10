@@ -20,4 +20,5 @@ export interface NameItemProps {
   checked?: boolean;
   onCheckedChange?: (checked: CheckedState) => void;
   placeholder?: string;
+  errorMessage?: string;
 }

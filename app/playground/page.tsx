@@ -34,6 +34,7 @@ import RightAsideBtns from "@/components/playground/RightAsideBtns";
 import Aside from "@/components/playground/Aside";
 import { AsideRef } from "@/components/interfaces/Playground";
 import SymbolSearch from "@/components/SymbolSearch";
+import UploadForm from "@/components/playground/UploadForm";
 
 const Playground = () => {
   // TChart component instance
@@ -179,7 +180,7 @@ const Playground = () => {
             >
               <CandlestickSeries
                 seriesData={candlestickData}
-                customSeriesOptions={{ id: "XAU/USD", toFixedNum: 2 }}
+                customSeriesOptions={{ id: "XAUUSD", toFixedNum: 2 }}
               />
               {drawedLineList.map((lineOption) => (
                 <LineSeries
@@ -195,7 +196,7 @@ const Playground = () => {
                   seriesData={line.data}
                 />
               ))}
-              <Tooltips productName="XAU/USD" tChartRef={tChartRef} />
+              <Tooltips productName="XAUUSD" tChartRef={tChartRef} />
             </TChart>
             <div
               className="w-2 bg-transparent cursor-col-resize"
@@ -239,6 +240,7 @@ const Playground = () => {
                 <TechnicalIndexForm />
               )}
               {isSymbolSearch && <SymbolSearch />}
+              {isUploadData && <UploadForm />}
             </CustomDialogContent>
           )}
         </DialogContext.Provider>

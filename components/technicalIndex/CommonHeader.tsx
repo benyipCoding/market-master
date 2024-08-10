@@ -19,23 +19,25 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
 
   return (
     <CardHeader>
-      <CardTitle className={cn("relative pr-8", titleClass)}>
+      <CardTitle className={cn("relative pr-8 select-none", titleClass)}>
         {title}
-        <TooltipProvider disableHoverableContent={true} delayDuration={0}>
-          <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
-            <TooltipTrigger asChild>
-              <span className="pointer-events-none absolute top-0 right-0"></span>
-            </TooltipTrigger>
-            <Info
-              className="absolute top-0 right-0 text-gray-400 dark:text-gray-500 cursor-pointer"
-              size={20}
-              onClick={() => setTooltipOpen(true)}
-            />
-            <TooltipContent align="end">
-              <p className="w-52">{description}</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        {description && (
+          <TooltipProvider disableHoverableContent={true} delayDuration={0}>
+            <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
+              <TooltipTrigger asChild>
+                <span className="pointer-events-none absolute top-0 right-0"></span>
+              </TooltipTrigger>
+              <Info
+                className="absolute top-0 right-0 text-gray-400 dark:text-gray-500 cursor-pointer"
+                size={20}
+                onClick={() => setTooltipOpen(true)}
+              />
+              <TooltipContent align="end">
+                <p className="w-52 font-normal">{description}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
       </CardTitle>
     </CardHeader>
   );

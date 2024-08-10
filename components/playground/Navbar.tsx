@@ -17,8 +17,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
 import {
   getFileExtension,
   validateFileExtension,
@@ -51,27 +49,9 @@ const Navbar: React.FC<NavbarProps> = ({
     openDialogHandler(DialogContentType.SymbolSearch);
   }, [dialogVisible, dialogContent]);
 
-  const onUploadFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      const file = event.target?.files![0];
-
-      if (!validateFileType(file) || !validateFileExtension(file))
-        throw new Error(
-          "The uploaded file format must be an Excel or CSV file"
-        );
-
-      const extname = getFileExtension(file.name);
-
-      const data =
-        extname === "csv"
-          ? await analyzeCSVData(file)
-          : await analyzeExcelData(file);
-
-      console.log("@@@", data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const openUploadForm = useCallback(() => {
+    openDialogHandler(DialogContentType.UploadData);
+  }, []);
 
   useEffect(() => {
     hotkeys("i", openTechnicalIndexDialog);
@@ -116,7 +96,7 @@ const Navbar: React.FC<NavbarProps> = ({
               onClick={openSymbolSearch}
             >
               <Search size={18} />
-              XAU/USD
+              XAUUSD
               <span className="sr-only">Symbol Search</span>
             </Button>
           </TooltipTrigger>
@@ -173,23 +153,17 @@ const Navbar: React.FC<NavbarProps> = ({
 
         <div className="absolute right-14 h-full flex py-1 gap-4 items-center">
           {/* Upload data */}
-          <Input
-            type="file"
-            className="hidden"
-            id="uploadExcel"
-            accept=".xls, .xlsx, .csv"
-            onChange={onUploadFile}
-          />
+          {/* <Input type="file" className="hidden" accept=".xls, .xlsx, .csv" /> */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <Label
-                htmlFor="uploadExcel"
-                className={cn("nav-item px-2 active:scale-100")}
-                // onClick={uploadHandler}
+              <Button
+                variant={"ghost"}
+                className={cn("nav-item px-2")}
+                onClick={openUploadForm}
               >
                 <Upload size={20} />
                 <span className="sr-only">Upload Data</span>
-              </Label>
+              </Button>
               {/* <Input className="" type="file" /> */}
             </TooltipTrigger>
             <TooltipContent className="flex">

@@ -13,10 +13,17 @@ const NameItem: React.FC<NameItemProps> = ({
   onCheckedChange,
   placeholder,
   itemLabel,
+  errorMessage,
 }) => {
   return (
     <div className="form-item">
-      <Label htmlFor="seriesLabel" className="py-1 flex justify-between">
+      <Label
+        htmlFor="seriesLabel"
+        className={cn(
+          "py-1 flex justify-between",
+          errorMessage && "text-destructive"
+        )}
+      >
         {itemLabel}
         {/* Extra checkbox */}
         {showExtraCheckbox && (
@@ -40,6 +47,9 @@ const NameItem: React.FC<NameItemProps> = ({
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
       />
+      {errorMessage && (
+        <p className="text-sm font-medium text-destructive">{errorMessage}</p>
+      )}
     </div>
   );
 };

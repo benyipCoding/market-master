@@ -17,7 +17,7 @@ export type SidebarNavItemType = {
 export interface CommonHeaderProps {
   title: string;
   titleClass?: string;
-  description: string;
+  description?: string;
 }
 
 export interface BaseFormValue {

@@ -1,4 +1,3 @@
-import { LineWidthOptions, LineStyleOptions } from "@/constants/seriesOptions";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -9,8 +8,6 @@ import {
 } from "@/components/ui/select";
 import React, {
   forwardRef,
-  ForwardRefRenderFunction,
-  useEffect,
   useImperativeHandle,
   useMemo,
   useState,
