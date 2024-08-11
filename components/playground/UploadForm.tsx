@@ -9,14 +9,18 @@ import {
   validateFileType,
   validateFileExtension,
   getFileExtension,
+  downloadFile,
 } from "@/utils/helpers";
 import IntervalItem from "../commonFormItem/IntervalItem";
-
-export interface UploadFormValue extends Record<string, any> {
-  symbol: string;
-  interval: string;
-  customInterval: string;
-}
+import { UploadFormValue } from "../interfaces/UploadForm";
+import UploadItem from "../commonFormItem/UploadItem";
+import { Download } from "lucide-react";
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 
 const UploadForm = () => {
   const { setDialogVisible } = useContext(DialogContext);
@@ -25,6 +29,7 @@ const UploadForm = () => {
     symbol: "",
     interval: "D1",
     customInterval: "",
+    toFixedNum: 0,
   });
 
   const isCustomInterval = useMemo(
@@ -48,7 +53,6 @@ const UploadForm = () => {
         return "Custom interval is required";
       if (!/^[mHDWM]\d+$/.test(value) && isCustomInterval)
         return "Please input correct interval.";
-
       return "";
     },
   };
@@ -133,7 +137,22 @@ const UploadForm = () => {
 
   return (
     <Card className="w-full">
-      <CommonHeader title="Upload your personal chart data" />
+      <CommonHeader title="Upload your personal chart data">
+        <TooltipProvider disableHoverableContent={true} delayDuration={0}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Download
+                className="absolute top-1/2 -translate-y-1/2 right-0 text-gray-400 hover:text-black dark:text-gray-500 dark:hover:text-white cursor-pointer"
+                size={20}
+                onClick={() => downloadFile("/template.xlsx", "template.xlsx")}
+              />
+            </TooltipTrigger>
+            <TooltipContent align="center">
+              <p className="w-fit font-normal">Download template</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </CommonHeader>
 
       <form onSubmit={uploadHandler}>
         <CardContent>
@@ -159,6 +178,7 @@ const UploadForm = () => {
               }}
               errorMessage={errorMsg.customInterval}
             />
+            <UploadItem />
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">

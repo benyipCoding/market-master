@@ -5,15 +5,16 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 import { Info } from "lucide-react";
-import React, { useState } from "react";
+import React, { PropsWithChildren, useState } from "react";
 import { CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { CommonHeaderProps } from "../interfaces/TechnicalIndexForm";
 
-const CommonHeader: React.FC<CommonHeaderProps> = ({
+const CommonHeader: React.FC<PropsWithChildren<CommonHeaderProps>> = ({
   title,
   titleClass,
   description,
+  children,
 }) => {
   const [tooltipOpen, setTooltipOpen] = useState(false);
 
@@ -38,6 +39,7 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
             </Tooltip>
           </TooltipProvider>
         )}
+        {children}
       </CardTitle>
     </CardHeader>
   );

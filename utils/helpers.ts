@@ -269,3 +269,21 @@ export const validateFileExtension = (file: File) => {
 
   return validExtensions.includes(fileExtension);
 };
+
+export function countDecimalPlaces(number: number) {
+  const numberStr = number.toString();
+  if (numberStr.includes(".")) {
+    return numberStr.split(".")[1].length;
+  } else {
+    return 0;
+  }
+}
+
+export function downloadFile(href: string, filename: string) {
+  const a = document.createElement("a");
+  a.href = href;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
