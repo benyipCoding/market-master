@@ -13,6 +13,7 @@ const COLUMN_HEADERS = [
   "close",
   "date",
   "volumn",
+  "volumn(optional)",
 ];
 
 const SPECIAL_DATE_STR = "D/M/YYYY HH:mm:ss";

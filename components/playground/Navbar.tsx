@@ -153,7 +153,6 @@ const Navbar: React.FC<NavbarProps> = ({
 
         <div className="absolute right-14 h-full flex py-1 gap-4 items-center">
           {/* Upload data */}
-          {/* <Input type="file" className="hidden" accept=".xls, .xlsx, .csv" /> */}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -164,7 +163,6 @@ const Navbar: React.FC<NavbarProps> = ({
                 <Upload size={20} />
                 <span className="sr-only">Upload Data</span>
               </Button>
-              {/* <Input className="" type="file" /> */}
             </TooltipTrigger>
             <TooltipContent className="flex">
               <p className="nav-item-divider">Upload Data</p>

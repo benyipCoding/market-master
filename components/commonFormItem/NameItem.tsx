@@ -48,7 +48,9 @@ const NameItem: React.FC<NameItemProps> = ({
         onChange={(e) => setInputValue(e.target.value)}
       />
       {errorMessage && (
-        <p className="text-sm font-medium text-destructive">{errorMessage}</p>
+        <p className="text-sm font-medium text-destructive select-none">
+          {errorMessage}
+        </p>
       )}
     </div>
   );

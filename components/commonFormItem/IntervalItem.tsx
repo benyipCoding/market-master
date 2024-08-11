@@ -66,7 +66,9 @@ const IntervalItem: React.FC<IntervalItemProps> = ({
         />
       </div>
       {errorMessage && (
-        <p className="text-sm font-medium text-destructive">{errorMessage}</p>
+        <p className="text-sm font-medium text-destructive select-none">
+          {errorMessage}
+        </p>
       )}
     </div>
   );

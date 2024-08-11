@@ -75,7 +75,7 @@ const PeriodItem: React.ForwardRefRenderFunction<
         />
         <p
           className={cn(
-            "absolute left-0 -bottom-5 text-red-500 overflow-hidden text-ellipsis max-w-1/2 px-1 text-sm h-fit opacity-0 transition duration-300",
+            "absolute left-0 -bottom-5 text-red-500 overflow-hidden text-ellipsis max-w-1/2 px-1 text-sm h-fit opacity-0 transition duration-300 select-none",
             showErrorMessage && "opacity-100"
           )}
         >

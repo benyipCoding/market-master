@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import CommonHeader from "@/components/technicalIndex/CommonHeader";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -24,12 +24,13 @@ import {
 
 const UploadForm = () => {
   const { setDialogVisible } = useContext(DialogContext);
-
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formValue, setFormValue] = useState<UploadFormValue>({
     symbol: "",
     interval: "D1",
     customInterval: "",
     toFixedNum: 0,
+    file: null,
   });
 
   const isCustomInterval = useMemo(
@@ -55,21 +56,31 @@ const UploadForm = () => {
         return "Please input correct interval.";
       return "";
     },
+    file: (file: File | null): string => {
+      if (!file) return "File data is required";
+      return "";
+    },
   };
 
   const [errorMsg, setErrorMsg] = useState({
     symbol: "",
     customInterval: "",
+    file: "",
   });
 
-  const fileHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const fileHandler = async (files: FileList | null) => {
+    if (!files || !files.length) return;
+    setErrorMsg((prev) => ({ ...prev, file: "" }));
+
     try {
-      const file = event.target?.files![0];
+      const file = files[0];
 
       if (!validateFileType(file) || !validateFileExtension(file))
         throw new Error(
           "The uploaded file format must be an Excel or CSV file"
         );
+
+      setFormValue({ ...formValue, file });
 
       const extname = getFileExtension(file.name);
 
@@ -79,8 +90,9 @@ const UploadForm = () => {
           : await analyzeExcelData(file);
 
       console.log("@@@", data);
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      setErrorMsg((prev) => ({ ...prev, file: error.message }));
+      clearFiles();
     }
   };
   const formValidate = (field?: keyof UploadFormValue) => {
@@ -104,7 +116,7 @@ const UploadForm = () => {
     });
   };
 
-  const uploadHandler = async (e: React.FormEvent<HTMLFormElement>) => {
+  const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
@@ -114,6 +126,12 @@ const UploadForm = () => {
     } catch (error) {
       console.log({ error });
     }
+  };
+
+  const clearFiles = () => {
+    if (!fileInputRef.current) return;
+    fileInputRef.current.value = "";
+    setFormValue({ ...formValue, file: null });
   };
 
   // trigger validate by changing
@@ -154,7 +172,7 @@ const UploadForm = () => {
         </TooltipProvider>
       </CommonHeader>
 
-      <form onSubmit={uploadHandler}>
+      <form onSubmit={submitHandler}>
         <CardContent>
           <div className="grid w-full items-center gap-4">
             <NameItem
@@ -178,7 +196,15 @@ const UploadForm = () => {
               }}
               errorMessage={errorMsg.customInterval}
             />
-            <UploadItem />
+            <UploadItem
+              accept=".xls, .xlsx, .csv"
+              id="fileData"
+              label="File"
+              onFileChange={fileHandler}
+              errorMessage={errorMsg.file}
+              ref={fileInputRef}
+              clearFiles={clearFiles}
+            />
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">

@@ -3,4 +3,5 @@ export interface UploadFormValue extends Record<string, any> {
   interval: string;
   customInterval: string;
   toFixedNum: number;
+  file: File | null;
 }
