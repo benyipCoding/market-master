@@ -7,8 +7,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import React, { useState } from "react";
-import { interval } from "date-fns";
+import React from "react";
 import { cn } from "@/lib/utils";
 
 interface IntervalItemProps {

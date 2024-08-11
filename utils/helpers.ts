@@ -5,6 +5,7 @@ import {
   Time,
   IChartApi,
   LineData,
+  CandlestickData,
 } from "lightweight-charts";
 
 export const calcMouseCoordinate = (
@@ -286,4 +287,20 @@ export function downloadFile(href: string, filename: string) {
   document.body.appendChild(a);
   a.click();
   a.remove();
+}
+
+export function calculateToFixedNum(
+  data: CandlestickData<Time>[],
+  times: number = 20
+): number {
+  let toFixedNum = 0;
+  for (let i = 0; i < times; i++) {
+    const randomIndex = Math.floor(Math.random() * data.length);
+    const num = countDecimalPlaces(data[randomIndex].close);
+    if (num > toFixedNum) {
+      console.log("###");
+      toFixedNum = num;
+    }
+  }
+  return toFixedNum;
 }

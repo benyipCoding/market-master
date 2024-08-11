@@ -10,6 +10,7 @@ import {
   validateFileExtension,
   getFileExtension,
   downloadFile,
+  calculateToFixedNum,
 } from "@/utils/helpers";
 import IntervalItem from "../commonFormItem/IntervalItem";
 import { UploadFormValue } from "../interfaces/UploadForm";
@@ -21,6 +22,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
+import { CandlestickData, Time } from "lightweight-charts";
 
 const UploadForm = () => {
   const { setDialogVisible } = useContext(DialogContext);
@@ -80,16 +82,22 @@ const UploadForm = () => {
           "The uploaded file format must be an Excel or CSV file"
         );
 
-      setFormValue({ ...formValue, file });
+      setFormValue({ ...formValue, file, toFixedNum: 0 });
 
       const extname = getFileExtension(file.name);
 
       const data =
         extname === "csv"
-          ? await analyzeCSVData(file)
-          : await analyzeExcelData(file);
+          ? ((await analyzeCSVData(file)) as CandlestickData<Time>[])
+          : ((await analyzeExcelData(
+              file
+            )) as unknown as CandlestickData<Time>[]);
 
       console.log("@@@", data);
+
+      // calculate toFixedNum
+      const toFixedNum = calculateToFixedNum(data);
+      setFormValue((prev) => ({ ...prev, toFixedNum }));
     } catch (error: any) {
       setErrorMsg((prev) => ({ ...prev, file: error.message }));
       clearFiles();
@@ -131,7 +139,7 @@ const UploadForm = () => {
   const clearFiles = () => {
     if (!fileInputRef.current) return;
     fileInputRef.current.value = "";
-    setFormValue({ ...formValue, file: null });
+    setFormValue({ ...formValue, file: null, toFixedNum: 0 });
   };
 
   // trigger validate by changing

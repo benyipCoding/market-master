@@ -17,12 +17,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
-import {
-  getFileExtension,
-  validateFileExtension,
-  validateFileType,
-} from "@/utils/helpers";
-import { analyzeExcelData, analyzeCSVData } from "@/utils/excel";
 
 const Navbar: React.FC<NavbarProps> = ({
   className,
@@ -51,15 +45,17 @@ const Navbar: React.FC<NavbarProps> = ({
 
   const openUploadForm = useCallback(() => {
     openDialogHandler(DialogContentType.UploadData);
-  }, []);
+  }, [dialogVisible, dialogContent]);
 
   useEffect(() => {
     hotkeys("i", openTechnicalIndexDialog);
     hotkeys("s", openSymbolSearch);
+    hotkeys("u", openUploadForm);
 
     return () => {
       hotkeys.unbind("i");
       hotkeys.unbind("s");
+      hotkeys.unbind("u");
     };
   }, [openTechnicalIndexDialog]);
 
