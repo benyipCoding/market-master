@@ -15,6 +15,7 @@ import { RootState } from "@/store";
 import { useSelector } from "react-redux";
 import { produce } from "immer";
 import { DialogContext } from "@/context/Dialog";
+import { timestampToDateStr } from "@/utils/helpers";
 
 const FormItems = [
   {
@@ -125,7 +126,7 @@ const SeriesDataForm: React.FC<SeriesDataFormProps> = () => {
                   type="button"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {formValue[item.timeProp]}
+                  {timestampToDateStr(formValue[item.timeProp])}
                 </Button>
               </div>
             </div>

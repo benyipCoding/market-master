@@ -1,3 +1,4 @@
+import { timestampToDateStr } from "@/utils/helpers";
 import dayjs from "dayjs";
 import {
   ChartOptions,
@@ -48,7 +49,7 @@ export const defaultChartOptions: DeepPartial<ChartOptions> = {
       tickMarkType: TickMarkType,
       locale: string
     ) => {
-      return dayjs(time as number).format("YYYY-MM-DD HH:mm");
+      return timestampToDateStr(time as number);
     },
   },
 };

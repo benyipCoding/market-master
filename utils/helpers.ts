@@ -1,4 +1,5 @@
 import { CustomLineSeriesType } from "@/hooks/interfaces";
+import dayjs from "dayjs";
 import {
   ISeriesApi,
   SeriesType,
@@ -303,4 +304,8 @@ export function calculateToFixedNum(
     }
   }
   return toFixedNum;
+}
+
+export function timestampToDateStr(timestamp: number) {
+  return dayjs(timestamp).format("YYYY-MM-DD HH:mm");
 }
