@@ -18,6 +18,7 @@ import {
   SeriesType,
   SingleValueData,
   Time,
+  UTCTimestamp,
 } from "lightweight-charts";
 import { useContext, useEffect, useState } from "react";
 
@@ -75,9 +76,10 @@ export const useSeries = <T>(
     if (!seriesData || !seriesData.length) return;
 
     series.setData(
-      seriesData.map((item) => ({
+      seriesData.map((item, index) => ({
         ...item,
-        customValues: { id: `${id}_${type}` },
+        time: new Date(item.time as string).getTime() as UTCTimestamp,
+        customValues: { customLogic: index + 1 },
       }))
     );
   }, [series, seriesData, setChildSeries]);

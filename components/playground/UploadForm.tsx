@@ -22,17 +22,27 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
-import { CandlestickData, Time } from "lightweight-charts";
+import {
+  CandlestickData,
+  CandlestickStyleOptions,
+  SeriesPartialOptions,
+  Time,
+  UTCTimestamp,
+} from "lightweight-charts";
+import { EmitteryContext, OnApply } from "@/providers/EmitteryProvider";
+import dayjs from "dayjs";
 
 const UploadForm = () => {
   const { setDialogVisible } = useContext(DialogContext);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { emittery } = useContext(EmitteryContext);
   const [formValue, setFormValue] = useState<UploadFormValue>({
     symbol: "",
     interval: "D1",
     customInterval: "",
     toFixedNum: 0,
     file: null,
+    data: [],
   });
 
   const isCustomInterval = useMemo(
@@ -76,16 +86,13 @@ const UploadForm = () => {
 
     try {
       const file = files[0];
-
       if (!validateFileType(file) || !validateFileExtension(file))
         throw new Error(
           "The uploaded file format must be an Excel or CSV file"
         );
-
-      setFormValue({ ...formValue, file, toFixedNum: 0 });
+      setFormValue({ ...formValue, file, toFixedNum: 0, data: [] });
 
       const extname = getFileExtension(file.name);
-
       const data =
         extname === "csv"
           ? ((await analyzeCSVData(file)) as CandlestickData<Time>[])
@@ -93,11 +100,9 @@ const UploadForm = () => {
               file
             )) as unknown as CandlestickData<Time>[]);
 
-      console.log("@@@", data);
-
       // calculate toFixedNum
       const toFixedNum = calculateToFixedNum(data);
-      setFormValue((prev) => ({ ...prev, toFixedNum }));
+      setFormValue((prev) => ({ ...prev, toFixedNum, data }));
     } catch (error: any) {
       setErrorMsg((prev) => ({ ...prev, file: error.message }));
       clearFiles();
@@ -130,7 +135,29 @@ const UploadForm = () => {
     try {
       // Validate
       await formValidate();
-      console.log(formValue);
+
+      //  Package payload
+      const id = `${formValue.symbol}_${formValue.interval}_${Date.now()}`;
+      const customOptions: SeriesPartialOptions<CandlestickStyleOptions> = {
+        id,
+        toFixedNum: formValue.toFixedNum,
+      };
+      const seriesData: CandlestickData<Time>[] = formValue.data.map(
+        (item, index) => ({
+          ...item,
+          time: new Date(item.time as string).getTime() as UTCTimestamp,
+          customValues: { customLogic: index + 1 },
+        })
+      );
+
+      seriesData.reverse();
+      console.log({ seriesData });
+
+      // Emitter
+      // emittery?.emit(OnApply.ResetMainSeriesData, {
+      //   customOptions,
+      //   seriesData,
+      // });
     } catch (error) {
       console.log({ error });
     }
@@ -139,7 +166,7 @@ const UploadForm = () => {
   const clearFiles = () => {
     if (!fileInputRef.current) return;
     fileInputRef.current.value = "";
-    setFormValue({ ...formValue, file: null, toFixedNum: 0 });
+    setFormValue({ ...formValue, file: null, toFixedNum: 0, data: [] });
   };
 
   // trigger validate by changing

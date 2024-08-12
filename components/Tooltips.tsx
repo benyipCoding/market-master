@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import { CandlestickData, Time } from "lightweight-charts";
 import { TooltipsProps } from "./interfaces/Tooltips";
 import { titleCase } from "@/utils/helpers";
+import dayjs from "dayjs";
 
 const tooltipsOffset = {
   x: 5,
@@ -119,7 +120,11 @@ const Tooltips: React.FC<TooltipsProps> = ({ productName, tChartRef }) => {
       {currentCandlestick && (
         <div className="w-fit bg-white text-black dark:bg-black dark:text-white p-2 rounded-sm">
           <h1 className="mb-2 font-semibold">{productName}</h1>
-          <p className="text-sm mb-1">{currentCandlestick?.time.toString()}</p>
+          <p className="text-sm mb-1">
+            {dayjs(currentCandlestick?.time as number).format(
+              "YYYY-MM-DD HH:mm"
+            )}
+          </p>
           {["open", "high", "low", "close"].map((label) => (
             <p className="flex text-sm pointer-events-none" key={label}>
               <span className="w-14">{titleCase(label)}:</span>

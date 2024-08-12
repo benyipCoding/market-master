@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import {
   ChartOptions,
   ColorType,
@@ -41,12 +42,13 @@ export const defaultChartOptions: DeepPartial<ChartOptions> = {
   // },
   timeScale: {
     borderColor: "rgba(197, 203, 206, 0.8)", // 时间刻度边框颜色
+    tickMarkMaxCharacterLength: 12,
     tickMarkFormatter: (
       time: Time,
       tickMarkType: TickMarkType,
       locale: string
     ) => {
-      return time;
+      return dayjs(time as number).format("YYYY-MM-DD HH:mm");
     },
   },
 };

@@ -31,4 +31,5 @@ export type EmitterEventType = {
 export enum OnApply {
   Property = "apply_property",
   Data = "apply_data",
+  ResetMainSeriesData = "reset_main_series_data",
 }
