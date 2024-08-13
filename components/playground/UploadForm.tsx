@@ -168,6 +168,8 @@ const UploadForm = () => {
         customOptions,
         seriesData,
       });
+
+      setDialogVisible(false);
     } catch (error) {
       console.log({ error });
     }
