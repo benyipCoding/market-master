@@ -76,11 +76,13 @@ export const useSeries = <T>(
     if (!seriesData || !seriesData.length) return;
 
     series.setData(
-      seriesData.map((item, index) => ({
-        ...item,
-        time: new Date(item.time as string).getTime() as UTCTimestamp,
-        customValues: { customLogic: index + 1 },
-      }))
+      seriesData
+        .map((item, index) => ({
+          ...item,
+          time: new Date(item.time as string).getTime() as UTCTimestamp,
+          customValues: { customLogic: index + 1 },
+        }))
+        .sort((a, b) => a.time - b.time)
     );
   }, [series, seriesData, setChildSeries]);
 

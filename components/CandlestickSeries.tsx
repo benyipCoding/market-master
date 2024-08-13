@@ -25,8 +25,12 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     seriesData: CandlestickData<Time>[];
   }) => {
     console.log("收到重置main series data", { customOptions, seriesData });
+    series?.applyOptions(customOptions);
+    series?.setData(seriesData);
+    console.log(series?.options());
+
     // console.log(series?.data());
-    console.log(series?.setData(seriesData));
+    // console.log(series?.setData(seriesData));
   };
 
   useEffect(() => {

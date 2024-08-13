@@ -180,7 +180,11 @@ const Playground = () => {
             >
               <CandlestickSeries
                 seriesData={candlestickData}
-                customSeriesOptions={{ id: "XAUUSD", toFixedNum: 2 }}
+                customSeriesOptions={{
+                  id: "XAUUSD",
+                  toFixedNum: 2,
+                  priceFormat: { precision: 2, minMove: 0.01 },
+                }}
               />
               {drawedLineList.map((lineOption) => (
                 <LineSeries

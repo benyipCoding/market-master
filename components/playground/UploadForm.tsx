@@ -15,7 +15,7 @@ import {
 import IntervalItem from "../commonFormItem/IntervalItem";
 import { UploadFormValue } from "../interfaces/UploadForm";
 import UploadItem from "../commonFormItem/UploadItem";
-import { Download } from "lucide-react";
+import { Download, Loader } from "lucide-react";
 import {
   TooltipProvider,
   Tooltip,
@@ -31,11 +31,14 @@ import {
 } from "lightweight-charts";
 import { EmitteryContext, OnApply } from "@/providers/EmitteryProvider";
 import dayjs from "dayjs";
+import Loading from "../Loading";
 
 const UploadForm = () => {
   const { setDialogVisible } = useContext(DialogContext);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { emittery } = useContext(EmitteryContext);
+  const [loading, setLoading] = useState(false);
+
   const [formValue, setFormValue] = useState<UploadFormValue>({
     symbol: "",
     interval: "D1",
@@ -83,7 +86,7 @@ const UploadForm = () => {
   const fileHandler = async (files: FileList | null) => {
     if (!files || !files.length) return;
     setErrorMsg((prev) => ({ ...prev, file: "" }));
-
+    setLoading(true);
     try {
       const file = files[0];
       if (!validateFileType(file) || !validateFileExtension(file))
@@ -106,6 +109,8 @@ const UploadForm = () => {
     } catch (error: any) {
       setErrorMsg((prev) => ({ ...prev, file: error.message }));
       clearFiles();
+    } finally {
+      setLoading(false);
     }
   };
   const formValidate = (field?: keyof UploadFormValue) => {
@@ -136,28 +141,33 @@ const UploadForm = () => {
       // Validate
       await formValidate();
 
-      //  Package payload
+      //  Package up the payload
       const id = `${formValue.symbol}_${formValue.interval}_${Date.now()}`;
       const customOptions: SeriesPartialOptions<CandlestickStyleOptions> = {
         id,
         toFixedNum: formValue.toFixedNum,
+        priceFormat: {
+          precision: formValue.toFixedNum,
+          minMove: 1 / Math.pow(10, formValue.toFixedNum),
+        },
       };
-      const seriesData: CandlestickData<Time>[] = formValue.data.map(
-        (item, index) => ({
+      const seriesData: CandlestickData<Time>[] = formValue.data
+        .filter((item) => !!item.time)
+        .map((item, index) => ({
           ...item,
           time: new Date(item.time as string).getTime() as UTCTimestamp,
           customValues: { customLogic: index + 1 },
-        })
-      );
+        }));
 
-      seriesData.reverse();
-      console.log({ seriesData });
+      seriesData.sort((a, b) => (a.time as number) - (b.time as number));
+
+      console.log({ seriesData, customOptions });
 
       // Emitter
-      // emittery?.emit(OnApply.ResetMainSeriesData, {
-      //   customOptions,
-      //   seriesData,
-      // });
+      emittery?.emit(OnApply.ResetMainSeriesData, {
+        customOptions,
+        seriesData,
+      });
     } catch (error) {
       console.log({ error });
     }
@@ -250,7 +260,7 @@ const UploadForm = () => {
           >
             Cancel
           </Button>
-          <Button>Upload</Button>
+          <Button disabled={loading}>{loading ? <Loading /> : "Upload"}</Button>
         </CardFooter>
       </form>
     </Card>

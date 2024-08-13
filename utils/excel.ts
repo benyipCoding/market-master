@@ -53,6 +53,7 @@ export function analyzeExcelData(
             if (rowNumber === 1) {
               // Validate headers name
               if (!COLUMN_HEADERS.includes((cell as string).toLowerCase()))
+                // if (!COLUMN_HEADERS.every((stHeader)=>(cell as string).includes(stHeader)))
                 reject(new Error("The header name of the table is incorrect"));
 
               headerMap.set(index, (cell as string).toLowerCase());
