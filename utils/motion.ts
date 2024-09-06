@@ -29,11 +29,11 @@ export const customDialogContentPopIn = () => {
 export const textVariant = (delay: number) => {
   return {
     hidden: {
-      y: -50,
+      x: 50,
       opacity: 0,
     },
     show: {
-      y: 0,
+      x: 0,
       opacity: 1,
       transition: {
         type: "spring",
@@ -123,6 +123,25 @@ export const staggerContainer = (
       transition: {
         staggerChildren: staggerChildren,
         delayChildren: delayChildren || 0,
+      },
+    },
+  };
+};
+
+export const popIn = () => {
+  return {
+    hidden: {
+      scale: 0,
+    },
+    show: {
+      scale: 1,
+      transition: {
+        duration: 0.3,
+        scale: {
+          type: "spring",
+          damping: 10,
+          stiffness: 150,
+        },
       },
     },
   };

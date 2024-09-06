@@ -52,6 +52,8 @@ const UploadForm = () => {
     () => formValue.interval === "custom",
     [formValue.interval]
   );
+  const hasFile = useMemo(() => !!formValue.data.length, [formValue.data]);
+  // const hasFile = useMemo(() => true, []);
 
   const rules: Record<keyof UploadFormValue, (...args: any[]) => string> = {
     symbol: (name: string): string => {
@@ -90,18 +92,12 @@ const UploadForm = () => {
     try {
       const file = files[0];
       if (!validateFileType(file) || !validateFileExtension(file))
-        throw new Error(
-          "The uploaded file format must be an Excel or CSV file"
-        );
+        throw new Error("The uploaded file format must be an Excel file");
       setFormValue({ ...formValue, file, toFixedNum: 0, data: [] });
 
-      const extname = getFileExtension(file.name);
-      const data =
-        extname === "csv"
-          ? ((await analyzeCSVData(file)) as CandlestickData<Time>[])
-          : ((await analyzeExcelData(
-              file
-            )) as unknown as CandlestickData<Time>[]);
+      const data = (await analyzeExcelData(
+        file
+      )) as unknown as CandlestickData<Time>[];
 
       // calculate toFixedNum
       const toFixedNum = calculateToFixedNum(data);
@@ -175,8 +171,9 @@ const UploadForm = () => {
     }
   };
 
-  const clearFiles = () => {
+  const clearFiles = (e?: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
     if (!fileInputRef.current) return;
+    if (e) e.preventDefault();
     fileInputRef.current.value = "";
     setFormValue({ ...formValue, file: null, toFixedNum: 0, data: [] });
   };
@@ -231,7 +228,7 @@ const UploadForm = () => {
               }
               errorMessage={errorMsg.symbol}
             />
-            <IntervalItem
+            {/* <IntervalItem
               interval={formValue.interval}
               changeInterval={(interval) => {
                 setFormValue({ ...formValue, interval, customInterval: "" });
@@ -242,15 +239,17 @@ const UploadForm = () => {
                 setFormValue({ ...formValue, customInterval });
               }}
               errorMessage={errorMsg.customInterval}
-            />
+            /> */}
             <UploadItem
-              accept=".xls, .xlsx, .csv"
+              accept=".xls, .xlsx"
               id="fileData"
               label="File"
               onFileChange={fileHandler}
               errorMessage={errorMsg.file}
               ref={fileInputRef}
               clearFiles={clearFiles}
+              hasFile={hasFile}
+              formValue={formValue}
             />
           </div>
         </CardContent>

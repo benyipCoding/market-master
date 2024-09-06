@@ -258,7 +258,7 @@ export const validateFileType = (file: File) => {
   const validMimeTypes = [
     "application/vnd.ms-excel",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    "text/csv",
+    // "text/csv",
   ];
 
   return validMimeTypes.includes(file.type);
@@ -266,7 +266,8 @@ export const validateFileType = (file: File) => {
 
 // Validate excel or csv file
 export const validateFileExtension = (file: File) => {
-  const validExtensions = ["xls", "xlsx", "csv"];
+  // const validExtensions = ["xls", "xlsx", "csv"];
+  const validExtensions = ["xls", "xlsx"];
   const fileExtension = getFileExtension(file.name);
 
   return validExtensions.includes(fileExtension);
