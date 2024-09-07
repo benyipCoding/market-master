@@ -28,9 +28,6 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     series?.applyOptions(customOptions);
     series?.setData(seriesData);
     console.log(series?.options());
-
-    // console.log(series?.data());
-    // console.log(series?.setData(seriesData));
   };
 
   useEffect(() => {

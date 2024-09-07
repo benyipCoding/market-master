@@ -1,5 +1,6 @@
-import { CustomLineSeriesType } from "@/hooks/interfaces";
+import { CustomLineSeriesType } from "../hooks/interfaces";
 import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import {
   ISeriesApi,
   SeriesType,
@@ -300,13 +301,120 @@ export function calculateToFixedNum(
     const randomIndex = Math.floor(Math.random() * data.length);
     const num = countDecimalPlaces(data[randomIndex].close);
     if (num > toFixedNum) {
-      console.log("###");
       toFixedNum = num;
     }
   }
   return toFixedNum;
 }
 
+function getMinutesBetweenTimestamps(
+  timestamp1: number,
+  timestamp2: number
+): number {
+  const diffInMilliseconds = Math.abs(timestamp2 - timestamp1); // 计算两个时间戳的差值
+  const diffInMinutes = diffInMilliseconds / (1000 * 60); // 将毫秒转换为分钟
+  return diffInMinutes;
+}
+
+function getKeyWithMaxValue(countMap: Map<number, number>): number | undefined {
+  let maxKey: number | undefined = undefined;
+  let maxValue: number = -Infinity;
+
+  for (const [key, value] of countMap) {
+    if (value > maxValue) {
+      maxValue = value;
+      maxKey = key;
+    }
+  }
+  return maxKey;
+}
+
+function formatMinutes(minutes: number): string {
+  const MINUTES_IN_HOUR = 60;
+  const MINUTES_IN_DAY = 60 * 24;
+  const MINUTES_IN_WEEK = 60 * 24 * 7;
+  const MINUTES_IN_MONTH = 60 * 24 * 30; // 取30天为一个月的估计
+
+  if (minutes < MINUTES_IN_HOUR) {
+    return `m${minutes}`; // 小于60分钟，返回分钟
+  } else if (minutes < MINUTES_IN_DAY) {
+    const hours = Math.floor(minutes / MINUTES_IN_HOUR);
+    return `H${hours}`; // 小于一天，返回小时
+  } else if (minutes < MINUTES_IN_WEEK) {
+    const days = Math.floor(minutes / MINUTES_IN_DAY);
+    return `D${days}`; // 小于一周，返回天数
+  } else if (minutes < MINUTES_IN_MONTH) {
+    const weeks = Math.floor(minutes / MINUTES_IN_WEEK);
+    return `W${weeks}`; // 小于一个月，返回周数
+  } else {
+    const months = Math.floor(minutes / MINUTES_IN_MONTH);
+    return `M${months}`; // 超过或等于一个月，返回月数
+  }
+}
+
+export function calculateInterval(
+  data: CandlestickData<Time>[],
+  count: number = 1000
+): string {
+  if (!data || !data.length) throw new Error("Parameter 1 is missing data");
+
+  count = Math.min(data.length, count);
+  const minutes_count = new Map<number, number>();
+
+  for (let i = 0; i < count; i++) {
+    const rand = Math.floor(Math.random() * (data.length + 1));
+    const current = data[rand];
+    const next = data[rand - 1];
+    const timestamp1 = new Date(current.time as string).getTime();
+    const timestamp2 = new Date(next.time as string).getTime();
+    const diff = getMinutesBetweenTimestamps(timestamp1, timestamp2);
+
+    if (minutes_count.has(diff)) {
+      const count = minutes_count.get(diff)!;
+      minutes_count.set(diff, count + 1);
+    } else {
+      minutes_count.set(diff, 1);
+    }
+  }
+  const maxShowUpMinute = getKeyWithMaxValue(minutes_count);
+  if (!maxShowUpMinute) throw new Error("No maxShowUpMinute");
+  const result = formatMinutes(maxShowUpMinute);
+  return result;
+}
+
 export function timestampToDateStr(timestamp: number) {
   return dayjs(timestamp).format("YYYY-MM-DD HH:mm");
+}
+
+dayjs.extend(customParseFormat);
+const SPECIAL_DATE_STR = "D/M/YYYY HH:mm:ss";
+const FORMAT_DATE_STR = "YYYY-MM-DD HH:mm:ss";
+export function isValidTime(str: string): boolean {
+  const value1 = dayjs(str).format(FORMAT_DATE_STR);
+  const value2 = dayjs(str, SPECIAL_DATE_STR).format(FORMAT_DATE_STR);
+  return dayjs(value1).isValid() || dayjs(value2).isValid();
+}
+
+export function transferToDateStr(date: Date) {
+  if (!(date instanceof Date))
+    throw new TypeError("The type of the parameter must be Date type");
+
+  const utcDate = adjustTimeZoneOffset(date);
+
+  return dayjs(utcDate).isValid()
+    ? dayjs(utcDate).format(FORMAT_DATE_STR)
+    : dayjs(utcDate, SPECIAL_DATE_STR).format(FORMAT_DATE_STR);
+}
+
+export function indexOfVol(arr: Array<any>): number {
+  if (!arr || !arr.length) return -1;
+  if (arr.length < 6) return -1;
+  return arr.indexOf(Math.max(...arr));
+}
+
+export function adjustTimeZoneOffset(date: Date) {
+  const offsetInHours = date.getTimezoneOffset();
+  const eightHoursInMilliseconds = offsetInHours * 60 * 1000;
+  const newDate = new Date(date.getTime() + eightHoursInMilliseconds);
+  return newDate;
 }

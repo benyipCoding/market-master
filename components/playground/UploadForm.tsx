@@ -1,21 +1,24 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { useContext, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import CommonHeader from "@/components/technicalIndex/CommonHeader";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { DialogContext } from "@/context/Dialog";
 import NameItem from "../commonFormItem/NameItem";
-import { analyzeCSVData, analyzeExcelData } from "@/utils/excel";
+import {
+  analyzeExcelData,
+  ColumnHeaders,
+  verifyOpenAndClose,
+} from "@/utils/excel";
 import {
   validateFileType,
   validateFileExtension,
-  getFileExtension,
   downloadFile,
   calculateToFixedNum,
+  calculateInterval,
 } from "@/utils/helpers";
-import IntervalItem from "../commonFormItem/IntervalItem";
 import { UploadFormValue } from "../interfaces/UploadForm";
 import UploadItem from "../commonFormItem/UploadItem";
-import { Download, Loader } from "lucide-react";
+import { Download } from "lucide-react";
 import {
   TooltipProvider,
   Tooltip,
@@ -30,7 +33,6 @@ import {
   UTCTimestamp,
 } from "lightweight-charts";
 import { EmitteryContext, OnApply } from "@/providers/EmitteryProvider";
-import dayjs from "dayjs";
 import Loading from "../Loading";
 
 const UploadForm = () => {
@@ -41,47 +43,48 @@ const UploadForm = () => {
 
   const [formValue, setFormValue] = useState<UploadFormValue>({
     symbol: "",
-    interval: "D1",
-    customInterval: "",
+    interval: "",
+    // customInterval: "",
     toFixedNum: 0,
     file: null,
     data: [],
+    hasVol: false,
   });
 
-  const isCustomInterval = useMemo(
-    () => formValue.interval === "custom",
-    [formValue.interval]
-  );
+  // const isCustomInterval = useMemo(
+  //   () => formValue.interval === "custom",
+  //   [formValue.interval]
+  // );
   const hasFile = useMemo(() => !!formValue.data.length, [formValue.data]);
   // const hasFile = useMemo(() => true, []);
 
-  const rules: Record<keyof UploadFormValue, (...args: any[]) => string> = {
-    symbol: (name: string): string => {
-      if (!name) return "Symbol name is required";
-      if (
-        !/^(?!^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(\..*)?$)[^\\/:*?"<>|]{1,255}$/.test(
-          name
-        )
-      )
-        return "Please input correct symbol name";
-      return "";
-    },
-    customInterval: (value: string): string => {
-      if (isCustomInterval && !formValue.customInterval)
-        return "Custom interval is required";
-      if (!/^[mHDWM]\d+$/.test(value) && isCustomInterval)
-        return "Please input correct interval.";
-      return "";
-    },
-    file: (file: File | null): string => {
-      if (!file) return "File data is required";
-      return "";
-    },
-  };
+  // const rules: Record<keyof UploadFormValue, (...args: any[]) => string> = {
+  //   symbol: (name: string): string => {
+  //     if (!name) return "Symbol name is required";
+  //     if (
+  //       !/^(?!^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(\..*)?$)[^\\/:*?"<>|]{1,255}$/.test(
+  //         name
+  //       )
+  //     )
+  //       return "Please input correct symbol name";
+  //     return "";
+  //   },
+  //   customInterval: (value: string): string => {
+  //     if (isCustomInterval && !formValue.customInterval)
+  //       return "Custom interval is required";
+  //     if (!/^[mHDWM]\d+$/.test(value) && isCustomInterval)
+  //       return "Please input correct interval.";
+  //     return "";
+  //   },
+  //   file: (file: File | null): string => {
+  //     if (!file) return "File data is required";
+  //     return "";
+  //   },
+  // };
 
   const [errorMsg, setErrorMsg] = useState({
     symbol: "",
-    customInterval: "",
+    // customInterval: "",
     file: "",
   });
 
@@ -95,13 +98,31 @@ const UploadForm = () => {
         throw new Error("The uploaded file format must be an Excel file");
       setFormValue({ ...formValue, file, toFixedNum: 0, data: [] });
 
-      const data = (await analyzeExcelData(
+      let data = (await analyzeExcelData(
         file
       )) as unknown as CandlestickData<Time>[];
 
       // calculate toFixedNum
       const toFixedNum = calculateToFixedNum(data);
-      setFormValue((prev) => ({ ...prev, toFixedNum, data }));
+      const result = verifyOpenAndClose(data);
+      if (result < 0.9)
+        data = data.map((item) => ({
+          ...item,
+          open: item.close,
+          close: item.open,
+        }));
+
+      // calculate interval
+      const interval = calculateInterval(data);
+      const noVol = data.some((item) => !(ColumnHeaders.VOL in item));
+
+      setFormValue((prev) => ({
+        ...prev,
+        toFixedNum,
+        data,
+        interval,
+        hasVol: !noVol,
+      }));
     } catch (error: any) {
       setErrorMsg((prev) => ({ ...prev, file: error.message }));
       clearFiles();
@@ -109,33 +130,33 @@ const UploadForm = () => {
       setLoading(false);
     }
   };
-  const formValidate = (field?: keyof UploadFormValue) => {
-    return new Promise((resolve, reject) => {
-      let hasError = false;
+  // const formValidate = (field?: keyof UploadFormValue) => {
+  //   return new Promise((resolve, reject) => {
+  //     let hasError = false;
 
-      if (!field) {
-        for (const key in rules) {
-          const msg = rules[key](formValue[key]);
-          if (msg) hasError = true;
-          setErrorMsg((prev) => ({ ...prev, [key]: msg }));
-        }
-      } else {
-        const msg = rules[field](formValue[field]);
-        if (msg) hasError = true;
-        setErrorMsg((prev) => ({ ...prev, [field]: msg }));
-      }
+  //     if (!field) {
+  //       for (const key in rules) {
+  //         const msg = rules[key](formValue[key]);
+  //         if (msg) hasError = true;
+  //         setErrorMsg((prev) => ({ ...prev, [key]: msg }));
+  //       }
+  //     } else {
+  //       const msg = rules[field](formValue[field]);
+  //       if (msg) hasError = true;
+  //       setErrorMsg((prev) => ({ ...prev, [field]: msg }));
+  //     }
 
-      if (hasError) reject(false);
-      else resolve(true);
-    });
-  };
+  //     if (hasError) reject(false);
+  //     else resolve(true);
+  //   });
+  // };
 
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
       // Validate
-      await formValidate();
+      // await formValidate();
 
       //  Package up the payload
       const id = `${formValue.symbol}_${formValue.interval}_${Date.now()}`;
@@ -175,27 +196,35 @@ const UploadForm = () => {
     if (!fileInputRef.current) return;
     if (e) e.preventDefault();
     fileInputRef.current.value = "";
-    setFormValue({ ...formValue, file: null, toFixedNum: 0, data: [] });
+    setFormValue({
+      ...formValue,
+      file: null,
+      toFixedNum: 0,
+      data: [],
+      hasVol: false,
+      interval: "",
+      symbol: "",
+    });
   };
 
   // trigger validate by changing
-  useEffect(() => {
-    if (!isCustomInterval) return;
-    try {
-      formValidate("customInterval");
-    } catch (error) {
-      console.log(error);
-    }
-  }, [formValue.customInterval]);
+  // useEffect(() => {
+  //   if (!isCustomInterval) return;
+  //   try {
+  //     formValidate("customInterval");
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }, [formValue.customInterval]);
 
-  useEffect(() => {
-    if (formValue.symbol === "") return;
-    try {
-      formValidate("symbol");
-    } catch (error) {
-      console.log(error);
-    }
-  }, [formValue.symbol]);
+  // useEffect(() => {
+  //   if (formValue.symbol === "") return;
+  //   try {
+  //     formValidate("symbol");
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }, [formValue.symbol]);
 
   return (
     <Card className="w-full">
@@ -261,7 +290,11 @@ const UploadForm = () => {
           >
             Cancel
           </Button>
-          <Button disabled={loading}>{loading ? <Loading /> : "Upload"}</Button>
+          <Button
+            disabled={loading || !formValue.symbol || !formValue.data.length}
+          >
+            {loading ? <Loading /> : "Upload"}
+          </Button>
         </CardFooter>
       </form>
     </Card>

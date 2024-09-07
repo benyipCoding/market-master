@@ -99,7 +99,11 @@ const UploadItem: React.ForwardRefRenderFunction<
               >
                 <span className="flex-1">Volumn:</span>
                 <span className="flex-1">
-                  <Check className="h-full" />
+                  {formValue.hasVol ? (
+                    <Check className="h-full" />
+                  ) : (
+                    <Plus className="h-full rotate-45" />
+                  )}
                 </span>
               </motion.div>
             </div>
