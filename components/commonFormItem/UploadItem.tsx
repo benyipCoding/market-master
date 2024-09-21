@@ -2,10 +2,16 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import React, { forwardRef } from "react";
 import { cn } from "@/lib/utils";
-import { Check, CircleX, Plus, Sheet } from "lucide-react";
+import { CircleX, Plus, Sheet } from "lucide-react";
 import { UploadItemProps } from "../interfaces/UploadItem";
 import { motion } from "framer-motion";
 import { popIn, textVariant } from "@/utils/motion";
+
+const descriptionList = [
+  { label: "Interval", prop: "interval" },
+  { label: "Precision", prop: "toFixedNum" },
+  { label: "Total", prop: "total" },
+];
 
 const UploadItem: React.ForwardRefRenderFunction<
   HTMLInputElement,
@@ -73,39 +79,18 @@ const UploadItem: React.ForwardRefRenderFunction<
 
           {hasFile && (
             <div className="flex-1 h-full px-2 flex flex-col justify-evenly">
-              <motion.div
-                variants={textVariant(0.2)}
-                className="flex"
-                initial="hidden"
-                whileInView="show"
-              >
-                <span className="flex-1">Interval:</span>
-                <span className="flex-1">{formValue.interval}</span>
-              </motion.div>
-              <motion.div
-                variants={textVariant(0.3)}
-                className="flex"
-                initial="hidden"
-                whileInView="show"
-              >
-                <span className="flex-1">Precision:</span>
-                <span className="flex-1">{formValue.toFixedNum}</span>
-              </motion.div>
-              <motion.div
-                variants={textVariant(0.4)}
-                className="flex"
-                initial="hidden"
-                whileInView="show"
-              >
-                <span className="flex-1">Volumn:</span>
-                <span className="flex-1">
-                  {formValue.hasVol ? (
-                    <Check className="h-full" />
-                  ) : (
-                    <Plus className="h-full rotate-45" />
-                  )}
-                </span>
-              </motion.div>
+              {descriptionList.map((item, index) => (
+                <motion.div
+                  variants={textVariant(0.2 + index / 10)}
+                  className="flex"
+                  initial="hidden"
+                  whileInView="show"
+                  key={index}
+                >
+                  <span className="flex-1">{item.label}</span>
+                  <span className="flex-1">{formValue[item.prop]}</span>
+                </motion.div>
+              ))}
             </div>
           )}
         </div>

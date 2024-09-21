@@ -49,6 +49,7 @@ const UploadForm = () => {
     file: null,
     data: [],
     hasVol: false,
+    total: 0,
   });
 
   // const isCustomInterval = useMemo(
@@ -122,6 +123,7 @@ const UploadForm = () => {
         data,
         interval,
         hasVol: !noVol,
+        total: data.length,
       }));
     } catch (error: any) {
       setErrorMsg((prev) => ({ ...prev, file: error.message }));

@@ -8,4 +8,5 @@ export interface UploadFormValue extends Record<string, any> {
   file: File | null;
   data: CandlestickData<Time>[];
   hasVol: boolean;
+  total: number;
 }
