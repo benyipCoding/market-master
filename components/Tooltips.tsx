@@ -59,15 +59,16 @@ const Tooltips: React.FC<TooltipsProps> = ({ productName, tChartRef }) => {
   useEffect(() => {
     if (!mouseClickEventParam?.point || !tChartRef.current) return;
 
-    if (visible) {
-      setVisible(false);
-      return;
-    }
+    if (visible) return setVisible(false);
+
     // get candlestick data
     const { childSeries } = tChartRef.current;
     const data = mouseClickEventParam.seriesData.get(childSeries[0]) as
       | CandlestickData<Time>
       | undefined;
+
+    if (!data) return;
+
     setCurrentCandlestick(data);
     setVisible(true);
   }, [mouseClickEventParam]);
