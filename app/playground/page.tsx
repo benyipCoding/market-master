@@ -35,6 +35,7 @@ import Aside from "@/components/playground/Aside";
 import { AsideRef } from "@/components/interfaces/Playground";
 import SymbolSearch from "@/components/SymbolSearch";
 import UploadForm from "@/components/playground/UploadForm";
+import { useAutomaticLineDrawing } from "@/hooks/useAutomaticLineDrawing";
 
 const Playground = () => {
   // TChart component instance
@@ -82,6 +83,22 @@ const Playground = () => {
 
   // dialog trigger
   const [dialogVisible, setDialogVisible] = useState(false);
+
+  // 测试用
+  const processedData = useMemo(
+    () => candlestickData.slice(-20),
+    [candlestickData]
+  );
+
+  const { performDrawing } = useAutomaticLineDrawing({
+    candlestickData: processedData,
+    setDrawedLineList,
+    mainSeries: tChartRef.current?.childSeries[0],
+  });
+
+  const handleProcessedData = () => {
+    performDrawing();
+  };
 
   const getCandlestickData = async () => {
     const res = await getDummyData();
@@ -179,7 +196,8 @@ const Playground = () => {
               dialogVisible={dialogVisible}
             >
               <CandlestickSeries
-                seriesData={candlestickData}
+                // seriesData={candlestickData}
+                seriesData={processedData}
                 customSeriesOptions={{
                   id: "XAUUSD",
                   toFixedNum: 2,
@@ -208,9 +226,10 @@ const Playground = () => {
               onPointerDown={toggleAsideOpen}
             ></div>
             <Aside
-              className="bg-background rounded-md overflow-auto max-md:hidden"
+              className="bg-background rounded-md overflow-auto max-md:hidden p-2"
               ref={asideRef}
               asideOpen={asideOpen}
+              handleProcessedData={handleProcessedData}
             />
           </div>
           <RightAsideBtns

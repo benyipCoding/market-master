@@ -9,6 +9,7 @@ import { TechnicalIndicatorLine } from "./TechnicalIndexForm";
 export interface AsideProps {
   className?: string;
   asideOpen: boolean;
+  handleProcessedData: any;
 }
 
 export interface AsideRef {
