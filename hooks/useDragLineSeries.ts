@@ -124,7 +124,6 @@ export const useDragLineSeries = ({
 
     try {
       selectedSeries.setData(lineData);
-
       recordEquation(
         fixed.customValues as any,
         dynamic.customValues as any,

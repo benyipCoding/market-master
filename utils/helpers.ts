@@ -30,8 +30,25 @@ export const calcValue = (
   const valueY = +series.coordinateToPrice(y)!.toFixed(toFixedNum);
   const valueX = chart.timeScale().coordinateToTime(x);
   const logic = chart.timeScale().coordinateToLogical(x);
-
   return [valueX, valueY, x, y, logic];
+};
+
+export interface CalcCoordinateArgs {
+  chart: IChartApi;
+  time: Time;
+  series: ISeriesApi<SeriesType, Time>;
+  price: number;
+}
+export const calcCoordinate = ({
+  chart,
+  time,
+  series,
+  price,
+}: CalcCoordinateArgs) => {
+  const x = chart.timeScale().timeToCoordinate(time)!;
+  const y = series.priceToCoordinate(price);
+  const logic = chart.timeScale().coordinateToLogical(x);
+  return { x, y, logic };
 };
 
 export type AnyFunction = (...args: any[]) => any;
@@ -188,7 +205,7 @@ export const makeLineData = (
   point1: LineData<Time>,
   point2: LineData<Time>,
   lineId: string
-) => {
+): LineData<Time>[] => {
   return [point1, point2]
     .sort(
       (a, b) =>
@@ -418,3 +435,23 @@ export function adjustTimeZoneOffset(date: Date) {
   const newDate = new Date(date.getTime() + eightHoursInMilliseconds);
   return newDate;
 }
+
+export const generateLinePoint = (
+  time: Time,
+  price: number,
+  mainSeries: ISeriesApi<SeriesType, Time>,
+  chart: IChartApi
+) => {
+  const { x, y, logic } = calcCoordinate({
+    time,
+    price,
+    series: mainSeries!,
+    chart,
+  });
+
+  return {
+    value: price,
+    time,
+    customValues: { x, y, logic, price },
+  };
+};

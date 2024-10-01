@@ -1,3 +1,4 @@
+import { Equation } from "@/utils/helpers";
 import {
   DeepPartial,
   LineStyleOptions,
@@ -33,4 +34,7 @@ export interface TChartRef {
   chartContainer: React.RefObject<HTMLDivElement>;
   dialogVisible: boolean;
   setWidth: React.Dispatch<React.SetStateAction<string>>;
+  setLineId_equation: React.Dispatch<
+    React.SetStateAction<Record<string, Equation>>
+  >;
 }

@@ -33,3 +33,7 @@ export enum OnApply {
   Data = "apply_data",
   ResetMainSeriesData = "reset_main_series_data",
 }
+
+export enum OnSeriesCreate {
+  LineSeries = "lineSeriesCreate",
+}

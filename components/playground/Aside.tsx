@@ -2,9 +2,10 @@ import { cn } from "@/lib/utils";
 import React, { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
 import { AsideRef, AsideProps } from "../interfaces/Playground";
 import { Button } from "../ui/button";
+import { useAutomaticLineDrawing } from "@/hooks/useAutomaticLineDrawing";
 
 const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
-  { className, asideOpen, handleProcessedData },
+  { className, asideOpen, setDrawedLineList, tChartRef },
   ref
 ) => {
   const asideRef = useRef<HTMLDivElement>(null);
@@ -14,13 +15,18 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     [asideOpen]
   );
 
+  const { performDrawing } = useAutomaticLineDrawing({
+    setDrawedLineList,
+    tChartRef,
+  });
+
   useImperativeHandle(ref, () => ({
     container: asideRef.current,
   }));
 
   return (
     <div className={cn(className)} ref={asideRef} style={{ width }}>
-      <Button onClick={handleProcessedData}>Test</Button>
+      <Button onClick={performDrawing}>Test</Button>
     </div>
   );
 };

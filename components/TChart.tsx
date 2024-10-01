@@ -235,6 +235,7 @@ const TChart: React.ForwardRefRenderFunction<
     chartContainer: container,
     dialogVisible,
     setWidth,
+    setLineId_equation,
   }));
 
   return (

@@ -16,8 +16,10 @@ import {
   EmitterEventType,
   EmitteryContext,
   OnApply,
+  OnSeriesCreate,
 } from "@/providers/EmitteryProvider";
 import dayjs from "dayjs";
+import { CustomLineSeriesType } from "@/hooks/interfaces";
 
 const LineSeries: React.FC<LineSeriesProps> = ({
   seriesData,
@@ -152,14 +154,16 @@ const LineSeries: React.FC<LineSeriesProps> = ({
     emittery?.on(OnApply.Data, applyHandler);
 
     setCurrentSeriesOptions(series.options());
-  }, [series]);
 
-  useEffect(() => {
+    if (series.options().customType === CustomLineSeriesType.AutomaticDrawed) {
+      emittery?.emit(OnSeriesCreate.LineSeries, series);
+    }
+
     return () => {
       emittery?.off(OnApply.Property, applyHandler);
       emittery?.off(OnApply.Data, applyHandler);
     };
-  }, []);
+  }, [series]);
 
   return null;
 };

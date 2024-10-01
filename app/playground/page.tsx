@@ -90,16 +90,6 @@ const Playground = () => {
     [candlestickData]
   );
 
-  const { performDrawing } = useAutomaticLineDrawing({
-    candlestickData: processedData,
-    setDrawedLineList,
-    mainSeries: tChartRef.current?.childSeries[0],
-  });
-
-  const handleProcessedData = () => {
-    performDrawing();
-  };
-
   const getCandlestickData = async () => {
     const res = await getDummyData();
     setCandlestickData(res.data);
@@ -229,7 +219,8 @@ const Playground = () => {
               className="bg-background rounded-md overflow-auto max-md:hidden p-2"
               ref={asideRef}
               asideOpen={asideOpen}
-              handleProcessedData={handleProcessedData}
+              setDrawedLineList={setDrawedLineList}
+              tChartRef={tChartRef}
             />
           </div>
           <RightAsideBtns

@@ -1,4 +1,5 @@
 import { CalculatePriceType } from "@/components/commonFormItem/PeriodItem";
+import { TChartRef } from "@/components/interfaces/TChart";
 import { TechnicalIndexItemTitleType } from "@/constants/technicalIndexList";
 import { Equation } from "@/utils/helpers";
 import {
@@ -16,6 +17,7 @@ import {
 export enum CustomLineSeriesType {
   Drawed = "drawed",
   Indicator = "indicator",
+  AutomaticDrawed = "automaticDrawed",
 }
 
 declare module "lightweight-charts" {
@@ -50,4 +52,11 @@ export interface IDragLineSeries {
   setLineId_equation: React.Dispatch<
     React.SetStateAction<Record<string, Equation>>
   >;
+}
+
+export interface AutomaticLineDrawingArgs {
+  setDrawedLineList: React.Dispatch<
+    React.SetStateAction<DeepPartial<LineStyleOptions & SeriesOptionsCommon>[]>
+  >;
+  tChartRef: React.RefObject<TChartRef>;
 }

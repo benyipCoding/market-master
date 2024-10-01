@@ -9,7 +9,10 @@ import { TechnicalIndicatorLine } from "./TechnicalIndexForm";
 export interface AsideProps {
   className?: string;
   asideOpen: boolean;
-  handleProcessedData: any;
+  setDrawedLineList: React.Dispatch<
+    React.SetStateAction<DeepPartial<LineStyleOptions & SeriesOptionsCommon>[]>
+  >;
+  tChartRef: React.RefObject<TChartRef>;
 }
 
 export interface AsideRef {

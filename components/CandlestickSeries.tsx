@@ -24,10 +24,8 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     customOptions: SeriesPartialOptions<CandlestickStyleOptions>;
     seriesData: CandlestickData<Time>[];
   }) => {
-    console.log("收到重置main series data", { customOptions, seriesData });
     series?.applyOptions(customOptions);
     series?.setData(seriesData);
-    console.log(series?.options());
   };
 
   useEffect(() => {
