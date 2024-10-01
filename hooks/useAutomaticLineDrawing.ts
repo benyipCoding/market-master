@@ -14,14 +14,14 @@ import { EmitteryContext, OnSeriesCreate } from "@/providers/EmitteryProvider";
 export const useAutomaticLineDrawing = ({
   setDrawedLineList,
   tChartRef,
-}: // childSeries,
-// chart,
-AutomaticLineDrawingArgs) => {
+}: AutomaticLineDrawingArgs) => {
   // let highPoint = { price: 0, index: 0 };
   // let lowPoint = { price: 999999, index: 999999 };
-  const [lineData, setLineData] = useState<LineData<Time>[]>();
+  const [lineData, setLineData] = useState<LineData<Time>[] | null>(null);
   const { emittery } = useContext(EmitteryContext);
-  const [series, setSeries] = useState<ISeriesApi<SeriesType, Time>>();
+  const [series, setSeries] = useState<ISeriesApi<SeriesType, Time> | null>(
+    null
+  );
 
   const generateLinePoint = (
     time: Time,
@@ -62,6 +62,11 @@ AutomaticLineDrawingArgs) => {
     // 2. 给这个LineSeries组件setData
     const candlestickData = mainSeries.data() as CandlestickData<Time>[];
 
+    // 如何得出index 和 价位?
+    candlestickData.forEach((candle, index) => {
+      const high = Math.max(candle.open, candle.close);
+    });
+
     // 起始点
     const startPoint = generateLinePoint(
       candlestickData[3].time,
@@ -74,6 +79,7 @@ AutomaticLineDrawingArgs) => {
       candlestickData[16].close,
       mainSeries
     );
+
     setLineData(makeLineData(startPoint, endPoint, lineId));
   };
 
@@ -92,7 +98,11 @@ AutomaticLineDrawingArgs) => {
       tChartRef.current?.setLineId_equation,
       tChartRef.current.chart
     );
-  }, [series, lineData]);
+    Promise.resolve().then(() => {
+      setSeries(null);
+      setLineData(null);
+    });
+  }, [series, lineData, tChartRef]);
 
   useEffect(() => {
     emittery?.on(OnSeriesCreate.LineSeries, lineSeriesCreatedHandler);
