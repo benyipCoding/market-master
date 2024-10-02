@@ -14,7 +14,6 @@ import {
 import {
   calcCoordinate,
   makeLineData,
-  recordEquation,
   recordEquationHandler,
 } from "@/utils/helpers";
 import { useContext, useEffect, useState } from "react";
@@ -99,19 +98,20 @@ export const useAutomaticLineDrawing = ({
       candle: CandlestickData<Time>,
       kCount: number = 5
     ) => {
-      // 计算相隔多少根K线
-      const diff =
-        newTrend === TrendType.Up
-          ? Math.abs(
-              high.index! - (startPoint ? startPoint.index! : low.index!)
-            ) + 1
-          : Math.abs(
-              (startPoint ? startPoint.index! : high.index!) - low.index!
-            ) + 1;
+      let diff: number = 0;
 
-      if (diff >= kCount) {
-        if (currentTrend === newTrend) {
-          // 趋势延续
+      if (currentTrend === newTrend) {
+        // 趋势延续
+        diff =
+          newTrend === TrendType.Up
+            ? Math.abs(
+                high.index! - (startPoint ? startPoint.index! : low.index!)
+              ) + 1
+            : Math.abs(
+                (startPoint ? startPoint.index! : high.index!) - low.index!
+              ) + 1;
+
+        if (diff >= kCount) {
           endPoint = newTrend === TrendType.Up ? { ...high } : { ...low };
 
           newTrend === TrendType.Up && (low.index = index);
@@ -121,8 +121,18 @@ export const useAutomaticLineDrawing = ({
           newTrend === TrendType.Down && (high.index = index);
           newTrend === TrendType.Down && (high.price = currentHigh);
           newTrend === TrendType.Down && (high.time = candle.time);
-        } else {
-          // 趋势改变或初始化
+        }
+      } else {
+        // 趋势改变或初始化
+        diff =
+          newTrend === TrendType.Up
+            ? Math.abs(
+                high.index! - (endPoint ? endPoint.index! : low.index!)
+              ) + 1
+            : Math.abs(
+                (endPoint ? endPoint.index! : high.index!) - low.index!
+              ) + 1;
+        if (diff >= kCount) {
           currentTrend = newTrend;
           // 结算前一个相反趋势线
           if (startPoint && endPoint) {
@@ -141,6 +151,7 @@ export const useAutomaticLineDrawing = ({
       const currentLow = Math.min(candle.open, candle.close);
 
       if (currentHigh > high.price) {
+        // 高位刷新时
         high.index = index;
         high.price = currentHigh;
         high.time = candle.time;
@@ -148,6 +159,7 @@ export const useAutomaticLineDrawing = ({
       }
 
       if (currentLow < low.price) {
+        // 低位刷新时
         low.index = index;
         low.price = currentLow;
         low.time = candle.time;
