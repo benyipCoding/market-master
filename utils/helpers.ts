@@ -112,7 +112,7 @@ export function generateLinearEquation(
   };
 }
 
-export const recordEquation = debonce(function (
+export const recordEquationHandler = function (
   point1: Point,
   point2: Point,
   lineSeriesId: string,
@@ -123,8 +123,9 @@ export const recordEquation = debonce(function (
 ) {
   const equation = generateLinearEquation(point1, point2, chart);
   setLineId_equation((prev) => ({ ...prev, [lineSeriesId]: equation }));
-},
-500);
+};
+
+export const recordEquation = debonce(recordEquationHandler, 500);
 
 export interface IFindHoveringSeries {
   childSeries: ISeriesApi<SeriesType, Time>[];

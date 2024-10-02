@@ -5,17 +5,20 @@ import {
   SeriesType,
   Time,
 } from "lightweight-charts";
-import { AutomaticLineDrawingArgs, CustomLineSeriesType } from "./interfaces";
-import { calcCoordinate, makeLineData, recordEquation } from "@/utils/helpers";
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import {
+  AutomaticLineDrawingArgs,
+  AutomaticLinePoint,
+  CustomLineSeriesType,
+  TrendType,
+} from "./interfaces";
+import {
+  calcCoordinate,
+  makeLineData,
+  recordEquation,
+  recordEquationHandler,
+} from "@/utils/helpers";
+import { useContext, useEffect, useState } from "react";
 import { EmitteryContext, OnSeriesCreate } from "@/providers/EmitteryProvider";
-
-export type AutomaticLinePoint = { index?: number; time: Time; price: number };
-
-export enum TrendType {
-  Up = 1,
-  Down = -1,
-}
 
 export const useAutomaticLineDrawing = ({
   setDrawedLineList,
@@ -26,6 +29,15 @@ export const useAutomaticLineDrawing = ({
     SeriesType,
     Time
   > | null>(null);
+  const [canNext, setCanNext] = useState(true);
+  const [iterator, setIterator] = useState<IterableIterator<{
+    startPoint: AutomaticLinePoint;
+    endPoint: AutomaticLinePoint;
+  }> | null>(null);
+  const [lineValue, setLineValue] = useState<{
+    startPoint: AutomaticLinePoint;
+    endPoint: AutomaticLinePoint;
+  } | null>(null);
 
   const generateLinePoint = (time: Time, price: number) => {
     const { x, y, logic } = calcCoordinate({
@@ -57,20 +69,8 @@ export const useAutomaticLineDrawing = ({
 
   const performDrawing = () => {
     if (!tChartRef.current) return;
-    const mainSeries = tChartRef.current.childSeries[0];
-    const candlestickData = mainSeries.data() as CandlestickData<Time>[];
-
-    // const lineId = `${mainSeries!.options().id}_line_${Date.now()}`;
-
-    // setDrawedLineList((prev) => [
-    //   ...prev,
-    //   {
-    //     id: lineId,
-    //     showLabel: false,
-    //     customTitle: "",
-    //     customType: CustomLineSeriesType.AutomaticDrawed,
-    //   },
-    // ]);
+    const candlestickData =
+      tChartRef.current.childSeries[0].data() as CandlestickData<Time>[];
 
     const high: AutomaticLinePoint = {
       index: 0,
@@ -96,6 +96,7 @@ export const useAutomaticLineDrawing = ({
       currentHigh: number,
       currentLow: number,
       index: number,
+      candle: CandlestickData<Time>,
       kCount: number = 5
     ) => {
       // 计算相隔多少根K线
@@ -115,18 +116,21 @@ export const useAutomaticLineDrawing = ({
 
           newTrend === TrendType.Up && (low.index = index);
           newTrend === TrendType.Up && (low.price = currentLow);
+          newTrend === TrendType.Up && (low.time = candle.time);
 
           newTrend === TrendType.Down && (high.index = index);
           newTrend === TrendType.Down && (high.price = currentHigh);
+          newTrend === TrendType.Down && (high.time = candle.time);
         } else {
           // 趋势改变或初始化
           currentTrend = newTrend;
+          // 结算前一个相反趋势线
           if (startPoint && endPoint) {
             lineList.push({ startPoint, endPoint });
           }
 
-          startPoint = TrendType.Up ? { ...low } : { ...high };
-          endPoint = TrendType.Up ? { ...high } : { ...low };
+          startPoint = newTrend === TrendType.Up ? { ...low } : { ...high };
+          endPoint = newTrend === TrendType.Up ? { ...high } : { ...low };
         }
       }
     };
@@ -139,17 +143,19 @@ export const useAutomaticLineDrawing = ({
       if (currentHigh > high.price) {
         high.index = index;
         high.price = currentHigh;
-        updateTrend(TrendType.Up, currentHigh, currentLow, index);
+        high.time = candle.time;
+        updateTrend(TrendType.Up, currentHigh, currentLow, index, candle);
       }
 
       if (currentLow < low.price) {
         low.index = index;
         low.price = currentLow;
-        updateTrend(TrendType.Down, currentHigh, currentLow, index);
+        low.time = candle.time;
+        updateTrend(TrendType.Down, currentHigh, currentLow, index, candle);
       }
     });
 
-    console.log(lineList);
+    setIterator(lineList[Symbol.iterator]());
   };
 
   const lineSeriesCreatedHandler = (series: ISeriesApi<SeriesType, Time>) => {
@@ -159,30 +165,50 @@ export const useAutomaticLineDrawing = ({
   useEffect(() => {
     if (!addtionalSeries) return;
 
-    const candlestickData =
-      tChartRef.current?.childSeries[0].data() as CandlestickData<Time>[];
-
     const lineData = generateLineData(
-      {
-        time: candlestickData[0].time as Time,
-        price: candlestickData[0].open,
-      },
-      {
-        time: candlestickData[9].time as Time,
-        price: candlestickData[9].close,
-      },
+      lineValue?.startPoint!,
+      lineValue?.endPoint!,
       addtionalSeries.options().id
     );
 
     addtionalSeries.setData(lineData);
-    recordEquation(
+    recordEquationHandler(
       lineData[0].customValues! as unknown as Point,
       lineData[1].customValues! as unknown as Point,
       addtionalSeries.options().id,
       tChartRef.current!.setLineId_equation,
       tChartRef.current!.chart
     );
+
+    setCanNext(true);
   }, [addtionalSeries]);
+
+  useEffect(() => {
+    if (!canNext || !iterator || !tChartRef.current) return;
+    setCanNext(() => false);
+
+    const { done, value } = iterator.next();
+    if (done) {
+      setIterator(null);
+      setCanNext(true);
+      setAddtionalSeries(null);
+      return;
+    }
+    setLineValue(value);
+
+    const mainSeries = tChartRef.current.childSeries[0];
+    const lineId = `${mainSeries.options().id}_line_${Date.now()}`;
+
+    setDrawedLineList((prev) => [
+      ...prev,
+      {
+        id: lineId,
+        showLabel: false,
+        customTitle: "",
+        customType: CustomLineSeriesType.AutomaticDrawed,
+      },
+    ]);
+  }, [canNext, iterator]);
 
   useEffect(() => {
     emittery?.on(OnSeriesCreate.LineSeries, lineSeriesCreatedHandler);

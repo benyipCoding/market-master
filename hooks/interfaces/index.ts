@@ -60,3 +60,10 @@ export interface AutomaticLineDrawingArgs {
   >;
   tChartRef: React.RefObject<TChartRef>;
 }
+
+export type AutomaticLinePoint = { index?: number; time: Time; price: number };
+
+export enum TrendType {
+  Up = 1,
+  Down = -1,
+}
