@@ -1,37 +1,37 @@
 import {
   CandlestickData,
   ISeriesApi,
-  LineData,
   Point,
   SeriesType,
   Time,
 } from "lightweight-charts";
 import { AutomaticLineDrawingArgs, CustomLineSeriesType } from "./interfaces";
 import { calcCoordinate, makeLineData, recordEquation } from "@/utils/helpers";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { EmitteryContext, OnSeriesCreate } from "@/providers/EmitteryProvider";
+
+export type AutomaticLinePoint = { index?: number; time: Time; price: number };
+
+export enum TrendType {
+  Up = 1,
+  Down = -1,
+}
 
 export const useAutomaticLineDrawing = ({
   setDrawedLineList,
   tChartRef,
 }: AutomaticLineDrawingArgs) => {
-  // let highPoint = { price: 0, index: 0 };
-  // let lowPoint = { price: 999999, index: 999999 };
-  const [lineData, setLineData] = useState<LineData<Time>[] | null>(null);
   const { emittery } = useContext(EmitteryContext);
-  const [series, setSeries] = useState<ISeriesApi<SeriesType, Time> | null>(
-    null
-  );
+  const [addtionalSeries, setAddtionalSeries] = useState<ISeriesApi<
+    SeriesType,
+    Time
+  > | null>(null);
 
-  const generateLinePoint = (
-    time: Time,
-    price: number,
-    mainSeries: ISeriesApi<SeriesType, Time>
-  ) => {
+  const generateLinePoint = (time: Time, price: number) => {
     const { x, y, logic } = calcCoordinate({
       time,
       price,
-      series: mainSeries!,
+      series: tChartRef.current?.childSeries[0]!,
       chart: tChartRef.current?.chart!,
     });
 
@@ -42,67 +42,147 @@ export const useAutomaticLineDrawing = ({
     };
   };
 
+  const generateLineData = (
+    startPoint: AutomaticLinePoint,
+    endPoint: AutomaticLinePoint,
+    lineId: string
+  ) => {
+    // 起始点
+    const lineStart = generateLinePoint(startPoint.time, startPoint.price);
+    // 结束点
+    const lineEnd = generateLinePoint(endPoint.time, endPoint.price);
+
+    return makeLineData(lineStart, lineEnd, lineId);
+  };
+
   const performDrawing = () => {
     if (!tChartRef.current) return;
-    const childSeries = tChartRef.current.childSeries;
-
-    const mainSeries = childSeries[0];
-
-    // 1. 增加一个LineSeries组件到TChart里
-    const lineId = `${mainSeries!.options().id}_line_${Date.now()}`;
-    setDrawedLineList((prev) => [
-      ...prev,
-      {
-        id: lineId,
-        showLabel: false,
-        customTitle: "",
-        customType: CustomLineSeriesType.AutomaticDrawed,
-      },
-    ]);
-    // 2. 给这个LineSeries组件setData
+    const mainSeries = tChartRef.current.childSeries[0];
     const candlestickData = mainSeries.data() as CandlestickData<Time>[];
 
-    // 如何得出index 和 价位?
+    // const lineId = `${mainSeries!.options().id}_line_${Date.now()}`;
+
+    // setDrawedLineList((prev) => [
+    //   ...prev,
+    //   {
+    //     id: lineId,
+    //     showLabel: false,
+    //     customTitle: "",
+    //     customType: CustomLineSeriesType.AutomaticDrawed,
+    //   },
+    // ]);
+
+    const high: AutomaticLinePoint = {
+      index: 0,
+      price: Math.max(candlestickData[0].open, candlestickData[0].close),
+      time: candlestickData[0].time as Time,
+    };
+    const low: AutomaticLinePoint = {
+      index: 0,
+      price: Math.min(candlestickData[0].open, candlestickData[0].close),
+      time: candlestickData[0].time as Time,
+    };
+
+    let currentTrend: TrendType | null = null;
+    let startPoint: AutomaticLinePoint | null;
+    let endPoint: AutomaticLinePoint | null;
+    const lineList: Array<{
+      startPoint: AutomaticLinePoint;
+      endPoint: AutomaticLinePoint;
+    }> = [];
+
+    const updateTrend = (
+      newTrend: TrendType,
+      currentHigh: number,
+      currentLow: number,
+      index: number,
+      kCount: number = 5
+    ) => {
+      // 计算相隔多少根K线
+      const diff =
+        newTrend === TrendType.Up
+          ? Math.abs(
+              high.index! - (startPoint ? startPoint.index! : low.index!)
+            ) + 1
+          : Math.abs(
+              (startPoint ? startPoint.index! : high.index!) - low.index!
+            ) + 1;
+
+      if (diff >= kCount) {
+        if (currentTrend === newTrend) {
+          // 趋势延续
+          endPoint = newTrend === TrendType.Up ? { ...high } : { ...low };
+
+          newTrend === TrendType.Up && (low.index = index);
+          newTrend === TrendType.Up && (low.price = currentLow);
+
+          newTrend === TrendType.Down && (high.index = index);
+          newTrend === TrendType.Down && (high.price = currentHigh);
+        } else {
+          // 趋势改变或初始化
+          currentTrend = newTrend;
+          if (startPoint && endPoint) {
+            lineList.push({ startPoint, endPoint });
+          }
+
+          startPoint = TrendType.Up ? { ...low } : { ...high };
+          endPoint = TrendType.Up ? { ...high } : { ...low };
+        }
+      }
+    };
+
     candlestickData.forEach((candle, index) => {
-      const high = Math.max(candle.open, candle.close);
+      if (index === 0) return;
+      const currentHigh = Math.max(candle.open, candle.close);
+      const currentLow = Math.min(candle.open, candle.close);
+
+      if (currentHigh > high.price) {
+        high.index = index;
+        high.price = currentHigh;
+        updateTrend(TrendType.Up, currentHigh, currentLow, index);
+      }
+
+      if (currentLow < low.price) {
+        low.index = index;
+        low.price = currentLow;
+        updateTrend(TrendType.Down, currentHigh, currentLow, index);
+      }
     });
 
-    // 起始点
-    const startPoint = generateLinePoint(
-      candlestickData[3].time,
-      candlestickData[3].open,
-      mainSeries
-    );
-    // 结束点
-    const endPoint = generateLinePoint(
-      candlestickData[16].time,
-      candlestickData[16].close,
-      mainSeries
-    );
-
-    setLineData(makeLineData(startPoint, endPoint, lineId));
+    console.log(lineList);
   };
 
   const lineSeriesCreatedHandler = (series: ISeriesApi<SeriesType, Time>) => {
-    setSeries(series);
+    setAddtionalSeries(series);
   };
 
   useEffect(() => {
-    if (!series || !lineData || !tChartRef.current) return;
+    if (!addtionalSeries) return;
 
-    series.setData(lineData);
+    const candlestickData =
+      tChartRef.current?.childSeries[0].data() as CandlestickData<Time>[];
+
+    const lineData = generateLineData(
+      {
+        time: candlestickData[0].time as Time,
+        price: candlestickData[0].open,
+      },
+      {
+        time: candlestickData[9].time as Time,
+        price: candlestickData[9].close,
+      },
+      addtionalSeries.options().id
+    );
+
+    addtionalSeries.setData(lineData);
     recordEquation(
       lineData[0].customValues! as unknown as Point,
       lineData[1].customValues! as unknown as Point,
-      series.options().id,
-      tChartRef.current?.setLineId_equation,
-      tChartRef.current.chart
+      addtionalSeries.options().id,
+      tChartRef.current!.setLineId_equation,
+      tChartRef.current!.chart
     );
-    Promise.resolve().then(() => {
-      setSeries(null);
-      setLineData(null);
-    });
-  }, [series, lineData, tChartRef]);
+  }, [addtionalSeries]);
 
   useEffect(() => {
     emittery?.on(OnSeriesCreate.LineSeries, lineSeriesCreatedHandler);
