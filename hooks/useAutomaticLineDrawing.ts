@@ -90,6 +90,22 @@ export const useAutomaticLineDrawing = ({
       endPoint: AutomaticLinePoint;
     }> = [];
 
+    const updateLowOrHigh = (
+      newTrend: TrendType,
+      currentHigh: number,
+      currentLow: number,
+      index: number,
+      candle: CandlestickData<Time>
+    ) => {
+      newTrend === TrendType.Up && (low.index = index);
+      newTrend === TrendType.Up && (low.price = currentLow);
+      newTrend === TrendType.Up && (low.time = candle.time);
+
+      newTrend === TrendType.Down && (high.index = index);
+      newTrend === TrendType.Down && (high.price = currentHigh);
+      newTrend === TrendType.Down && (high.time = candle.time);
+    };
+
     const updateTrend = (
       newTrend: TrendType,
       currentHigh: number,
@@ -114,13 +130,7 @@ export const useAutomaticLineDrawing = ({
         if (diff >= kCount) {
           endPoint = newTrend === TrendType.Up ? { ...high } : { ...low };
 
-          newTrend === TrendType.Up && (low.index = index);
-          newTrend === TrendType.Up && (low.price = currentLow);
-          newTrend === TrendType.Up && (low.time = candle.time);
-
-          newTrend === TrendType.Down && (high.index = index);
-          newTrend === TrendType.Down && (high.price = currentHigh);
-          newTrend === TrendType.Down && (high.time = candle.time);
+          updateLowOrHigh(newTrend, currentHigh, currentLow, index, candle);
         }
       } else {
         // 趋势改变或初始化
@@ -141,6 +151,8 @@ export const useAutomaticLineDrawing = ({
 
           startPoint = newTrend === TrendType.Up ? { ...low } : { ...high };
           endPoint = newTrend === TrendType.Up ? { ...high } : { ...low };
+
+          updateLowOrHigh(newTrend, currentHigh, currentLow, index, candle);
         }
       }
     };
@@ -192,7 +204,9 @@ export const useAutomaticLineDrawing = ({
       tChartRef.current!.chart
     );
 
-    setCanNext(true);
+    setTimeout(() => {
+      setCanNext(true);
+    }, 50);
   }, [addtionalSeries]);
 
   useEffect(() => {
