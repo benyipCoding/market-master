@@ -86,7 +86,7 @@ const Playground = () => {
 
   // 测试用
   const processedData = useMemo(
-    () => candlestickData.slice(-325),
+    () => candlestickData.slice(-2000),
     [candlestickData]
   );
 

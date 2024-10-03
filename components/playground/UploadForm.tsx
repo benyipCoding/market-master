@@ -44,7 +44,6 @@ const UploadForm = () => {
   const [formValue, setFormValue] = useState<UploadFormValue>({
     symbol: "",
     interval: "",
-    // customInterval: "",
     toFixedNum: 0,
     file: null,
     data: [],
@@ -52,40 +51,10 @@ const UploadForm = () => {
     total: 0,
   });
 
-  // const isCustomInterval = useMemo(
-  //   () => formValue.interval === "custom",
-  //   [formValue.interval]
-  // );
   const hasFile = useMemo(() => !!formValue.data.length, [formValue.data]);
-  // const hasFile = useMemo(() => true, []);
-
-  // const rules: Record<keyof UploadFormValue, (...args: any[]) => string> = {
-  //   symbol: (name: string): string => {
-  //     if (!name) return "Symbol name is required";
-  //     if (
-  //       !/^(?!^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(\..*)?$)[^\\/:*?"<>|]{1,255}$/.test(
-  //         name
-  //       )
-  //     )
-  //       return "Please input correct symbol name";
-  //     return "";
-  //   },
-  //   customInterval: (value: string): string => {
-  //     if (isCustomInterval && !formValue.customInterval)
-  //       return "Custom interval is required";
-  //     if (!/^[mHDWM]\d+$/.test(value) && isCustomInterval)
-  //       return "Please input correct interval.";
-  //     return "";
-  //   },
-  //   file: (file: File | null): string => {
-  //     if (!file) return "File data is required";
-  //     return "";
-  //   },
-  // };
 
   const [errorMsg, setErrorMsg] = useState({
     symbol: "",
-    // customInterval: "",
     file: "",
   });
 
@@ -103,7 +72,6 @@ const UploadForm = () => {
         file
       )) as unknown as CandlestickData<Time>[];
 
-      // calculate toFixedNum
       const toFixedNum = calculateToFixedNum(data);
       const result = verifyOpenAndClose(data);
       if (result < 0.9)
@@ -113,7 +81,6 @@ const UploadForm = () => {
           close: item.open,
         }));
 
-      // calculate interval
       const interval = calculateInterval(data);
       const noVol = data.some((item) => !(ColumnHeaders.VOL in item));
 
@@ -132,34 +99,11 @@ const UploadForm = () => {
       setLoading(false);
     }
   };
-  // const formValidate = (field?: keyof UploadFormValue) => {
-  //   return new Promise((resolve, reject) => {
-  //     let hasError = false;
-
-  //     if (!field) {
-  //       for (const key in rules) {
-  //         const msg = rules[key](formValue[key]);
-  //         if (msg) hasError = true;
-  //         setErrorMsg((prev) => ({ ...prev, [key]: msg }));
-  //       }
-  //     } else {
-  //       const msg = rules[field](formValue[field]);
-  //       if (msg) hasError = true;
-  //       setErrorMsg((prev) => ({ ...prev, [field]: msg }));
-  //     }
-
-  //     if (hasError) reject(false);
-  //     else resolve(true);
-  //   });
-  // };
 
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-      // Validate
-      // await formValidate();
-
       //  Package up the payload
       const id = `${formValue.symbol}_${formValue.interval}_${Date.now()}`;
       const customOptions: SeriesPartialOptions<CandlestickStyleOptions> = {
@@ -209,25 +153,6 @@ const UploadForm = () => {
     });
   };
 
-  // trigger validate by changing
-  // useEffect(() => {
-  //   if (!isCustomInterval) return;
-  //   try {
-  //     formValidate("customInterval");
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }, [formValue.customInterval]);
-
-  // useEffect(() => {
-  //   if (formValue.symbol === "") return;
-  //   try {
-  //     formValidate("symbol");
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }, [formValue.symbol]);
-
   return (
     <Card className="w-full">
       <CommonHeader title="Upload your personal chart data">
@@ -259,18 +184,7 @@ const UploadForm = () => {
               }
               errorMessage={errorMsg.symbol}
             />
-            {/* <IntervalItem
-              interval={formValue.interval}
-              changeInterval={(interval) => {
-                setFormValue({ ...formValue, interval, customInterval: "" });
-                setErrorMsg({ ...errorMsg, customInterval: "" });
-              }}
-              customInterval={formValue.customInterval}
-              customInputChange={(customInterval) => {
-                setFormValue({ ...formValue, customInterval });
-              }}
-              errorMessage={errorMsg.customInterval}
-            /> */}
+
             <UploadItem
               accept=".xls, .xlsx"
               id="fileData"

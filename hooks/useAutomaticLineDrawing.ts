@@ -37,6 +37,7 @@ export const useAutomaticLineDrawing = ({
     startPoint: AutomaticLinePoint;
     endPoint: AutomaticLinePoint;
   } | null>(null);
+  const [autoDrawing, setAutoDrawing] = useState(false);
 
   const generateLinePoint = (time: Time, price: number) => {
     const { x, y, logic } = calcCoordinate({
@@ -212,12 +213,13 @@ export const useAutomaticLineDrawing = ({
   useEffect(() => {
     if (!canNext || !iterator || !tChartRef.current) return;
     setCanNext(() => false);
-
+    setAutoDrawing(true);
     const { done, value } = iterator.next();
     if (done) {
       setIterator(null);
       setCanNext(true);
       setAddtionalSeries(null);
+      setAutoDrawing(false);
       return;
     }
     setLineValue(value);
@@ -246,5 +248,6 @@ export const useAutomaticLineDrawing = ({
 
   return {
     performDrawing,
+    autoDrawing,
   };
 };

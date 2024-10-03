@@ -3,6 +3,7 @@ import React, { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
 import { AsideRef, AsideProps } from "../interfaces/Playground";
 import { Button } from "../ui/button";
 import { useAutomaticLineDrawing } from "@/hooks/useAutomaticLineDrawing";
+import Loading from "../Loading";
 
 const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   { className, asideOpen, setDrawedLineList, tChartRef },
@@ -15,7 +16,7 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     [asideOpen]
   );
 
-  const { performDrawing } = useAutomaticLineDrawing({
+  const { performDrawing, autoDrawing } = useAutomaticLineDrawing({
     setDrawedLineList,
     tChartRef,
   });
@@ -26,7 +27,9 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
 
   return (
     <div className={cn(className)} ref={asideRef} style={{ width }}>
-      <Button onClick={performDrawing}>Test</Button>
+      <Button onClick={performDrawing} disabled={autoDrawing}>
+        {autoDrawing ? <Loading /> : "Automatic Line"}
+      </Button>
     </div>
   );
 };
