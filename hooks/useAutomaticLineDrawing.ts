@@ -205,9 +205,7 @@ export const useAutomaticLineDrawing = ({
       tChartRef.current!.chart
     );
 
-    setTimeout(() => {
-      setCanNext(true);
-    }, 50);
+    setTimeout(() => setCanNext(true), 50);
   }, [addtionalSeries]);
 
   useEffect(() => {
