@@ -42,7 +42,7 @@ export const SeriesColors = [
   },
   {
     label: "orange",
-    value: "#ea580c",
+    value: "#ffa500",
   },
   {
     label: "yellow",

@@ -23,7 +23,7 @@ import LinePattern from "../commonFormItem/LinePattern";
 import ColorSelector from "../commonFormItem/ColorSelector";
 import NameItem from "../commonFormItem/NameItem";
 import { DialogContext } from "@/context/Dialog";
-import { setDialogContent } from "@/store/dialogSlice";
+import { setSelectedSeries } from "@/store/commonSlice";
 
 const PropertySettingsForm: React.FC<PropertySettingsFormProps> = () => {
   const { setDialogVisible } = useContext(DialogContext);
@@ -60,6 +60,8 @@ const PropertySettingsForm: React.FC<PropertySettingsFormProps> = () => {
     e.preventDefault();
     onApply();
     setDialogVisible(false);
+
+    if (selectedSeries) dispatch(setSelectedSeries(null));
   };
 
   const onApply = () => {
