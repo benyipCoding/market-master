@@ -67,3 +67,10 @@ export enum TrendType {
   Up = 1,
   Down = -1,
 }
+
+// 笔和线段的共同抽象类型
+export interface LineState {
+  startPoint: AutomaticLinePoint;
+  endPoint: AutomaticLinePoint;
+  trend: TrendType;
+}

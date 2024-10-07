@@ -9,6 +9,7 @@ import {
   AutomaticLineDrawingArgs,
   AutomaticLinePoint,
   CustomLineSeriesType,
+  LineState,
   TrendType,
 } from "./interfaces";
 import {
@@ -29,14 +30,10 @@ export const useAutomaticLineDrawing = ({
     Time
   > | null>(null);
   const [canNext, setCanNext] = useState(true);
-  const [iterator, setIterator] = useState<IterableIterator<{
-    startPoint: AutomaticLinePoint;
-    endPoint: AutomaticLinePoint;
-  }> | null>(null);
-  const [lineValue, setLineValue] = useState<{
-    startPoint: AutomaticLinePoint;
-    endPoint: AutomaticLinePoint;
-  } | null>(null);
+  const [iterator, setIterator] = useState<IterableIterator<LineState> | null>(
+    null
+  );
+  const [lineValue, setLineValue] = useState<LineState | null>(null);
   const [autoDrawing, setAutoDrawing] = useState(false);
 
   const generateLinePoint = (time: Time, price: number) => {
@@ -86,10 +83,7 @@ export const useAutomaticLineDrawing = ({
     let currentTrend: TrendType | null = null;
     let startPoint: AutomaticLinePoint | null;
     let endPoint: AutomaticLinePoint | null;
-    const lineList: Array<{
-      startPoint: AutomaticLinePoint;
-      endPoint: AutomaticLinePoint;
-    }> = [];
+    const lineList: Array<LineState> = [];
 
     const updateLowOrHigh = (
       newTrend: TrendType,
@@ -144,11 +138,16 @@ export const useAutomaticLineDrawing = ({
                 (endPoint ? endPoint.index! : high.index!) - low.index!
               ) + 1;
         if (diff >= kCount) {
-          currentTrend = newTrend;
           // 结算前一个相反趋势线
           if (startPoint && endPoint) {
-            lineList.push({ startPoint, endPoint });
+            lineList.push({
+              startPoint,
+              endPoint,
+              trend: currentTrend || newTrend,
+            });
           }
+
+          currentTrend = newTrend;
 
           startPoint = newTrend === TrendType.Up ? { ...low } : { ...high };
           endPoint = newTrend === TrendType.Up ? { ...high } : { ...low };
@@ -181,6 +180,12 @@ export const useAutomaticLineDrawing = ({
     });
 
     setIterator(lineList[Symbol.iterator]());
+
+    // 从笔到线段的整合
+    let currentLine: LineState | null = null;
+    lineList.forEach((line, index) => {
+      console.log(line);
+    });
   };
 
   const lineSeriesCreatedHandler = (series: ISeriesApi<SeriesType, Time>) => {
