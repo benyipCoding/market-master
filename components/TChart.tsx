@@ -141,20 +141,22 @@ const TChart: React.ForwardRefRenderFunction<
 
       if (point) setHoveringPoint(point);
       else setHoveringPoint(null);
-    }
 
-    // Logic of hoveringSeries
-    const hoveringSeries = findHoveringSeries({
-      childSeries,
-      chart,
-      lineId_equation,
-      point: mouseMovingEventParam?.point!,
-    });
-
-    if (hoveringSeries) {
-      dispatch(setHoveringSeries(hoveringSeries));
+      if (hoveringSeries) dispatch(setHoveringSeries(null));
     } else {
-      dispatch(setHoveringSeries(null));
+      // Logic of hoveringSeries
+      const hoveringSeries = findHoveringSeries({
+        childSeries,
+        chart,
+        lineId_equation,
+        point: mouseMovingEventParam?.point!,
+      });
+
+      if (hoveringSeries) {
+        dispatch(setHoveringSeries(hoveringSeries));
+      } else {
+        dispatch(setHoveringSeries(null));
+      }
     }
 
     // Logic of hoveringIndicator

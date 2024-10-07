@@ -84,11 +84,10 @@ const Playground = () => {
   // dialog trigger
   const [dialogVisible, setDialogVisible] = useState(false);
 
-  // 测试用
-  // const processedData = useMemo(
-  //   () => candlestickData.slice(-2000),
-  //   [candlestickData]
-  // );
+  const processedData = useMemo(
+    () => candlestickData.slice(-2000),
+    [candlestickData]
+  );
 
   const getCandlestickData = async () => {
     const res = await getDummyData();
@@ -186,8 +185,8 @@ const Playground = () => {
               dialogVisible={dialogVisible}
             >
               <CandlestickSeries
-                seriesData={candlestickData}
-                // seriesData={processedData}
+                // seriesData={candlestickData}
+                seriesData={processedData}
                 customSeriesOptions={{
                   id: "XAUUSD",
                   toFixedNum: 2,
