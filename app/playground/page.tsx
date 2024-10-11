@@ -85,7 +85,7 @@ const Playground = () => {
   const [dialogVisible, setDialogVisible] = useState(false);
 
   const processedData = useMemo(
-    () => candlestickData.slice(-2000),
+    () => candlestickData.slice(-4000),
     [candlestickData]
   );
 
@@ -215,7 +215,10 @@ const Playground = () => {
               onPointerDown={toggleAsideOpen}
             ></div>
             <Aside
-              className="bg-background rounded-md overflow-auto max-md:hidden p-2"
+              className={cn(
+                "bg-background rounded-md overflow-auto max-md:hidden p-2",
+                !asideOpen && "p-0"
+              )}
               ref={asideRef}
               asideOpen={asideOpen}
               setDrawedLineList={setDrawedLineList}

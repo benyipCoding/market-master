@@ -27,9 +27,11 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
 
   return (
     <div className={cn(className)} ref={asideRef} style={{ width }}>
-      <Button onClick={performDrawing} disabled={autoDrawing}>
-        {autoDrawing ? <Loading /> : "Automatic Line"}
-      </Button>
+      {asideOpen && (
+        <Button onClick={performDrawing} disabled={autoDrawing}>
+          {autoDrawing ? <Loading /> : "Automatic Line"}
+        </Button>
+      )}
     </div>
   );
 };

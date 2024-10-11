@@ -18,6 +18,7 @@ export enum CustomLineSeriesType {
   Drawed = "drawed",
   Indicator = "indicator",
   AutomaticDrawed = "automaticDrawed",
+  SegmentDrawed = "segmentDrawed",
 }
 
 declare module "lightweight-charts" {
@@ -73,4 +74,5 @@ export interface LineState {
   startPoint: AutomaticLinePoint;
   endPoint: AutomaticLinePoint;
   trend: TrendType;
+  type?: CustomLineSeriesType;
 }
