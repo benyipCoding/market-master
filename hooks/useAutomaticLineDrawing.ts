@@ -36,9 +36,11 @@ export const useAutomaticLineDrawing = ({
   );
   const [segmentIterator, setSegmentIterator] =
     useState<IterableIterator<LineState> | null>(null);
-
   const [lineValue, setLineValue] = useState<LineState | null>(null);
   const [autoDrawing, setAutoDrawing] = useState(false);
+  const [lineSeriesRecord, setLineSeriesRecord] = useState<
+    ISeriesApi<"Line", Time>[]
+  >([]);
 
   const generateLinePoint = (time: Time, price: number) => {
     const { x, y, logic } = calcCoordinate({
@@ -199,8 +201,9 @@ export const useAutomaticLineDrawing = ({
     index: number,
     arr: LineState[],
     segmentTrend: TrendType | null,
-    segmentStartIndex: number
-  ): boolean => {
+    segmentStartIndex: number,
+    segmentEndIndex: number
+  ): [boolean, number] => {
     const currentTrend = line.trend;
     const currentStartPrice = line.startPoint.price;
     const currentEndPrice = line.endPoint.price;
@@ -222,8 +225,10 @@ export const useAutomaticLineDrawing = ({
           ? currentTrend !== segmentTrend && nextStartPrice > currentStartPrice
           : currentTrend !== segmentTrend && nextStartPrice < currentStartPrice;
       const canNotGrow3 = index - segmentStartIndex === 1 && segmentTrend;
+      const canNotGrow4 = index < segmentEndIndex;
 
-      if (canNotGrow || canNotGrow2 || canNotGrow3) return false;
+      if (canNotGrow || canNotGrow2 || canNotGrow3 || canNotGrow4)
+        return [false, -1];
 
       // 2. 可持续情况一
       const canGrow1 =
@@ -231,7 +236,7 @@ export const useAutomaticLineDrawing = ({
           ? nextStartPrice > currentStartPrice && nextEndPrice > currentEndPrice
           : nextStartPrice < currentStartPrice &&
             nextEndPrice < currentEndPrice;
-      if (canGrow1) return true;
+      if (canGrow1) return [true, i];
 
       // 3. 可持续情况二
       if (!prevLine || segmentTrend === line.trend) continue;
@@ -240,25 +245,26 @@ export const useAutomaticLineDrawing = ({
         currentTrend === TrendType.Up
           ? currentEndPrice > prevStartPrice && nextEndPrice > prevStartPrice
           : currentEndPrice < prevStartPrice && nextEndPrice < prevStartPrice;
-      if (canGrow2) return true;
+      if (canGrow2) return [true, i];
     }
-    return false;
+    return [false, -1];
   };
 
   const generateLineSegment = (lineList: LineState[]): LineState[] => {
     let segmentTrend: TrendType | null = null;
     let segmentStart: AutomaticLinePoint | null = null;
     let segmentStartIndex: number = 0;
-    // let segmentEnd: AutomaticLinePoint | null = null;
+    let segmentEndIndex: number = 0;
     const segmentList: LineState[] = [];
 
     lineList.forEach((line, index, arr) => {
-      const canDraw = canDrawSegment(
+      const [canDraw, endIndex] = canDrawSegment(
         line,
         index,
         arr,
         segmentTrend,
-        segmentStartIndex
+        segmentStartIndex,
+        segmentEndIndex
       );
 
       if (canDraw && !segmentTrend) {
@@ -278,6 +284,7 @@ export const useAutomaticLineDrawing = ({
         segmentStart = line.startPoint;
         segmentStartIndex = index;
         segmentTrend = line.trend;
+        segmentEndIndex = endIndex;
         return;
       }
     });
@@ -289,9 +296,31 @@ export const useAutomaticLineDrawing = ({
     setAddtionalSeries(series);
   };
 
+  const deleteBaseLine = () => {
+    if (!tChartRef.current) return;
+
+    const baseLineSeries = lineSeriesRecord.filter(
+      (series) =>
+        series.options().customType === CustomLineSeriesType.AutomaticDrawed
+    );
+    baseLineSeries.forEach((series) => {
+      const id = series.options().id;
+      setDrawedLineList((prev) => prev.filter((option) => option.id !== id));
+      tChartRef.current!.setLineId_equation((prev) => {
+        const newObj = { ...prev };
+        delete newObj[id];
+        return newObj;
+      });
+      tChartRef.current!.chart.removeSeries(series);
+    });
+  };
+
   useEffect(() => {
     if (!addtionalSeries) return;
-
+    setLineSeriesRecord((prev) => [
+      ...prev,
+      addtionalSeries as ISeriesApi<"Line", Time>,
+    ]);
     const lineData = generateLineData(
       lineValue?.startPoint!,
       lineValue?.endPoint!,
@@ -356,5 +385,6 @@ export const useAutomaticLineDrawing = ({
   return {
     performDrawing,
     autoDrawing,
+    deleteBaseLine,
   };
 };

@@ -16,10 +16,11 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     [asideOpen]
   );
 
-  const { performDrawing, autoDrawing } = useAutomaticLineDrawing({
-    setDrawedLineList,
-    tChartRef,
-  });
+  const { performDrawing, autoDrawing, deleteBaseLine } =
+    useAutomaticLineDrawing({
+      setDrawedLineList,
+      tChartRef,
+    });
 
   useImperativeHandle(ref, () => ({
     container: asideRef.current,
@@ -28,9 +29,18 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   return (
     <div className={cn(className)} ref={asideRef} style={{ width }}>
       {asideOpen && (
-        <Button onClick={performDrawing} disabled={autoDrawing}>
-          {autoDrawing ? <Loading /> : "Automatic Line"}
-        </Button>
+        <div className="flex flex-col gap-4">
+          <Button onClick={performDrawing} disabled={autoDrawing}>
+            {autoDrawing ? <Loading /> : "Automatic Line"}
+          </Button>
+          <Button
+            onClick={deleteBaseLine}
+            disabled={autoDrawing}
+            variant={"destructive"}
+          >
+            Delete Base Line
+          </Button>
+        </div>
       )}
     </div>
   );
