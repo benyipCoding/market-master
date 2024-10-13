@@ -143,6 +143,7 @@ const EMASettings = () => {
 
     if (!selectedIndicator) addIndicator();
     else editIndicator();
+
     dispatch(setRecentlyIndicator(currentTab));
     setDialogVisible(false);
   };

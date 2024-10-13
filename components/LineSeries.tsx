@@ -157,7 +157,7 @@ const LineSeries: React.FC<LineSeriesProps> = ({
 
     if (
       series.options().customType === CustomLineSeriesType.AutomaticDrawed ||
-      CustomLineSeriesType.SegmentDrawed
+      series.options().customType === CustomLineSeriesType.SegmentDrawed
     ) {
       emittery?.emit(OnSeriesCreate.LineSeries, series);
     }
