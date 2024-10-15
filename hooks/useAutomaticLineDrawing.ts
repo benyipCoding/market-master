@@ -190,7 +190,8 @@ export const useAutomaticLineDrawing = ({
 
     // 从笔到线段的整合
     const segmentList = generateLineSegment(lineList);
-    console.log(segmentList);
+
+    // setIterator(segmentList[Symbol.iterator]());
 
     setSegmentIterator(segmentList[Symbol.iterator]());
   };

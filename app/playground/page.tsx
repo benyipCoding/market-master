@@ -185,8 +185,8 @@ const Playground = () => {
               dialogVisible={dialogVisible}
             >
               <CandlestickSeries
-                // seriesData={candlestickData}
-                seriesData={processedData}
+                seriesData={candlestickData}
+                // seriesData={processedData}
                 customSeriesOptions={{
                   id: "XAUUSD",
                   toFixedNum: 2,
