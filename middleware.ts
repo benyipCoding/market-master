@@ -5,6 +5,7 @@ const unauthorizedRoutes = [
   "/favicon.ico",
   "/auth/login",
   "/playground",
+  "/test",
 ];
 export function middleware(request: NextRequest) {
   const auth = request.cookies.get("Authentication")?.value;

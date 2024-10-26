@@ -5,6 +5,7 @@ import StoreProvider from "@/providers/StoreProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { cn } from "@/lib/utils";
 import EmitteryProvider from "@/providers/EmitteryProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 const fontSans = FontSans({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -36,6 +37,7 @@ export default function RootLayout({
             <EmitteryProvider>{children}</EmitteryProvider>
           </StoreProvider>
         </ThemeProvider>
+        <Toaster position="top-right" duration={2000} />
       </body>
     </html>
   );

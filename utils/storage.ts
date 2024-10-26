@@ -41,3 +41,8 @@ export function getDefaultCandlestickOptions(): CandlestickSeriesPartialOptions 
 export function hasDefaultCandlestickOptions(): boolean {
   return localStorage.getItem(DEFAULT_CANDLESTICK_OPTIONS) !== null;
 }
+
+const REFRESH_TOKEN = "refreshToken";
+export function saveRefreshToken(refreshToken: string) {
+  return localStorage.setItem(REFRESH_TOKEN, refreshToken);
+}

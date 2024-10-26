@@ -1,10 +1,14 @@
+"use client";
 import { cn } from "@/lib/utils";
 import React, { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
 import { AsideRef, AsideProps } from "../interfaces/Playground";
 import { Button } from "../ui/button";
 import { useAutomaticLineDrawing } from "@/hooks/useAutomaticLineDrawing";
 import Loading from "../Loading";
-import { LoginTest } from "./actions/login";
+import { LoginTest, Tokens } from "./actions/login";
+import { toast } from "sonner";
+import { getMe } from "./actions/getMe";
+import { saveRefreshToken } from "@/utils/storage";
 
 const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   { className, asideOpen, setDrawedLineList, tChartRef },
@@ -24,10 +28,20 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     });
 
   const login = async () => {
-    const formData = new FormData();
-    formData.append("email", "ben_yip@126.com");
-    formData.append("password", "5207logiNN");
-    LoginTest(formData);
+    const payload = {
+      email: "ben_yip@126.com",
+      password: "5207logiNN",
+    };
+
+    const res = await LoginTest<Tokens>(payload);
+    if (res?.status !== 200) return toast.error(res.msg);
+    saveRefreshToken(res.data.refreshToken);
+  };
+
+  const getMeAction = async () => {
+    const res = await getMe();
+    if (res?.status !== 200) return toast.error(res.msg);
+    console.log(res);
   };
 
   useImperativeHandle(ref, () => ({
@@ -50,6 +64,9 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
           </Button>
           <Button variant={"outline"} onClick={login}>
             登录测试按钮
+          </Button>
+          <Button variant={"outline"} onClick={getMeAction}>
+            Get Me
           </Button>
         </div>
       )}
