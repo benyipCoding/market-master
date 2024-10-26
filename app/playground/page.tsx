@@ -35,7 +35,6 @@ import Aside from "@/components/playground/Aside";
 import { AsideRef } from "@/components/interfaces/Playground";
 import SymbolSearch from "@/components/SymbolSearch";
 import UploadForm from "@/components/playground/UploadForm";
-import { useAutomaticLineDrawing } from "@/hooks/useAutomaticLineDrawing";
 
 const Playground = () => {
   // TChart component instance
@@ -91,6 +90,8 @@ const Playground = () => {
 
   const getCandlestickData = async () => {
     const res = await getDummyData();
+    console.log(res.data);
+
     setCandlestickData(res.data);
   };
 

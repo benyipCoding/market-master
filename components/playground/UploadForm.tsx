@@ -34,6 +34,7 @@ import {
 } from "lightweight-charts";
 import { EmitteryContext, OnApply } from "@/providers/EmitteryProvider";
 import Loading from "../Loading";
+import { uploadFile } from "./actions/uploadFile";
 
 const UploadForm = () => {
   const { setDialogVisible } = useContext(DialogContext);
@@ -60,12 +61,19 @@ const UploadForm = () => {
 
   const fileHandler = async (files: FileList | null) => {
     if (!files || !files.length) return;
+
     setErrorMsg((prev) => ({ ...prev, file: "" }));
     setLoading(true);
     try {
       const file = files[0];
       if (!validateFileType(file) || !validateFileExtension(file))
         throw new Error("The uploaded file format must be an Excel file");
+
+      // 这里开始掉后端接口来实现：把file文件对象传给后端
+      const formData = new FormData();
+      formData.append("file", file);
+      uploadFile(formData);
+
       setFormValue({ ...formValue, file, toFixedNum: 0, data: [] });
 
       let data = (await analyzeExcelData(

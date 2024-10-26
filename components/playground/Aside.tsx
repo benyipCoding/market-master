@@ -4,6 +4,7 @@ import { AsideRef, AsideProps } from "../interfaces/Playground";
 import { Button } from "../ui/button";
 import { useAutomaticLineDrawing } from "@/hooks/useAutomaticLineDrawing";
 import Loading from "../Loading";
+import { LoginTest } from "./actions/login";
 
 const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   { className, asideOpen, setDrawedLineList, tChartRef },
@@ -22,6 +23,13 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
       tChartRef,
     });
 
+  const login = async () => {
+    const formData = new FormData();
+    formData.append("email", "ben_yip@126.com");
+    formData.append("password", "5207logiNN");
+    LoginTest(formData);
+  };
+
   useImperativeHandle(ref, () => ({
     container: asideRef.current,
   }));
@@ -39,6 +47,9 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
             variant={"destructive"}
           >
             Delete Base Line
+          </Button>
+          <Button variant={"outline"} onClick={login}>
+            登录测试按钮
           </Button>
         </div>
       )}
