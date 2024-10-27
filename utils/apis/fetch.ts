@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import { cookies } from "next/headers";
 import { tokenRefresh } from "@/app/auth/login/tokenRefresh";
-import { RefreshTokenKey, Tokens } from "../cookieHelper";
+import { RefreshTokenKey } from "../cookieHelper";
 
 const BASE_URL = process.env.BASE_URL + "/api";
 
@@ -27,7 +27,9 @@ request.interceptors.response.use(
     const errStr = JSON.stringify(errResponseData);
 
     if (errResponseData.statusCode === 401) {
-      const cookies: string[] = err.response.config.headers.Cookie.split(";");
+      const config = err.response.config;
+
+      const cookies: string[] = config.headers.Cookie.split(";");
       let refreshToken = cookies.find((cookie) =>
         cookie.includes(RefreshTokenKey)
       );
@@ -35,7 +37,7 @@ request.interceptors.response.use(
       if (!refreshToken) throw new Error(errStr);
       refreshToken = refreshToken.split("=")[1];
       await tokenRefresh(refreshToken);
-      return request(err.response.config);
+      return request(config);
     }
 
     throw new Error(errStr);

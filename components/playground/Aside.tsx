@@ -43,10 +43,7 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     const res = await getMe();
     if (res.status !== 200) return toast.error(res.msg);
     console.log("页面打印", res.data);
-    // console.log(res.data);
   };
-
-  const tokenRefreshAction = async () => {};
 
   useImperativeHandle(ref, () => ({
     container: asideRef.current,
@@ -71,9 +68,6 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
           </Button>
           <Button variant={"outline"} onClick={getMeAction}>
             Get Me
-          </Button>
-          <Button variant={"outline"} onClick={tokenRefreshAction}>
-            Token refresh
           </Button>
         </div>
       )}
