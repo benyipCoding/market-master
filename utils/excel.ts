@@ -189,6 +189,8 @@ export function verifyOpenAndClose(
     const current = data[rand];
     const next = data[rand - 1];
 
+    if (!current || !next) continue;
+
     if (current.close === next.open) correct++;
   }
 

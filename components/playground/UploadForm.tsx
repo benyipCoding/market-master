@@ -68,10 +68,6 @@ const UploadForm = () => {
       if (!validateFileType(file) || !validateFileExtension(file))
         throw new Error("The uploaded file format must be an Excel file");
 
-      // 这里开始掉后端接口来实现：把file文件对象传给后端
-      const formData = new FormData();
-      formData.append("file", file);
-
       setFormValue({ ...formValue, file, toFixedNum: 0, data: [] });
 
       let data = (await analyzeExcelData(
@@ -110,6 +106,8 @@ const UploadForm = () => {
     e.preventDefault();
 
     try {
+      console.log(formValue);
+
       //  Package up the payload
       const id = `${formValue.symbol}_${formValue.interval}_${Date.now()}`;
       const customOptions: SeriesPartialOptions<CandlestickStyleOptions> = {
@@ -129,8 +127,6 @@ const UploadForm = () => {
         }));
 
       seriesData.sort((a, b) => (a.time as number) - (b.time as number));
-
-      console.log({ seriesData, customOptions });
 
       // Emitter
       emittery?.emit(OnApply.ResetMainSeriesData, {

@@ -383,6 +383,9 @@ export function calculateInterval(
     const rand = Math.floor(Math.random() * (data.length + 1));
     const current = data[rand];
     const next = data[rand - 1];
+
+    if (!current || !next) continue;
+
     const timestamp1 = new Date(current.time as string).getTime();
     const timestamp2 = new Date(next.time as string).getTime();
     const diff = getMinutesBetweenTimestamps(timestamp1, timestamp2);

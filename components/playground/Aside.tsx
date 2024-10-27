@@ -8,7 +8,6 @@ import Loading from "../Loading";
 import { toast } from "sonner";
 import { LoginTest } from "@/app/auth/login/login";
 import { getMe } from "@/app/auth/login/getMe";
-import { tokenRefresh } from "@/app/auth/login/tokenRefresh";
 import { Tokens } from "@/utils/cookieHelper";
 
 const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (

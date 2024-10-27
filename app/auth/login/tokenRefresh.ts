@@ -1,13 +1,8 @@
 "use server";
 
 import request from "@/utils/apis/fetch";
-import {
-  CustomResponseType,
-  ErrorResponse,
-  SuccessResponse,
-} from "@/utils/apis/response";
+import { CustomResponseType, SuccessResponse } from "@/utils/apis/response";
 import { setAuthCookie } from "@/utils/cookieHelper";
-import axios from "axios";
 
 export async function tokenRefresh<T = any>(
   refreshToken: string
