@@ -5,10 +5,11 @@ import { AsideRef, AsideProps } from "../interfaces/Playground";
 import { Button } from "../ui/button";
 import { useAutomaticLineDrawing } from "@/hooks/useAutomaticLineDrawing";
 import Loading from "../Loading";
-import { LoginTest, Tokens } from "./actions/login";
 import { toast } from "sonner";
-import { getMe } from "./actions/getMe";
-import { saveRefreshToken } from "@/utils/storage";
+import { LoginTest } from "@/app/auth/login/login";
+import { getMe } from "@/app/auth/login/getMe";
+import { tokenRefresh } from "@/app/auth/login/tokenRefresh";
+import { Tokens } from "@/utils/cookieHelper";
 
 const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   { className, asideOpen, setDrawedLineList, tChartRef },
@@ -35,14 +36,17 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
 
     const res = await LoginTest<Tokens>(payload);
     if (res?.status !== 200) return toast.error(res.msg);
-    saveRefreshToken(res.data.refreshToken);
+    console.log(res.data);
   };
 
   const getMeAction = async () => {
     const res = await getMe();
-    if (res?.status !== 200) return toast.error(res.msg);
-    console.log(res);
+    if (res.status !== 200) return toast.error(res.msg);
+    console.log("页面打印", res.data);
+    // console.log(res.data);
   };
+
+  const tokenRefreshAction = async () => {};
 
   useImperativeHandle(ref, () => ({
     container: asideRef.current,
@@ -67,6 +71,9 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
           </Button>
           <Button variant={"outline"} onClick={getMeAction}>
             Get Me
+          </Button>
+          <Button variant={"outline"} onClick={tokenRefreshAction}>
+            Token refresh
           </Button>
         </div>
       )}
