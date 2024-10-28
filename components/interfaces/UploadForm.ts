@@ -10,3 +10,17 @@ export interface UploadFormValue extends Record<string, any> {
   hasVol: boolean;
   total: number;
 }
+
+export interface PayloadForCreateKlines {
+  data: {
+    open: number;
+    close: number;
+    high: number;
+    low: number;
+    volume: number;
+    timestamp: number;
+  }[];
+  symbol: string;
+  period: string;
+  precision: number;
+}

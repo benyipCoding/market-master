@@ -384,7 +384,10 @@ export function calculateInterval(
     const current = data[rand];
     const next = data[rand - 1];
 
-    if (!current || !next) continue;
+    if (!current || !next) {
+      i--;
+      continue;
+    }
 
     const timestamp1 = new Date(current.time as string).getTime();
     const timestamp2 = new Date(next.time as string).getTime();

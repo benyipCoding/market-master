@@ -16,7 +16,10 @@ import {
   calculateToFixedNum,
   calculateInterval,
 } from "@/utils/helpers";
-import { UploadFormValue } from "../interfaces/UploadForm";
+import {
+  PayloadForCreateKlines,
+  UploadFormValue,
+} from "../interfaces/UploadForm";
 import UploadItem from "../commonFormItem/UploadItem";
 import { Download } from "lucide-react";
 import {
@@ -34,6 +37,8 @@ import {
 } from "lightweight-charts";
 import { EmitteryContext, OnApply } from "@/providers/EmitteryProvider";
 import Loading from "../Loading";
+import { symbol } from "zod";
+import { uploadKLine } from "@/app/playground/uploadKLine";
 
 const UploadForm = () => {
   const { setDialogVisible } = useContext(DialogContext);
@@ -104,10 +109,32 @@ const UploadForm = () => {
 
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const data = formValue.data.map((item) => ({
+      open: item.open,
+      close: item.close,
+      high: item.high,
+      low: item.low,
+      volume: (item as any).volume || 0,
+      timestamp: new Date(item.time as string).getTime(),
+    }));
+
+    const payload: PayloadForCreateKlines = {
+      data,
+      symbol: formValue.symbol,
+      period: formValue.interval,
+      precision: formValue.toFixedNum,
+    };
+
+    const bulkCount = 1000;
+    for (let i = 0; i < payload.data.length; i += bulkCount) {
+      const newPayload: PayloadForCreateKlines = {
+        ...payload,
+        data: payload.data.slice(i, i + bulkCount),
+      };
+      await uploadKLine(newPayload);
+    }
 
     try {
-      console.log(formValue);
-
       //  Package up the payload
       const id = `${formValue.symbol}_${formValue.interval}_${Date.now()}`;
       const customOptions: SeriesPartialOptions<CandlestickStyleOptions> = {

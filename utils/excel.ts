@@ -10,7 +10,7 @@ export enum ColumnHeaders {
   HIGH = "high",
   LOW = "low",
   CLOSE = "close",
-  VOL = "vol",
+  VOL = "volume",
   TIME = "time",
 }
 
@@ -74,7 +74,7 @@ export function analyzeExcelData(
             );
             headerMap.set(timeIndex, ColumnHeaders.TIME);
 
-            // Volumn
+            // Volume
             const volIndex = indexOfVol(rowData);
             headerMap.set(volIndex, ColumnHeaders.VOL);
 
@@ -189,7 +189,10 @@ export function verifyOpenAndClose(
     const current = data[rand];
     const next = data[rand - 1];
 
-    if (!current || !next) continue;
+    if (!current || !next) {
+      i--;
+      continue;
+    }
 
     if (current.close === next.open) correct++;
   }
