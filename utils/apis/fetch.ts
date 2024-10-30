@@ -26,18 +26,24 @@ request.interceptors.response.use(
     const errResponseData: any = err.response.data;
     const errStr = JSON.stringify(errResponseData);
 
-    if (errResponseData.statusCode === 401) {
-      const config = err.response.config;
+    try {
+      if (errResponseData.statusCode === 401) {
+        const config = err.response.config;
 
-      const cookies: string[] = config.headers.Cookie.split(";");
-      let refreshToken = cookies.find((cookie) =>
-        cookie.includes(RefreshTokenKey)
-      );
+        const cookies: string[] = config.headers.Cookie.split(";");
+        let refreshToken = cookies.find((cookie) =>
+          cookie.includes(RefreshTokenKey)
+        );
 
-      if (!refreshToken) throw new Error(errStr);
-      refreshToken = refreshToken.split("=")[1];
-      await tokenRefresh(refreshToken);
-      return request(config);
+        if (!refreshToken) throw new Error(errStr);
+        refreshToken = refreshToken.split("=")[1];
+
+        await tokenRefresh(refreshToken);
+        return request(config);
+      }
+    } catch (error: any) {
+      // TODO: remove refresh token in cookie
+      throw new Error(error.message);
     }
 
     throw new Error(errStr);

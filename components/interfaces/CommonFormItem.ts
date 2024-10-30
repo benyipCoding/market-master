@@ -22,3 +22,10 @@ export interface NameItemProps {
   placeholder?: string;
   errorMessage?: string;
 }
+
+export interface SelectorItemProps {
+  itemLabel: string;
+  selectValue: string;
+  setSelectValue: (value: string) => void;
+  options: Array<{ label: string; value: string }>;
+}

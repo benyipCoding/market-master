@@ -1,9 +1,8 @@
-import React, { useContext, useMemo, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import CommonHeader from "@/components/technicalIndex/CommonHeader";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { DialogContext } from "@/context/Dialog";
-import NameItem from "../commonFormItem/NameItem";
 import {
   analyzeExcelData,
   ColumnHeaders,
@@ -37,14 +36,19 @@ import {
 } from "lightweight-charts";
 import { EmitteryContext, OnApply } from "@/providers/EmitteryProvider";
 import Loading from "../Loading";
-import { symbol } from "zod";
 import { uploadKLine } from "@/app/playground/uploadKLine";
+import SymbolSelectItem from "../commonFormItem/SymbolSelectItem";
+import { getSymbols } from "@/app/playground/getSymbols";
+import { toast } from "sonner";
 
 const UploadForm = () => {
   const { setDialogVisible } = useContext(DialogContext);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { emittery } = useContext(EmitteryContext);
   const [loading, setLoading] = useState(false);
+  const [symbolOptions, setSymbolOptions] = useState<
+    Array<{ label: string; value: string }>
+  >([]);
 
   const [formValue, setFormValue] = useState<UploadFormValue>({
     symbol: "",
@@ -182,6 +186,18 @@ const UploadForm = () => {
     });
   };
 
+  const allSymbols = async () => {
+    const res = await getSymbols();
+    if (res.status !== 200) return toast.error(res.msg);
+    setSymbolOptions(
+      res.data.map((item: any) => ({ label: item.label, value: `${item.id}` }))
+    );
+  };
+
+  useEffect(() => {
+    allSymbols();
+  }, []);
+
   return (
     <Card className="w-full">
       <CommonHeader title="Upload your personal chart data">
@@ -204,14 +220,13 @@ const UploadForm = () => {
       <form onSubmit={submitHandler}>
         <CardContent>
           <div className="grid w-full items-center gap-4">
-            <NameItem
-              itemLabel="Symbol Name"
-              placeholder="Name of the symbol, example:XAUUSD"
-              inputValue={formValue.symbol}
-              setInputValue={(symbol) =>
+            <SymbolSelectItem
+              itemLabel="Symbol"
+              selectValue={formValue.symbol}
+              setSelectValue={(symbol) =>
                 setFormValue({ ...formValue, symbol: symbol.toUpperCase() })
               }
-              errorMessage={errorMsg.symbol}
+              options={symbolOptions}
             />
 
             <UploadItem
