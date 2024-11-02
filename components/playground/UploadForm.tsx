@@ -38,17 +38,18 @@ import { EmitteryContext, OnApply } from "@/providers/EmitteryProvider";
 import Loading from "../Loading";
 import { uploadKLine } from "@/app/playground/uploadKLine";
 import SymbolSelectItem from "../commonFormItem/SymbolSelectItem";
-import { getSymbols } from "@/app/playground/getSymbols";
-import { toast } from "sonner";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 const UploadForm = () => {
   const { setDialogVisible } = useContext(DialogContext);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { emittery } = useContext(EmitteryContext);
   const [loading, setLoading] = useState(false);
-  const [symbolOptions, setSymbolOptions] = useState<
-    Array<{ label: string; value: string }>
-  >([]);
+  const symbolOptions = useSelector((state: RootState) =>
+    state.fetchData.symbols?.map((s) => ({ label: s.label, value: `${s.id}` }))
+  );
+  const { periods } = useSelector((state: RootState) => state.fetchData);
 
   const [formValue, setFormValue] = useState<UploadFormValue>({
     symbol: "",
@@ -66,7 +67,7 @@ const UploadForm = () => {
     symbol: "",
     file: "",
   });
-
+  // Functions that handle Excel parsing
   const fileHandler = async (files: FileList | null) => {
     if (!files || !files.length) return;
 
@@ -110,9 +111,9 @@ const UploadForm = () => {
       setLoading(false);
     }
   };
-
-  const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  // Asynchronously upload data after clicking the Upload button
+  const bulkUpload = async () => {
+    console.time("upload");
     const data = formValue.data.map((item) => ({
       open: item.open,
       close: item.close,
@@ -124,20 +125,26 @@ const UploadForm = () => {
 
     const payload: PayloadForCreateKlines = {
       data,
-      symbol: formValue.symbol,
-      period: formValue.interval,
+      symbol: +formValue.symbol,
+      period: periods?.find((p) => p.label === formValue.interval)?.id,
       precision: formValue.toFixedNum,
     };
 
-    const bulkCount = 1000;
-    for (let i = 0; i < payload.data.length; i += bulkCount) {
+    const count = 1000;
+    const tasks: Array<Promise<any>> = [];
+    for (let i = 0; i < payload.data.length; i += count) {
       const newPayload: PayloadForCreateKlines = {
         ...payload,
-        data: payload.data.slice(i, i + bulkCount),
+        data: payload.data.slice(i, i + count),
       };
-      await uploadKLine(newPayload);
+      const task = uploadKLine(newPayload);
+      tasks.push(task);
     }
-
+    await Promise.all(tasks);
+    console.timeEnd("upload");
+  };
+  // Switch chart triggered after clicking the Upload button
+  const switchKLineChart = () => {
     try {
       //  Package up the payload
       const id = `${formValue.symbol}_${formValue.interval}_${Date.now()}`;
@@ -170,33 +177,29 @@ const UploadForm = () => {
       console.log({ error });
     }
   };
+  // Upload handler
+  const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // Asynchronously upload data
+    bulkUpload();
+    // Switch the current K-line chart
+    switchKLineChart();
+  };
 
   const clearFiles = (e?: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
     if (!fileInputRef.current) return;
     if (e) e.preventDefault();
     fileInputRef.current.value = "";
     setFormValue({
-      ...formValue,
       file: null,
       toFixedNum: 0,
       data: [],
       hasVol: false,
       interval: "",
       symbol: "",
+      total: 0,
     });
   };
-
-  const allSymbols = async () => {
-    const res = await getSymbols();
-    if (res.status !== 200) return toast.error(res.msg);
-    setSymbolOptions(
-      res.data.map((item: any) => ({ label: item.label, value: `${item.id}` }))
-    );
-  };
-
-  useEffect(() => {
-    allSymbols();
-  }, []);
 
   return (
     <Card className="w-full">
@@ -226,7 +229,7 @@ const UploadForm = () => {
               setSelectValue={(symbol) =>
                 setFormValue({ ...formValue, symbol: symbol.toUpperCase() })
               }
-              options={symbolOptions}
+              options={symbolOptions || []}
             />
 
             <UploadItem

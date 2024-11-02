@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { LoginTest } from "@/app/auth/login/login";
 import { getMe } from "@/app/auth/login/getMe";
 import { Tokens } from "@/utils/cookieHelper";
+import { getKLines, ListKLineDto } from "@/app/playground/getKLines";
 
 const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   { className, asideOpen, setDrawedLineList, tChartRef },
@@ -44,6 +45,17 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     console.log("页面打印", res.data);
   };
 
+  const getKLineDataAction = async () => {
+    const params: ListKLineDto = {
+      symbol: 1,
+      period: 1,
+    };
+
+    const res = await getKLines(params);
+    if (res.status !== 200) toast.error(res.msg);
+    console.log(res.data);
+  };
+
   useImperativeHandle(ref, () => ({
     container: asideRef.current,
   }));
@@ -67,6 +79,9 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
           </Button>
           <Button variant={"outline"} onClick={getMeAction}>
             Get Me
+          </Button>
+          <Button variant={"outline"} onClick={getKLineDataAction}>
+            Get KLine Data
           </Button>
         </div>
       )}

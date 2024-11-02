@@ -35,6 +35,7 @@ import Aside from "@/components/playground/Aside";
 import { AsideRef } from "@/components/interfaces/Playground";
 import SymbolSearch from "@/components/SymbolSearch";
 import UploadForm from "@/components/playground/UploadForm";
+import { fetchPeriods, fetchSymbols } from "@/store/fetchDataSlice";
 
 const Playground = () => {
   // TChart component instance
@@ -130,7 +131,8 @@ const Playground = () => {
   useEffect(() => {
     getCandlestickData();
     window.addEventListener("resize", throttle(resizeHandler, 100));
-
+    dispatch(fetchPeriods());
+    dispatch(fetchSymbols());
     return () => {
       window.removeEventListener("resize", throttle(resizeHandler, 100));
     };
