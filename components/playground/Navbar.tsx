@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { NavbarProps } from "../interfaces/Playground";
 import { setSelectedIndicator, setSelectedSeries } from "@/store/commonSlice";
 import { setDialogContent, DialogContentType } from "@/store/dialogSlice";
@@ -17,6 +17,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { ScrollArea } from "../ui/scroll-area";
 
 const Navbar: React.FC<NavbarProps> = ({
   className,
@@ -25,6 +33,13 @@ const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { dialogContent } = useSelector((state: RootState) => state.dialog);
+  const [selectedPeriod, setSelectedPeriod] = React.useState({
+    label: "D1",
+    value: "12",
+  });
+  const periods = useSelector((state: RootState) =>
+    state.fetchData.periods?.map((p) => ({ label: p.label, value: `${p.id}` }))
+  );
 
   const openDialogHandler = (type: DialogContentType) => {
     if (dialogVisible && dialogContent !== type) return;
@@ -103,19 +118,42 @@ const Navbar: React.FC<NavbarProps> = ({
         </Tooltip>
 
         {/* Period */}
-        <Tooltip>
-          <TooltipTrigger asChild>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
             <Button
-              className="nav-item px-2 gap-2 active:scale-100 nav-item-divider"
+              className="nav-item px-2 gap-2 active:scale-100 nav-item-divider w-20 text-md"
               variant={"ghost"}
             >
               <Hourglass size={20} />
-              D1
+              {selectedPeriod.label}
               <span className="sr-only">Select Period</span>
             </Button>
-          </TooltipTrigger>
-          <TooltipContent>D1</TooltipContent>
-        </Tooltip>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent className="w-fit">
+            <ScrollArea className="h-72 rounded-md">
+              <DropdownMenuRadioGroup
+                value={selectedPeriod.value}
+                onValueChange={(value) =>
+                  setSelectedPeriod(
+                    () => periods?.find((p) => p.value === value)!
+                  )
+                }
+              >
+                {periods?.map((p) => (
+                  <DropdownMenuRadioItem
+                    value={p.value}
+                    key={p.value}
+                    className="cursor-pointer"
+                  >
+                    {p.label}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </ScrollArea>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* Candle shape */}
         <Button
