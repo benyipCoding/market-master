@@ -40,6 +40,7 @@ import { uploadKLine } from "@/app/playground/uploadKLine";
 import SymbolSelectItem from "../commonFormItem/SymbolSelectItem";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { toast } from "sonner";
 
 const UploadForm = () => {
   const { setDialogVisible } = useContext(DialogContext);
@@ -140,7 +141,11 @@ const UploadForm = () => {
       const task = uploadKLine(newPayload);
       tasks.push(task);
     }
-    await Promise.all(tasks);
+    const results = await Promise.all(tasks);
+    console.log(results);
+    results.forEach((res: any) => {
+      if (res.statue !== 200) toast.error(res.msg);
+    });
     console.timeEnd("upload");
   };
   // Switch chart triggered after clicking the Upload button

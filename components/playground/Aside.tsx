@@ -42,7 +42,7 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   const getMeAction = async () => {
     const res = await getMe();
     if (res.status !== 200) return toast.error(res.msg);
-    console.log("页面打印", res.data);
+    console.log(res.data);
   };
 
   const getKLineDataAction = async () => {
