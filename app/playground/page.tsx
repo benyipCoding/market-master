@@ -36,6 +36,7 @@ import { AsideRef } from "@/components/interfaces/Playground";
 import SymbolSearch from "@/components/SymbolSearch";
 import UploadForm from "@/components/playground/UploadForm";
 import { fetchPeriods, fetchSymbols } from "@/store/fetchDataSlice";
+import { getKLines } from "./actions/getKLines";
 
 const Playground = () => {
   // TChart component instance

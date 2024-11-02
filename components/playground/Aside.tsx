@@ -9,7 +9,8 @@ import { toast } from "sonner";
 import { LoginTest } from "@/app/auth/login/login";
 import { getMe } from "@/app/auth/login/getMe";
 import { Tokens } from "@/utils/cookieHelper";
-import { getKLines, ListKLineDto } from "@/app/playground/getKLines";
+import { getKLines, ListKLineDto } from "@/app/playground/actions/getKLines";
+import { cleanData } from "@/app/playground/actions/cleanData";
 
 const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   { className, asideOpen, setDrawedLineList, tChartRef },
@@ -56,6 +57,11 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     console.log(res.data);
   };
 
+  const cleanDataAction = async () => {
+    const res = await cleanData();
+    console.log(res);
+  };
+
   useImperativeHandle(ref, () => ({
     container: asideRef.current,
   }));
@@ -82,6 +88,9 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
           </Button>
           <Button variant={"outline"} onClick={getKLineDataAction}>
             Get KLine Data
+          </Button>
+          <Button variant={"destructive"} onClick={cleanDataAction}>
+            Delete meaningless data
           </Button>
         </div>
       )}

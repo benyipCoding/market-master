@@ -36,7 +36,7 @@ import {
 } from "lightweight-charts";
 import { EmitteryContext, OnApply } from "@/providers/EmitteryProvider";
 import Loading from "../Loading";
-import { uploadKLine } from "@/app/playground/uploadKLine";
+import { uploadKLine } from "@/app/playground/actions/uploadKLine";
 import SymbolSelectItem from "../commonFormItem/SymbolSelectItem";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";

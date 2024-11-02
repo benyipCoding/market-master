@@ -29,7 +29,7 @@ export const defaultChartOptions: DeepPartial<ChartOptions> = {
   crosshair: {
     mode: CrosshairMode.Normal,
     vertLine: {
-      labelVisible: true,
+      labelVisible: false,
       color: "#515151",
     },
     horzLine: {

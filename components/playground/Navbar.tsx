@@ -25,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { ScrollArea } from "../ui/scroll-area";
+import { setCurrentPeriod } from "@/store/fetchDataSlice";
 
 const Navbar: React.FC<NavbarProps> = ({
   className,
@@ -33,12 +34,9 @@ const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { dialogContent } = useSelector((state: RootState) => state.dialog);
-  const [selectedPeriod, setSelectedPeriod] = React.useState({
-    label: "D1",
-    value: "12",
-  });
-  const periods = useSelector((state: RootState) =>
-    state.fetchData.periods?.map((p) => ({ label: p.label, value: `${p.id}` }))
+
+  const { periods, currentPeriod, currentSymbol } = useSelector(
+    (state: RootState) => state.fetchData
   );
 
   const openDialogHandler = (type: DialogContentType) => {
@@ -107,7 +105,7 @@ const Navbar: React.FC<NavbarProps> = ({
               onClick={openSymbolSearch}
             >
               <Search size={18} />
-              XAUUSD
+              {currentSymbol?.label}
               <span className="sr-only">Symbol Search</span>
             </Button>
           </TooltipTrigger>
@@ -126,25 +124,21 @@ const Navbar: React.FC<NavbarProps> = ({
               variant={"ghost"}
             >
               <Hourglass size={20} />
-              {selectedPeriod.label}
+              {currentPeriod?.label}
               <span className="sr-only">Select Period</span>
             </Button>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent className="w-fit">
-            <ScrollArea className="h-72 rounded-md">
+            <ScrollArea className="h-72 rounded-md pr-3">
               <DropdownMenuRadioGroup
-                value={selectedPeriod.value}
-                onValueChange={(value) =>
-                  setSelectedPeriod(
-                    () => periods?.find((p) => p.value === value)!
-                  )
-                }
+                value={`${currentPeriod?.id}`}
+                onValueChange={(value) => dispatch(setCurrentPeriod(value))}
               >
                 {periods?.map((p) => (
                   <DropdownMenuRadioItem
-                    value={p.value}
-                    key={p.value}
+                    value={`${p.id}`}
+                    key={p.id}
                     className="cursor-pointer"
                   >
                     {p.label}

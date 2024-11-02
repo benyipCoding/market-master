@@ -186,14 +186,14 @@ export const useAutomaticLineDrawing = ({
       }
     });
 
-    setIterator(lineList[Symbol.iterator]());
+    // setIterator(lineList[Symbol.iterator]());
 
     // 从笔到线段的整合
     const segmentList = generateLineSegment(lineList);
 
-    // setIterator(segmentList[Symbol.iterator]());
+    setIterator(segmentList[Symbol.iterator]());
 
-    setSegmentIterator(segmentList[Symbol.iterator]());
+    // setSegmentIterator(segmentList[Symbol.iterator]());
   };
 
   // 辅助函数，当前笔的方向在未来是否有可能成为线段
