@@ -52,7 +52,7 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     };
 
     const res = await getKLines(params);
-    if (res.status !== 200) toast.error(res.msg);
+    if (res.status !== 200) return toast.error(res.msg);
     console.log(res.data);
   };
 

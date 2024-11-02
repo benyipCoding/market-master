@@ -91,8 +91,6 @@ const Playground = () => {
 
   const getCandlestickData = async () => {
     const res = await getDummyData();
-    console.log(res.data);
-
     setCandlestickData(res.data);
   };
 

@@ -142,17 +142,18 @@ const UploadForm = () => {
       tasks.push(task);
     }
     const results = await Promise.all(tasks);
-    console.log(results);
     results.forEach((res: any) => {
       if (res.statue !== 200) toast.error(res.msg);
     });
     console.timeEnd("upload");
+    return;
   };
   // Switch chart triggered after clicking the Upload button
-  const switchKLineChart = () => {
+  const switchKLineChart = async () => {
     try {
       //  Package up the payload
-      const id = `${formValue.symbol}_${formValue.interval}_${Date.now()}`;
+      const id = `${formValue.symbol}_${formValue.period}_${Date.now()}`;
+
       const customOptions: SeriesPartialOptions<CandlestickStyleOptions> = {
         id,
         toFixedNum: formValue.toFixedNum,
@@ -170,20 +171,21 @@ const UploadForm = () => {
         }));
 
       seriesData.sort((a, b) => (a.time as number) - (b.time as number));
+      console.log({ seriesData });
 
       // Emitter
       emittery?.emit(OnApply.ResetMainSeriesData, {
         customOptions,
         seriesData,
       });
-
-      setDialogVisible(false);
     } catch (error) {
       console.log({ error });
+    } finally {
+      setDialogVisible(false);
     }
   };
   // Upload handler
-  const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
+  const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Asynchronously upload data
     bulkUpload();
