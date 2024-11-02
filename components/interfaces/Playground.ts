@@ -5,6 +5,7 @@ import {
 } from "lightweight-charts";
 import { TChartRef } from "./TChart";
 import { TechnicalIndicatorLine } from "./TechnicalIndexForm";
+import { CustomLineSeriesType } from "@/hooks/interfaces";
 
 export interface AsideProps {
   className?: string;
@@ -17,6 +18,7 @@ export interface AsideProps {
 
 export interface AsideRef {
   container: HTMLDivElement | null;
+  deleteLines: (type: CustomLineSeriesType) => void;
 }
 
 export interface LeftAsideBtnsProps {

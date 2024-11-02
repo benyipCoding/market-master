@@ -11,6 +11,7 @@ import { getMe } from "@/app/auth/login/getMe";
 import { Tokens } from "@/utils/cookieHelper";
 import { getKLines, ListKLineDto } from "@/app/playground/actions/getKLines";
 import { cleanData } from "@/app/playground/actions/cleanData";
+import { CustomLineSeriesType } from "@/hooks/interfaces";
 
 const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   { className, asideOpen, setDrawedLineList, tChartRef },
@@ -23,11 +24,10 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     [asideOpen]
   );
 
-  const { performDrawing, autoDrawing, deleteBaseLine } =
-    useAutomaticLineDrawing({
-      setDrawedLineList,
-      tChartRef,
-    });
+  const { performDrawing, autoDrawing, deleteLines } = useAutomaticLineDrawing({
+    setDrawedLineList,
+    tChartRef,
+  });
 
   const login = async () => {
     const payload = {
@@ -64,6 +64,7 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
 
   useImperativeHandle(ref, () => ({
     container: asideRef.current,
+    deleteLines,
   }));
 
   return (
@@ -74,7 +75,7 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
             {autoDrawing ? <Loading /> : "Automatic Line"}
           </Button>
           <Button
-            onClick={deleteBaseLine}
+            onClick={() => deleteLines(CustomLineSeriesType.SegmentDrawed)}
             disabled={autoDrawing}
             variant={"destructive"}
           >

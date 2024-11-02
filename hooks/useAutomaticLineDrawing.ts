@@ -297,14 +297,17 @@ export const useAutomaticLineDrawing = ({
     setAddtionalSeries(series);
   };
 
-  const deleteBaseLine = () => {
+  const deleteLines = (type: CustomLineSeriesType) => {
     if (!tChartRef.current) return;
 
-    const baseLineSeries = lineSeriesRecord.filter(
-      (series) =>
-        series.options().customType === CustomLineSeriesType.AutomaticDrawed
+    const needToRemoveLines = lineSeriesRecord.filter(
+      (series) => series.options().customType === type
     );
-    baseLineSeries.forEach((series) => {
+    setLineSeriesRecord((prev) =>
+      prev.filter((series) => series.options().customType !== type)
+    );
+
+    needToRemoveLines.forEach((series) => {
       const id = series.options().id;
       setDrawedLineList((prev) => prev.filter((option) => option.id !== id));
       tChartRef.current!.setLineId_equation((prev) => {
@@ -312,6 +315,7 @@ export const useAutomaticLineDrawing = ({
         delete newObj[id];
         return newObj;
       });
+
       tChartRef.current!.chart.removeSeries(series);
     });
   };
@@ -386,6 +390,6 @@ export const useAutomaticLineDrawing = ({
   return {
     performDrawing,
     autoDrawing,
-    deleteBaseLine,
+    deleteLines,
   };
 };

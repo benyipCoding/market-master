@@ -2,7 +2,6 @@
 import CandlestickSeries from "@/components/CandlestickSeries";
 import LineSeries from "@/components/LineSeries";
 import TChart from "@/components/TChart";
-import { getDummyData } from "@/utils/apis/getDummyData";
 import {
   CandlestickData,
   LineSeriesPartialOptions,
@@ -37,6 +36,7 @@ import SymbolSearch from "@/components/SymbolSearch";
 import UploadForm from "@/components/playground/UploadForm";
 import { fetchPeriods, fetchSymbols } from "@/store/fetchDataSlice";
 import { getKLines } from "./actions/getKLines";
+import { CustomLineSeriesType } from "@/hooks/interfaces";
 
 const Playground = () => {
   // TChart component instance
@@ -47,6 +47,9 @@ const Playground = () => {
   const [asideOpen, setAsideOpen] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
   const { dialogContent } = useSelector((state: RootState) => state.dialog);
+  const { currentPeriod, currentSymbol } = useSelector(
+    (state: RootState) => state.fetchData
+  );
   const isDrawedLineSettings = useMemo(
     () => dialogContent === DialogContentType.DrawedLineSettings,
     [dialogContent]
@@ -85,14 +88,18 @@ const Playground = () => {
   // dialog trigger
   const [dialogVisible, setDialogVisible] = useState(false);
 
-  const processedData = useMemo(
-    () => candlestickData.slice(-4000),
-    [candlestickData]
-  );
-
   const getCandlestickData = async () => {
-    const res = await getDummyData();
-    setCandlestickData(res.data);
+    const res = await getKLines({
+      symbol: currentSymbol?.id!,
+      period: currentPeriod?.id!,
+    });
+
+    setCandlestickData(
+      res.data.map((item: any) => ({
+        ...item,
+        time: item.timestamp,
+      }))
+    );
   };
 
   const crosshairMoveHandler = (param: MouseEventParams<Time>) => {
@@ -126,9 +133,7 @@ const Playground = () => {
     setAsideOpen((prev) => !prev);
   };
 
-  // get dummy candlestick data
   useEffect(() => {
-    getCandlestickData();
     window.addEventListener("resize", throttle(resizeHandler, 100));
     dispatch(fetchPeriods());
     dispatch(fetchSymbols());
@@ -157,6 +162,13 @@ const Playground = () => {
   useEffect(() => {
     if (!dialogVisible) dispatch(setDialogContent(undefined));
   }, [dialogVisible]);
+
+  // Monitor changes in the current period and symbol values
+  useEffect(() => {
+    if (!currentPeriod?.id || !currentSymbol?.id) return;
+    asideRef.current?.deleteLines(CustomLineSeriesType.SegmentDrawed);
+    getCandlestickData();
+  }, [currentPeriod, currentSymbol]);
 
   return (
     <>
@@ -211,6 +223,7 @@ const Playground = () => {
               ))}
               <Tooltips productName="XAUUSD" tChartRef={tChartRef} />
             </TChart>
+
             <div
               className="w-2 bg-transparent cursor-col-resize"
               ref={dividerRef}
