@@ -130,7 +130,10 @@ const Navbar: React.FC<NavbarProps> = ({
           </DropdownMenuTrigger>
 
           <DropdownMenuContent className="w-fit">
-            <ScrollArea className="h-72 rounded-md pr-3">
+            <ScrollArea
+              className="h-72 rounded-md pr-3"
+              thumbClass="dark:bg-primary-foreground"
+            >
               <DropdownMenuRadioGroup
                 value={`${currentPeriod?.id}`}
                 onValueChange={(value) => dispatch(setCurrentPeriod(value))}

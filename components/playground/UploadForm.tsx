@@ -143,7 +143,8 @@ const UploadForm = () => {
     }
     const results = await Promise.all(tasks);
     results.forEach((res: any) => {
-      if (res.statue !== 200) toast.error(res.msg);
+      if (!`${res.statue}`.startsWith("2")) toast.error(res.msg);
+      toast.success(res.data);
     });
     console.timeEnd("upload");
     return;
@@ -190,7 +191,7 @@ const UploadForm = () => {
     // Asynchronously upload data
     bulkUpload();
     // Switch the current K-line chart
-    switchKLineChart();
+    // switchKLineChart();
   };
 
   const clearFiles = (e?: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
