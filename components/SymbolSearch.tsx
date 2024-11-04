@@ -28,7 +28,7 @@ const SymbolSearch: React.FC = () => {
         <div className="relative w-full">
           <Input
             type="search"
-            placeholder="Filter emails..."
+            placeholder="Filter symbols..."
             className="max-w-sm pl-8"
           />
           <span className="absolute top-1/2 -translate-y-1/2 left-2 text-slate-400">

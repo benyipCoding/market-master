@@ -191,7 +191,7 @@ const UploadForm = () => {
     // Asynchronously upload data
     bulkUpload();
     // Switch the current K-line chart
-    // switchKLineChart();
+    switchKLineChart();
   };
 
   const clearFiles = (e?: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
