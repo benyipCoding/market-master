@@ -10,12 +10,20 @@ export interface SymbolCategory {
   parent_id: number | null;
 }
 
+export interface Symbol {
+  id: number;
+  label: string;
+  category_id: number;
+  description: string;
+  basic_point_place: number;
+}
+
 interface FetchDataState {
   periods: Array<BaseLabelType> | null;
-  symbols: Array<BaseLabelType> | null;
+  symbols: Array<Symbol> | null;
   categories: Array<SymbolCategory> | null;
   currentPeriod: BaseLabelType | undefined;
-  currentSymbol: BaseLabelType | undefined;
+  currentSymbol: Symbol | undefined;
   currentCategory: SymbolCategory | undefined;
 }
 
@@ -62,7 +70,7 @@ export const fetchDataSlice = createSlice({
     });
     builder.addCase(fetchSymbols.fulfilled, (state, action) => {
       state.symbols = action.payload.data;
-      state.currentSymbol = (action.payload.data as BaseLabelType[]).find(
+      state.currentSymbol = (action.payload.data as Symbol[]).find(
         (s) => s.label === "XAUUSD"
       );
     });
