@@ -10,6 +10,7 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Separator } from "./ui/separator";
 import { TiStarFullOutline, TiStarOutline } from "react-icons/ti";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
+import { addToFav } from "@/app/playground/actions/addToFav";
 const SymbolSearch: React.FC = () => {
   const [searchValue, setSearchValue] = useState("");
   const [showCollects, setShowCollects] = useState(false);
@@ -36,6 +37,16 @@ const SymbolSearch: React.FC = () => {
     console.log(symbol_id);
   };
 
+  const addToFavAction = async (
+    e: React.MouseEvent<HTMLSpanElement, MouseEvent>,
+    symbol_id: number
+  ) => {
+    e.stopPropagation();
+    // TODO: 调接口收藏该品种
+    const res = await addToFav(symbol_id);
+    console.log(res.data);
+  };
+
   useEffect(() => {
     if (!categories) dispatch(fetchCategories());
   }, []);
@@ -49,7 +60,7 @@ const SymbolSearch: React.FC = () => {
             placeholder="Filter symbols..."
             className="max-w-sm pl-8"
             value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
+            onChange={(e) => setSearchValue(e.target.value.toUpperCase())}
           />
           <span className="absolute top-1/2 -translate-y-1/2 left-2 text-slate-400">
             <Search size={18} />
@@ -92,12 +103,14 @@ const SymbolSearch: React.FC = () => {
             onClick={() => onSelectSymbol(s.id)}
           >
             <span className="flex-1 text-primary">{s.label}</span>
-            <span className="flex-1 text-slate-300 text-sm">
+            <span className="flex-1 text-slate-300 text-sm truncate">
               {s.description}
             </span>
-            <p className="flex-1 text-slate-300 text-sm flex justify-center items-center">
-              <IoIosHeartEmpty size={24} />
-            </p>
+            <div className="flex-1 text-sm flex justify-center items-center">
+              <span onClick={(e) => addToFavAction(e, s.id)}>
+                <IoIosHeartEmpty size={24} className="text-slate-300" />
+              </span>
+            </div>
             <Separator className="absolute bottom-0 w-full" />
           </div>
         ))}
