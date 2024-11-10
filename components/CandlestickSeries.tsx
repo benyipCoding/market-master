@@ -51,7 +51,6 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
       0
     );
     const avgAmplitude = totalAmplitude / seriesData.length;
-    console.log(avgAmplitude);
     dispatch(setAvgAmplitude(avgAmplitude));
   }, [seriesData]);
 
