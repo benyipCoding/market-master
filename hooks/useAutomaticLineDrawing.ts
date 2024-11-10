@@ -186,12 +186,12 @@ export const useAutomaticLineDrawing = ({
       }
     });
 
-    // setIterator(lineList[Symbol.iterator]());
+    setIterator(lineList[Symbol.iterator]());
 
     // 从笔到线段的整合
-    const segmentList = generateLineSegment(lineList);
+    // const segmentList = generateLineSegment(lineList);
 
-    setIterator(segmentList[Symbol.iterator]());
+    // setIterator(segmentList[Symbol.iterator]());
 
     // setSegmentIterator(segmentList[Symbol.iterator]());
   };

@@ -20,7 +20,6 @@ import {
   setGraphType,
 } from "@/store/commonSlice";
 import hotkeys from "hotkeys-js";
-import { undefined } from "zod";
 
 const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
   className,
@@ -61,11 +60,14 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
 
   const onDeleteSeries = useCallback(() => {
     if (!tChartRef.current) return;
-    const { chart, dialogVisible, setLineId_equation } = tChartRef.current;
+    const { chart, dialogVisible, setLineId_equation, setChildSeries } =
+      tChartRef.current;
     if (dialogVisible) return;
     if (selectedSeries) {
       chart.removeSeries(selectedSeries);
       const { id } = selectedSeries.options();
+
+      setChildSeries((prev) => prev.filter((s) => s.options().id !== id));
 
       setDrawedLineList((prev) =>
         prev.filter((lineOptions) => lineOptions.id !== id)

@@ -236,6 +236,7 @@ const TChart: React.ForwardRefRenderFunction<
     dialogVisible,
     setWidth,
     setLineId_equation,
+    setChildSeries,
   }));
 
   return (

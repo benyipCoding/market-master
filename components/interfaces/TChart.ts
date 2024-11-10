@@ -37,4 +37,7 @@ export interface TChartRef {
   setLineId_equation: React.Dispatch<
     React.SetStateAction<Record<string, Equation>>
   >;
+  setChildSeries: React.Dispatch<
+    React.SetStateAction<ISeriesApi<SeriesType, Time>[]>
+  >;
 }
