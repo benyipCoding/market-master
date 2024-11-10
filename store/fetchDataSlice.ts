@@ -1,7 +1,13 @@
 import { getCategories } from "@/app/playground/actions/getCategories";
 import { getPeriods } from "@/app/playground/actions/getPeriods";
 import { getSymbols } from "@/app/playground/actions/getSymbols";
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  createSelector,
+  createSlice,
+  PayloadAction,
+} from "@reduxjs/toolkit";
+import { RootState } from ".";
 
 type BaseLabelType = { id: number; label: string };
 export interface SymbolCategory {
@@ -16,6 +22,8 @@ export interface Symbol {
   category_id: number;
   description: string;
   basic_point_place: number;
+  minMove: number;
+  precision: number;
 }
 
 interface FetchDataState {
@@ -82,6 +90,20 @@ export const fetchDataSlice = createSlice({
     });
   },
 });
+
+const selectCurrentSymbol = (state: RootState) => state.fetchData.currentSymbol;
+
+export const symbolToSeriesOptions = createSelector(
+  [selectCurrentSymbol],
+  (currentSymbol) => ({
+    id: currentSymbol?.label,
+    toFixedNum: currentSymbol?.precision,
+    priceFormat: {
+      precision: currentSymbol?.precision,
+      minMove: currentSymbol?.minMove,
+    },
+  })
+);
 
 export const { setCurrentPeriod, setCurrentCategory } = fetchDataSlice.actions;
 
