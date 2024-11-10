@@ -71,21 +71,21 @@ export function throttle<T extends AnyFunction>(func: T, wait: number): T {
   } as T;
 }
 
-export function isWithinRange(
-  reference: number,
-  actual: number,
-  sensitivity: number = 0.005
-) {
-  const amount = reference * sensitivity;
-  return Math.abs(reference - actual) <= amount;
-}
+// export function isWithinRange(
+//   reference: number,
+//   actual: number,
+//   sensitivity: number = 0.005
+// ) {
+//   const amount = reference * sensitivity;
+//   return Math.abs(reference - actual) <= amount;
+// }
 
 export function isWithinRange2(
   reference: number,
   actual: number,
   amount: number
 ) {
-  return Math.abs(reference - actual) <= amount;
+  return Math.abs(reference - actual) <= amount * 0.5;
 }
 
 export function debonce<T extends AnyFunction>(func: T, wait: number): T {

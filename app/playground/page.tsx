@@ -199,7 +199,9 @@ const Playground = () => {
               dialogVisible={dialogVisible}
             >
               {currentSymbol && (
-                <CandlestickSeries seriesData={candlestickData} />
+                <CandlestickSeries
+                  seriesData={candlestickData.slice(0, 2000)}
+                />
               )}
               {drawedLineList.map((lineOption) => (
                 <LineSeries
@@ -207,7 +209,6 @@ const Playground = () => {
                   key={lineOption.id}
                 />
               ))}
-
               {technicalIndicatorLines.map((line) => (
                 <LineSeries
                   customSeriesOptions={line.options}
