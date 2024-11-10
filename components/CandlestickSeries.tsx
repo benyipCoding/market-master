@@ -9,9 +9,9 @@ import {
   CandlestickData,
   Time,
 } from "lightweight-charts";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
-import { symbolToSeriesOptions } from "@/store/fetchDataSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
+import { setAvgAmplitude, symbolToSeriesOptions } from "@/store/fetchDataSlice";
 
 const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   seriesData,
@@ -21,6 +21,7 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   );
   const { series } = useSeries("Candlestick", seriesData, customOptions);
   const { emittery } = useContext(EmitteryContext);
+  const dispatch = useDispatch<AppDispatch>();
 
   const resetDataHandler = ({
     customOptions,
@@ -43,6 +44,15 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
 
   useEffect(() => {
     if (!seriesData.length) return;
+
+    // 求平均振幅
+    const totalAmplitude = seriesData.reduce(
+      (res, cur) => res + (cur.high - cur.low),
+      0
+    );
+    const avgAmplitude = totalAmplitude / seriesData.length;
+    console.log(avgAmplitude);
+    dispatch(setAvgAmplitude(avgAmplitude));
   }, [seriesData]);
 
   return null;

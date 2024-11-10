@@ -108,6 +108,9 @@ const TChart: React.ForwardRefRenderFunction<
     hoveringPoint: hoveringPoint!,
     setLineId_equation,
   });
+
+  const { avgAmplitude } = useSelector((state: RootState) => state.fetchData);
+
   // Mounted
   useEffect(() => {
     if (!container.current) return;
@@ -149,6 +152,7 @@ const TChart: React.ForwardRefRenderFunction<
       chart,
       lineId_equation,
       point: mouseMovingEventParam?.point!,
+      avgAmplitude,
     });
 
     if (hoveringSeries) {
@@ -163,6 +167,7 @@ const TChart: React.ForwardRefRenderFunction<
       chart,
       x: mouseMovingEventParam?.point?.x!,
       y: mouseMovingEventParam?.point?.y!,
+      avgAmplitude: avgAmplitude!,
     });
     if (hoveringIndicator) {
       dispatch(setHoveringIndicator(hoveringIndicator));
@@ -180,6 +185,7 @@ const TChart: React.ForwardRefRenderFunction<
       chart,
       lineId_equation,
       point: mouseClickEventParam.point!,
+      avgAmplitude,
     });
 
     if (hoveringSeries) {

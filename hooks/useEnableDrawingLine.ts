@@ -38,6 +38,7 @@ export const useEnableDrawingLine = ({
     (state: RootState) => state.common
   );
   const dispatch = useDispatch<AppDispatch>();
+  const { avgAmplitude } = useSelector((state: RootState) => state.fetchData);
 
   const drawStart = (
     mouseEvent: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -78,7 +79,11 @@ export const useEnableDrawingLine = ({
         ]
       : [];
 
-    const cloestStart = findClosestPrice(value as number, refecences);
+    const cloestStart = findClosestPrice(
+      value as number,
+      refecences,
+      avgAmplitude!
+    );
 
     setDrawStartPoint({
       value: cloestStart || (value as number),
@@ -151,7 +156,11 @@ export const useEnableDrawingLine = ({
         ]
       : [];
 
-    const cloestEnd = findClosestPrice(drawEndPoint.value, refecences);
+    const cloestEnd = findClosestPrice(
+      drawEndPoint.value,
+      refecences,
+      avgAmplitude!
+    );
 
     const lineData = cloestEnd
       ? makeLineData(

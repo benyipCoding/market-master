@@ -33,6 +33,7 @@ interface FetchDataState {
   currentPeriod: BaseLabelType | undefined;
   currentSymbol: Symbol | undefined;
   currentCategory: SymbolCategory | undefined;
+  avgAmplitude: number | undefined;
 }
 
 const initialState: FetchDataState = {
@@ -42,6 +43,7 @@ const initialState: FetchDataState = {
   currentPeriod: undefined,
   currentSymbol: undefined,
   currentCategory: undefined,
+  avgAmplitude: undefined,
 };
 
 export const fetchPeriods = createAsyncThunk("fetch/periods", () => {
@@ -67,6 +69,9 @@ export const fetchDataSlice = createSlice({
     },
     setCurrentCategory(state, action: PayloadAction<SymbolCategory>) {
       state.currentCategory = action.payload;
+    },
+    setAvgAmplitude(state, action: PayloadAction<number>) {
+      state.avgAmplitude = action.payload;
     },
   },
   extraReducers(builder) {
@@ -105,6 +110,7 @@ export const symbolToSeriesOptions = createSelector(
   })
 );
 
-export const { setCurrentPeriod, setCurrentCategory } = fetchDataSlice.actions;
+export const { setCurrentPeriod, setCurrentCategory, setAvgAmplitude } =
+  fetchDataSlice.actions;
 
 export default fetchDataSlice.reducer;

@@ -34,6 +34,7 @@ export const useDragLineSeries = ({
   const [dynamic, setDynamic] = useState<LineData<Time> | null>(null);
   const [fixed, setFixed] = useState<LineData<Time> | null>(null);
   const lineId = useMemo(() => selectedSeries?.options().id, [selectedSeries]);
+  const { avgAmplitude } = useSelector((state: RootState) => state.fetchData);
 
   const changeSelectedSeries = useCallback(
     (e: MouseEvent | React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -104,7 +105,8 @@ export const useDragLineSeries = ({
             currentCandlestick.low,
             currentCandlestick.close,
           ]
-        : []
+        : [],
+      avgAmplitude!
     );
 
     const lineData = cloest

@@ -140,6 +140,7 @@ export interface IFindHoveringSeries {
   chart: IChartApi;
   lineId_equation: Record<string, Equation>;
   point: Point;
+  avgAmplitude?: number;
 }
 
 export const findHoveringSeries = ({
@@ -147,6 +148,7 @@ export const findHoveringSeries = ({
   chart,
   lineId_equation,
   point,
+  avgAmplitude,
 }: IFindHoveringSeries) => {
   if (!point) return;
 
@@ -170,7 +172,7 @@ export const findHoveringSeries = ({
     const isHoveringOverLine = isWithinRange2(
       price,
       series.coordinateToPrice(point.y)!,
-      13
+      avgAmplitude!
     );
 
     return isHoveringOverLine;
@@ -182,6 +184,7 @@ export interface IFindHoveringIndicator {
   x: number;
   y: number;
   chart: IChartApi;
+  avgAmplitude: number;
 }
 
 export const findHoveringIndicator = ({
@@ -189,6 +192,7 @@ export const findHoveringIndicator = ({
   x,
   y,
   chart,
+  avgAmplitude,
 }: IFindHoveringIndicator): ISeriesApi<SeriesType, Time> | null => {
   const hoveringPrice = childSeries[0].coordinateToPrice(y);
   const hoveringTime = chart.timeScale().coordinateToTime(x);
@@ -208,7 +212,11 @@ export const findHoveringIndicator = ({
     }
     return numArr;
   }, []);
-  const closestPrice = findClosestPrice(hoveringPrice as number, references);
+  const closestPrice = findClosestPrice(
+    hoveringPrice as number,
+    references,
+    avgAmplitude
+  );
   if (closestPrice) return price_series.get(closestPrice) || null;
   return null;
 };
@@ -237,12 +245,12 @@ export const makeLineData = (
 export const findClosestPrice = (
   targetPrice: number,
   references: number[],
-  sensitivity: number = 0.0025
+  avgAmplitude: number
 ): number | undefined => {
   if (!references.length) return;
 
   const closestPrices = references.filter((price) =>
-    isWithinRange(price, targetPrice, sensitivity)
+    isWithinRange2(price, targetPrice, avgAmplitude)
   );
 
   if (!closestPrices.length) return;

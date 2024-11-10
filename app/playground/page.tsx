@@ -170,18 +170,6 @@ const Playground = () => {
     getCandlestickData();
   }, [currentPeriod, currentSymbol]);
 
-  useEffect(() => {
-    if (!candlestickData.length) return;
-    // 求平均振幅
-    const totalAmplitude = candlestickData.reduce(
-      (res, cur) => res + (cur.high - cur.low),
-      0
-    );
-    const avgAmplitude = totalAmplitude / candlestickData.length;
-
-    console.log(avgAmplitude);
-  }, [candlestickData]);
-
   return (
     <>
       <div className="h-full flex bg-slate-100 dark:bg-black flex-col gap-2">
