@@ -6,5 +6,4 @@ import {
 
 export interface CandlestickSeriesProps {
   seriesData: CandlestickData<Time>[];
-  customSeriesOptions?: CandlestickSeriesPartialOptions;
 }

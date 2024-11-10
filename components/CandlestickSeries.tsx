@@ -1,7 +1,7 @@
 "use client";
 import { useSeries } from "@/hooks/useSeries";
 import { CandlestickSeriesProps } from "./interfaces/CandlestickSeries";
-import { memo, useContext, useEffect } from "react";
+import { memo, useContext, useEffect, useMemo } from "react";
 import { EmitteryContext, OnApply } from "@/providers/EmitteryProvider";
 import {
   SeriesPartialOptions,
@@ -9,12 +9,17 @@ import {
   CandlestickData,
   Time,
 } from "lightweight-charts";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { symbolToSeriesOptions } from "@/store/fetchDataSlice";
 
 const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   seriesData,
-  customSeriesOptions,
 }) => {
-  const { series } = useSeries("Candlestick", seriesData, customSeriesOptions);
+  const customOptions = useSelector((state: RootState) =>
+    symbolToSeriesOptions(state)
+  );
+  const { series } = useSeries("Candlestick", seriesData, customOptions);
   const { emittery } = useContext(EmitteryContext);
 
   const resetDataHandler = ({
@@ -35,6 +40,10 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
       emittery?.off(OnApply.ResetMainSeriesData, resetDataHandler);
     };
   }, [series]);
+
+  useEffect(() => {
+    if (!seriesData.length) return;
+  }, [seriesData]);
 
   return null;
 };

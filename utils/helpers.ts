@@ -80,6 +80,14 @@ export function isWithinRange(
   return Math.abs(reference - actual) <= amount;
 }
 
+export function isWithinRange2(
+  reference: number,
+  actual: number,
+  amount: number
+) {
+  return Math.abs(reference - actual) <= amount;
+}
+
 export function debonce<T extends AnyFunction>(func: T, wait: number): T {
   let timer: NodeJS.Timeout;
 
@@ -148,19 +156,22 @@ export const findHoveringSeries = ({
     const id = series.options().id;
     const equation = lineId_equation[id];
     if (!equation) return;
-    const time = new Date(
-      chart.timeScale().coordinateToTime(point.x) as string
-    ).getTime();
-    const seriesTime = series
-      .data()
-      .map((d) => new Date(d.time as string).getTime())
+    const time = chart.timeScale().coordinateToTime(point.x) as number;
+    const lineData = series.data();
+    const seriesTime = lineData
+      .map((d) => d.time as number)
       .sort((a, b) => a - b);
 
     const isInBoundary = time >= seriesTime[0] && time <= seriesTime[1];
+    if (!isInBoundary) return;
+
     const price = equation(point.x);
 
-    const isHoveringOverLine =
-      isWithinRange(price, series.coordinateToPrice(point.y)!) && isInBoundary;
+    const isHoveringOverLine = isWithinRange2(
+      price,
+      series.coordinateToPrice(point.y)!,
+      13
+    );
 
     return isHoveringOverLine;
   });

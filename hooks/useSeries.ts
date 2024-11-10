@@ -34,6 +34,7 @@ export const useSeries = <T>(
 
   useEffect(() => {
     if (!chart) return;
+
     switch (type) {
       case "Line":
         if (!hasDefaultLineOptions()) setDefaultLineOptions(defaultLineOptions);

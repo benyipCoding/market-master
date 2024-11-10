@@ -170,6 +170,18 @@ const Playground = () => {
     getCandlestickData();
   }, [currentPeriod, currentSymbol]);
 
+  useEffect(() => {
+    if (!candlestickData.length) return;
+    // 求平均振幅
+    const totalAmplitude = candlestickData.reduce(
+      (res, cur) => res + (cur.high - cur.low),
+      0
+    );
+    const avgAmplitude = totalAmplitude / candlestickData.length;
+
+    console.log(avgAmplitude);
+  }, [candlestickData]);
+
   return (
     <>
       <div className="h-full flex bg-slate-100 dark:bg-black flex-col gap-2">
@@ -198,15 +210,9 @@ const Playground = () => {
               setDialogVisible={setDialogVisible}
               dialogVisible={dialogVisible}
             >
-              <CandlestickSeries
-                seriesData={candlestickData}
-                // seriesData={processedData}
-                customSeriesOptions={{
-                  id: "XAUUSD",
-                  toFixedNum: 2,
-                  priceFormat: { precision: 2, minMove: 0.01 },
-                }}
-              />
+              {currentSymbol && (
+                <CandlestickSeries seriesData={candlestickData} />
+              )}
               {drawedLineList.map((lineOption) => (
                 <LineSeries
                   customSeriesOptions={lineOption}
