@@ -190,10 +190,84 @@ export const useAutomaticLineDrawing = ({
 
     // 从笔到线段的整合
     // const segmentList = generateLineSegment(lineList);
+    // const segmentList = generateLineSegment2(lineList);
 
     // setIterator(segmentList[Symbol.iterator]());
 
     // setSegmentIterator(segmentList[Symbol.iterator]());
+  };
+
+  const drawSegment = () => {
+    console.log("画线段");
+  };
+
+  // 辅助函数
+  const canDrawSegment2 = (
+    currentLine: LineState,
+    currentIndex: number,
+    lineList: LineState[],
+    segmentTrend: TrendType | null
+  ): number | undefined => {
+    const currentTrend = currentLine.trend;
+    const currentStartPrice = currentLine.startPoint.price;
+    const currentEndPrice = currentLine.endPoint.price;
+    const prevLine = lineList[currentIndex - 1];
+    let endIndex: number | undefined = undefined;
+
+    for (let i = currentIndex + 2; i < lineList.length; i += 2) {
+      const nextSameTrendLine = lineList[i];
+      const nextStartPrice = nextSameTrendLine.startPoint.price;
+      const nextEndPrice = nextSameTrendLine.endPoint.price;
+
+      // 1.不可持续情况
+      const canNotGrow =
+        currentTrend === TrendType.Up
+          ? nextStartPrice < currentStartPrice && nextEndPrice < currentEndPrice
+          : nextStartPrice > currentStartPrice &&
+            nextEndPrice > currentEndPrice;
+      if (canNotGrow) return endIndex;
+
+      // 2. 可持续情况一
+      const canGrow1 =
+        currentTrend === TrendType.Up
+          ? nextStartPrice > currentStartPrice && nextEndPrice > currentEndPrice
+          : nextStartPrice < currentStartPrice &&
+            nextEndPrice < currentEndPrice;
+      if (canGrow1) {
+        endIndex = i;
+        continue;
+      }
+
+      // 3. 可持续情况二
+      if (!prevLine || segmentTrend === currentTrend) continue;
+      const prevStartPrice = prevLine.startPoint.price;
+      const canGrow2 =
+        currentTrend === TrendType.Up
+          ? currentEndPrice > prevStartPrice && nextEndPrice > prevStartPrice
+          : currentEndPrice < prevStartPrice && nextEndPrice < prevStartPrice;
+      if (canGrow2) {
+        endIndex = i;
+        continue;
+      }
+    }
+  };
+
+  const generateLineSegment2 = (lineList: LineState[]): LineState[] => {
+    let segmentTrend: TrendType | null = null;
+    let segmentStart: AutomaticLinePoint | null = null;
+    let segmentEnd: AutomaticLinePoint | null = null;
+
+    for (let i = 0; i < lineList.length; i++) {
+      const currentLine = lineList[i];
+      const endLineIndex = canDrawSegment2(
+        currentLine,
+        i,
+        lineList,
+        segmentTrend
+      );
+    }
+
+    return [];
   };
 
   // 辅助函数，当前笔的方向在未来是否有可能成为线段
@@ -354,10 +428,10 @@ export const useAutomaticLineDrawing = ({
       setCanNext(true);
       setAddtionalSeries(null);
       setAutoDrawing(false);
-      if (segmentIterator) {
-        setIterator(segmentIterator);
-        setSegmentIterator(null);
-      }
+      // if (segmentIterator) {
+      //   setIterator(segmentIterator);
+      //   setSegmentIterator(null);
+      // }
       return;
     }
     setLineValue(value);
@@ -389,6 +463,7 @@ export const useAutomaticLineDrawing = ({
 
   return {
     performDrawing,
+    drawSegment,
     autoDrawing,
     deleteLines,
   };

@@ -24,10 +24,11 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     [asideOpen]
   );
 
-  const { performDrawing, autoDrawing, deleteLines } = useAutomaticLineDrawing({
-    setDrawedLineList,
-    tChartRef,
-  });
+  const { performDrawing, autoDrawing, deleteLines, drawSegment } =
+    useAutomaticLineDrawing({
+      setDrawedLineList,
+      tChartRef,
+    });
 
   const login = async () => {
     const payload = {
@@ -73,6 +74,9 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
         <div className="flex flex-col gap-4">
           <Button onClick={performDrawing} disabled={autoDrawing}>
             {autoDrawing ? <Loading /> : "Automatic Line"}
+          </Button>
+          <Button onClick={drawSegment} disabled={autoDrawing}>
+            {autoDrawing ? <Loading /> : "Auto draw segment"}
           </Button>
           <Button
             onClick={() => deleteLines(CustomLineSeriesType.SegmentDrawed)}
