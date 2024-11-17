@@ -17,7 +17,7 @@ import {
   makeLineData,
   recordEquationHandler,
 } from "@/utils/helpers";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { EmitteryContext, OnSeriesCreate } from "@/providers/EmitteryProvider";
 import { SeriesColors } from "@/constants/seriesOptions";
 
@@ -31,11 +31,14 @@ export const useAutomaticLineDrawing = ({
     Time
   > | null>(null);
   const [canNext, setCanNext] = useState(true);
-  const [iterator, setIterator] = useState<IterableIterator<LineState> | null>(
-    null
-  );
-  const [segmentIterator, setSegmentIterator] =
-    useState<IterableIterator<LineState> | null>(null);
+  const [lineList, setLineList] = useState<Array<LineState>>([]);
+  const iterator = useMemo(() => lineList[Symbol.iterator](), [lineList]);
+
+  // const [iterator, setIterator] = useState<IterableIterator<LineState> | null>(
+  //   null
+  // );
+  // const [segmentIterator, setSegmentIterator] =
+  //   useState<IterableIterator<LineState> | null>(null);
   const [lineValue, setLineValue] = useState<LineState | null>(null);
   const [autoDrawing, setAutoDrawing] = useState(false);
   const [lineSeriesRecord, setLineSeriesRecord] = useState<
@@ -89,7 +92,7 @@ export const useAutomaticLineDrawing = ({
     let currentTrend: TrendType | null = null;
     let startPoint: AutomaticLinePoint | null;
     let endPoint: AutomaticLinePoint | null;
-    const lineList: Array<LineState> = [];
+    const lines: Array<LineState> = [];
 
     const updateLowOrHigh = (
       newTrend: TrendType,
@@ -146,7 +149,7 @@ export const useAutomaticLineDrawing = ({
         if (diff >= kCount) {
           // 结算前一个相反趋势线
           if (startPoint && endPoint) {
-            lineList.push({
+            lines.push({
               startPoint,
               endPoint,
               trend: currentTrend || newTrend,
@@ -186,7 +189,9 @@ export const useAutomaticLineDrawing = ({
       }
     });
 
-    setIterator(lineList[Symbol.iterator]());
+    setLineList(lines);
+
+    // setIterator(lineList[Symbol.iterator]());
 
     // 从笔到线段的整合
     // const segmentList = generateLineSegment(lineList);
@@ -198,48 +203,72 @@ export const useAutomaticLineDrawing = ({
   };
 
   const drawSegment = () => {
-    console.log("画线段");
+    const index = prompt("请输入笔的索引");
+    const segmentList = generateLineSegment2(lineList, +index!);
   };
 
   // 辅助函数
   const canDrawSegment2 = (
-    currentLine: LineState,
-    currentIndex: number,
-    lineList: LineState[],
-    segmentTrend: TrendType | null
+    rootLine: LineState,
+    rootIndex: number,
+    lineList: LineState[]
   ): number | undefined => {
-    const currentTrend = currentLine.trend;
-    const currentStartPrice = currentLine.startPoint.price;
-    const currentEndPrice = currentLine.endPoint.price;
-    const prevLine = lineList[currentIndex - 1];
+    let reference: LineState = rootLine;
     let endIndex: number | undefined = undefined;
+    let isFirstTime = true;
 
-    for (let i = currentIndex + 2; i < lineList.length; i += 2) {
+    for (let i = rootIndex + 2; i < lineList.length; i += 2) {
+      const currentTrend = reference.trend;
+      const currentStartPrice = reference.startPoint.price;
+      const currentEndPrice = reference.endPoint.price;
+      const prevLine = lineList[rootIndex - 1];
+
       const nextSameTrendLine = lineList[i];
       const nextStartPrice = nextSameTrendLine.startPoint.price;
       const nextEndPrice = nextSameTrendLine.endPoint.price;
 
-      // 1.不可持续情况
+      // 1. 趋势不可能持续的情况
       const canNotGrow =
-        currentTrend === TrendType.Up
-          ? nextStartPrice < currentStartPrice && nextEndPrice < currentEndPrice
-          : nextStartPrice > currentStartPrice &&
-            nextEndPrice > currentEndPrice;
-      if (canNotGrow) return endIndex;
+        rootLine.trend === TrendType.Up
+          ? nextStartPrice < rootLine.startPoint.price
+          : nextStartPrice > rootLine.startPoint.price;
+      if (canNotGrow) {
+        console.log("突破根笔的起点而终止");
+        console.log("突破的index", i);
+
+        return endIndex;
+      }
+
+      if (endIndex) {
+        const nextReverseLine = lineList[i - 1];
+        const res = canDrawSegment2(nextReverseLine, i - 1, lineList);
+        if (res) {
+          console.log("反向笔能画出线段而终止");
+          console.log("反向比的索引", i - 1);
+
+          return endIndex;
+        }
+      }
 
       // 2. 可持续情况一
       const canGrow1 =
         currentTrend === TrendType.Up
-          ? nextStartPrice > currentStartPrice && nextEndPrice > currentEndPrice
-          : nextStartPrice < currentStartPrice &&
+          ? (nextStartPrice > currentStartPrice ||
+              nextStartPrice > rootLine.startPoint.price) &&
+            nextEndPrice > currentEndPrice
+          : (nextStartPrice < currentStartPrice ||
+              nextStartPrice < rootLine.startPoint.price) &&
             nextEndPrice < currentEndPrice;
+
       if (canGrow1) {
         endIndex = i;
+        reference = lineList[i];
+        isFirstTime = false;
         continue;
       }
 
       // 3. 可持续情况二
-      if (!prevLine || segmentTrend === currentTrend) continue;
+      if (!prevLine || !isFirstTime) continue;
       const prevStartPrice = prevLine.startPoint.price;
       const canGrow2 =
         currentTrend === TrendType.Up
@@ -247,25 +276,23 @@ export const useAutomaticLineDrawing = ({
           : currentEndPrice < prevStartPrice && nextEndPrice < prevStartPrice;
       if (canGrow2) {
         endIndex = i;
+        reference = lineList[i];
+        isFirstTime = false;
         continue;
       }
     }
   };
 
-  const generateLineSegment2 = (lineList: LineState[]): LineState[] => {
+  const generateLineSegment2 = (
+    lineList: LineState[],
+    index?: number
+  ): LineState[] => {
     let segmentTrend: TrendType | null = null;
     let segmentStart: AutomaticLinePoint | null = null;
     let segmentEnd: AutomaticLinePoint | null = null;
 
-    for (let i = 0; i < lineList.length; i++) {
-      const currentLine = lineList[i];
-      const endLineIndex = canDrawSegment2(
-        currentLine,
-        i,
-        lineList,
-        segmentTrend
-      );
-    }
+    const endIndex = canDrawSegment2(lineList[index!], index!, lineList);
+    console.log(endIndex);
 
     return [];
   };
@@ -396,61 +423,65 @@ export const useAutomaticLineDrawing = ({
 
   useEffect(() => {
     if (!addtionalSeries) return;
-    setLineSeriesRecord((prev) => [
-      ...prev,
-      addtionalSeries as ISeriesApi<"Line", Time>,
-    ]);
-    const lineData = generateLineData(
-      lineValue?.startPoint!,
-      lineValue?.endPoint!,
-      addtionalSeries.options().id
-    );
+    try {
+      setLineSeriesRecord((prev) => [
+        ...prev,
+        addtionalSeries as ISeriesApi<"Line", Time>,
+      ]);
+      const lineData = generateLineData(
+        lineValue?.startPoint!,
+        lineValue?.endPoint!,
+        addtionalSeries.options().id
+      );
 
-    addtionalSeries.setData(lineData);
-    recordEquationHandler(
-      lineData[0].customValues! as unknown as Point,
-      lineData[1].customValues! as unknown as Point,
-      addtionalSeries.options().id,
-      tChartRef.current!.setLineId_equation,
-      tChartRef.current!.chart
-    );
+      addtionalSeries.setData(lineData);
+      recordEquationHandler(
+        lineData[0].customValues! as unknown as Point,
+        lineData[1].customValues! as unknown as Point,
+        addtionalSeries.options().id,
+        tChartRef.current!.setLineId_equation,
+        tChartRef.current!.chart
+      );
 
-    setTimeout(() => setCanNext(true), 50);
+      setTimeout(() => setCanNext(true), 50);
+    } catch (error) {
+      console.log("这里是监听addtionalSeries的useEffect");
+    }
   }, [addtionalSeries]);
 
   useEffect(() => {
     if (!canNext || !iterator || !tChartRef.current) return;
+
     setCanNext(() => false);
     setAutoDrawing(true);
-    const { done, value } = iterator.next();
-    if (done) {
-      setIterator(null);
-      setCanNext(true);
-      setAddtionalSeries(null);
-      setAutoDrawing(false);
-      // if (segmentIterator) {
-      //   setIterator(segmentIterator);
-      //   setSegmentIterator(null);
-      // }
-      return;
+    try {
+      const { done, value } = iterator.next();
+      if (done) {
+        setCanNext(true);
+        setAddtionalSeries(null);
+        setAutoDrawing(false);
+        return;
+      }
+      setLineValue(value);
+
+      const mainSeries = tChartRef.current.childSeries[0];
+      const lineId = `${mainSeries.options().id}_line_${Date.now()}`;
+
+      const lineOption = {
+        id: lineId,
+        showLabel: false,
+        customTitle: "",
+        customType: value.type,
+        color:
+          value.type === CustomLineSeriesType.SegmentDrawed
+            ? SeriesColors.find((color) => color.label === "green")?.value
+            : SeriesColors.find((color) => color.label === "yellow")?.value,
+      };
+
+      setDrawedLineList((prev) => [...prev, lineOption]);
+    } catch (error) {
+      console.log("这里是监听canNext和iterator的useEffect");
     }
-    setLineValue(value);
-
-    const mainSeries = tChartRef.current.childSeries[0];
-    const lineId = `${mainSeries.options().id}_line_${Date.now()}`;
-
-    const lineOption = {
-      id: lineId,
-      showLabel: false,
-      customTitle: "",
-      customType: value.type,
-      color:
-        value.type === CustomLineSeriesType.SegmentDrawed
-          ? SeriesColors.find((color) => color.label === "green")?.value
-          : SeriesColors.find((color) => color.label === "yellow")?.value,
-    };
-
-    setDrawedLineList((prev) => [...prev, lineOption]);
   }, [canNext, iterator]);
 
   useEffect(() => {
