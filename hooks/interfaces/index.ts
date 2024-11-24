@@ -19,6 +19,7 @@ export enum CustomLineSeriesType {
   Indicator = "indicator",
   AutomaticDrawed = "automaticDrawed",
   SegmentDrawed = "segmentDrawed",
+  GreatSegmentDrawed = "greateSegmentDrawed",
 }
 
 declare module "lightweight-charts" {

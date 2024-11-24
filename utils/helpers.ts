@@ -27,7 +27,7 @@ export const calcValue = (
 ) => {
   const [x, y] = calcMouseCoordinate(mouseEvent, chartContainer);
   const toFixedNum = series.options().toFixedNum;
-  const valueY = +series.coordinateToPrice(y)!.toFixed(toFixedNum);
+  const valueY = +series?.coordinateToPrice(y)!.toFixed(toFixedNum);
   const valueX = chart.timeScale().coordinateToTime(x);
   const logic = chart.timeScale().coordinateToLogical(x);
   return [valueX, valueY, x, y, logic];
@@ -171,7 +171,7 @@ export const findHoveringSeries = ({
 
     const isHoveringOverLine = isWithinRange2(
       price,
-      series.coordinateToPrice(point.y)!,
+      series?.coordinateToPrice(point.y)!,
       avgAmplitude!
     );
 
@@ -194,7 +194,7 @@ export const findHoveringIndicator = ({
   chart,
   avgAmplitude,
 }: IFindHoveringIndicator): ISeriesApi<SeriesType, Time> | null => {
-  const hoveringPrice = childSeries[0].coordinateToPrice(y);
+  const hoveringPrice = childSeries[0]?.coordinateToPrice(y);
   const hoveringTime = chart.timeScale().coordinateToTime(x);
   const allIndicatorSeries = childSeries.filter(
     (series) => series.options().customType === CustomLineSeriesType.Indicator

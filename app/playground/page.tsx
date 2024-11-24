@@ -199,9 +199,7 @@ const Playground = () => {
               dialogVisible={dialogVisible}
             >
               {currentSymbol && (
-                <CandlestickSeries
-                  seriesData={candlestickData.slice(0, 2000)}
-                />
+                <CandlestickSeries seriesData={candlestickData} />
               )}
               {drawedLineList.map((lineOption) => (
                 <LineSeries

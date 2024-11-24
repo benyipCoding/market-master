@@ -11,7 +11,7 @@ import { getMe } from "@/app/auth/login/getMe";
 import { Tokens } from "@/utils/cookieHelper";
 import { getKLines, ListKLineDto } from "@/app/playground/actions/getKLines";
 import { cleanData } from "@/app/playground/actions/cleanData";
-import { CustomLineSeriesType } from "@/hooks/interfaces";
+import { CustomLineSeriesType, LineState, TrendType } from "@/hooks/interfaces";
 
 const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   { className, asideOpen, setDrawedLineList, tChartRef },
@@ -24,11 +24,17 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     [asideOpen]
   );
 
-  const { performDrawing, autoDrawing, deleteLines, drawSegment } =
-    useAutomaticLineDrawing({
-      setDrawedLineList,
-      tChartRef,
-    });
+  const {
+    performDrawing,
+    autoDrawing,
+    deleteLines,
+    drawSegment,
+    setLineList,
+    generateLineSegment,
+  } = useAutomaticLineDrawing({
+    setDrawedLineList,
+    tChartRef,
+  });
 
   const login = async () => {
     const payload = {
@@ -63,6 +69,34 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     console.log(res);
   };
 
+  const getSegmentList = () => {
+    const dataset = tChartRef.current?.childSeries.map((series) =>
+      series.data()
+    );
+    dataset?.shift();
+    dataset?.sort((a, b) => (a[0].time as number) - (b[0].time as number));
+    const segmentList = dataset?.map((data) => ({
+      startPoint: { price: data[0].customValues?.price!, time: data[0].time },
+      endPoint: { price: data[1].customValues?.price!, time: data[1].time },
+      type: CustomLineSeriesType.SegmentDrawed,
+      trend:
+        data[1].customValues?.price! > data[0].customValues?.price!
+          ? TrendType.Up
+          : TrendType.Down,
+    }));
+    return segmentList;
+  };
+
+  const drawGreateSegment = () => {
+    const segmentList = getSegmentList();
+    const greateSegmentList = generateLineSegment(
+      segmentList as LineState[],
+      CustomLineSeriesType.GreatSegmentDrawed
+    );
+
+    setLineList(greateSegmentList);
+  };
+
   useImperativeHandle(ref, () => ({
     container: asideRef.current,
     deleteLines,
@@ -72,14 +106,14 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     <div className={cn(className)} ref={asideRef} style={{ width }}>
       {asideOpen && (
         <div className="flex flex-col gap-4">
-          <Button onClick={performDrawing} disabled={autoDrawing}>
+          <Button onClick={() => performDrawing()} disabled={autoDrawing}>
             {autoDrawing ? <Loading /> : "Automatic Line"}
           </Button>
           <Button onClick={drawSegment} disabled={autoDrawing}>
             {autoDrawing ? <Loading /> : "Auto draw segment"}
           </Button>
           <Button
-            onClick={() => deleteLines(CustomLineSeriesType.SegmentDrawed)}
+            onClick={() => deleteLines(CustomLineSeriesType.AutomaticDrawed)}
             disabled={autoDrawing}
             variant={"destructive"}
           >
@@ -88,14 +122,20 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
           <Button variant={"outline"} onClick={login}>
             登录测试按钮
           </Button>
-          <Button variant={"outline"} onClick={getMeAction}>
+          {/* <Button variant={"outline"} onClick={getMeAction}>
             Get Me
-          </Button>
-          <Button variant={"outline"} onClick={getKLineDataAction}>
+          </Button> */}
+          {/* <Button variant={"outline"} onClick={getKLineDataAction}>
             Get KLine Data
-          </Button>
-          <Button variant={"destructive"} onClick={cleanDataAction}>
+          </Button> */}
+          {/* <Button variant={"destructive"} onClick={cleanDataAction}>
             Delete meaningless data
+          </Button> */}
+          <Button variant={"default"} onClick={getSegmentList}>
+            获取当前线段数组
+          </Button>
+          <Button variant={"default"} onClick={drawGreateSegment}>
+            Draw greate segment
           </Button>
         </div>
       )}
