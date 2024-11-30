@@ -24,17 +24,11 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     [asideOpen]
   );
 
-  const {
-    performDrawing,
-    autoDrawing,
-    deleteLines,
-    drawSegment,
-    setLineList,
-    generateLineSegment,
-  } = useAutomaticLineDrawing({
-    setDrawedLineList,
-    tChartRef,
-  });
+  const { performDrawing, autoDrawing, deleteLines, drawSegment, setLineList } =
+    useAutomaticLineDrawing({
+      setDrawedLineList,
+      tChartRef,
+    });
 
   const login = async () => {
     const payload = {
@@ -87,15 +81,7 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     return segmentList;
   };
 
-  const drawGreateSegment = () => {
-    const segmentList = getSegmentList();
-    const greateSegmentList = generateLineSegment(
-      segmentList as LineState[],
-      CustomLineSeriesType.GreatSegmentDrawed
-    );
-
-    setLineList(greateSegmentList);
-  };
+  const drawGreateSegment = () => {};
 
   useImperativeHandle(ref, () => ({
     container: asideRef.current,
@@ -106,7 +92,7 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     <div className={cn(className)} ref={asideRef} style={{ width }}>
       {asideOpen && (
         <div className="flex flex-col gap-4">
-          <Button onClick={() => performDrawing()} disabled={autoDrawing}>
+          <Button onClick={() => performDrawing(true)} disabled={autoDrawing}>
             {autoDrawing ? <Loading /> : "Automatic Line"}
           </Button>
           <Button onClick={drawSegment} disabled={autoDrawing}>

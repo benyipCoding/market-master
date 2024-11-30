@@ -85,7 +85,7 @@ export function isWithinRange2(
   actual: number,
   amount: number
 ) {
-  return Math.abs(reference - actual) <= amount * 0.5;
+  return Math.abs(reference - actual) <= amount * 0.7;
 }
 
 export function debonce<T extends AnyFunction>(func: T, wait: number): T {

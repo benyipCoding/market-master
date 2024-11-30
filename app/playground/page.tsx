@@ -166,7 +166,7 @@ const Playground = () => {
   // Monitor changes in the current period and symbol values
   useEffect(() => {
     if (!currentPeriod?.id || !currentSymbol?.id) return;
-    asideRef.current?.deleteLines(CustomLineSeriesType.SegmentDrawed);
+    asideRef.current?.deleteLines();
     getCandlestickData();
   }, [currentPeriod, currentSymbol]);
 
@@ -199,7 +199,9 @@ const Playground = () => {
               dialogVisible={dialogVisible}
             >
               {currentSymbol && (
-                <CandlestickSeries seriesData={candlestickData} />
+                <CandlestickSeries
+                  seriesData={candlestickData.slice(0, 2000)}
+                />
               )}
               {drawedLineList.map((lineOption) => (
                 <LineSeries

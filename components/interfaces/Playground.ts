@@ -18,7 +18,7 @@ export interface AsideProps {
 
 export interface AsideRef {
   container: HTMLDivElement | null;
-  deleteLines: (type: CustomLineSeriesType) => void;
+  deleteLines: (type?: CustomLineSeriesType) => void;
 }
 
 export interface LeftAsideBtnsProps {

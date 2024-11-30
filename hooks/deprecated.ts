@@ -99,3 +99,98 @@ const generateLineSegment = (lineList: LineState[]): LineState[] => {
 
   return segmentList;
 };
+
+// 辅助函数
+const canDrawSegment2 = (
+  rootLine: LineState,
+  rootIndex: number,
+  lineList: LineState[]
+): number | undefined => {
+  let reference: LineState = rootLine;
+  let endIndex: number | undefined = undefined;
+  let isFirstTime = true;
+
+  for (let i = rootIndex + 2; i < lineList.length; i += 2) {
+    const currentTrend = reference.trend;
+    const currentStartPrice = reference.startPoint.price;
+    const currentEndPrice = reference.endPoint.price;
+    const prevLine = lineList[rootIndex - 1];
+
+    const nextSameTrendLine = lineList[i];
+    const nextStartPrice = nextSameTrendLine.startPoint.price;
+    const nextEndPrice = nextSameTrendLine.endPoint.price;
+
+    // 1. 趋势不可能持续的情况
+    const canNotGrow =
+      rootLine.trend === TrendType.Up
+        ? nextStartPrice < rootLine.startPoint.price
+        : nextStartPrice > rootLine.startPoint.price;
+    if (canNotGrow) {
+      return endIndex;
+    }
+
+    if (endIndex) {
+      const nextReverseLine = lineList[i - 1];
+      const res = canDrawSegment2(nextReverseLine, i - 1, lineList);
+      if (res) {
+        return endIndex;
+      }
+    }
+
+    // 2. 可持续情况一
+    const canGrow1 =
+      currentTrend === TrendType.Up
+        ? (nextStartPrice > currentStartPrice ||
+            nextStartPrice > rootLine.startPoint.price) &&
+          nextEndPrice > currentEndPrice
+        : (nextStartPrice < currentStartPrice ||
+            nextStartPrice < rootLine.startPoint.price) &&
+          nextEndPrice < currentEndPrice;
+
+    if (canGrow1) {
+      endIndex = i;
+      reference = lineList[i];
+      isFirstTime = false;
+      continue;
+    }
+
+    // 3. 可持续情况二
+    if (!prevLine || !isFirstTime) continue;
+    const prevStartPrice = prevLine.startPoint.price;
+    const canGrow2 =
+      currentTrend === TrendType.Up
+        ? currentEndPrice > prevStartPrice && nextEndPrice > prevStartPrice
+        : currentEndPrice < prevStartPrice && nextEndPrice < prevStartPrice;
+    if (canGrow2) {
+      endIndex = i;
+      reference = lineList[i];
+      isFirstTime = false;
+      continue;
+    }
+  }
+};
+
+const generateLineSegment2 = (
+  lineList: LineState[],
+  type: CustomLineSeriesType = CustomLineSeriesType.SegmentDrawed
+): LineState[] => {
+  const segmentList: LineState[] = [];
+
+  for (let i = 0; i < lineList.length; i++) {
+    const line = lineList[i];
+    const endIndex = canDrawSegment2(line, i, lineList);
+    if (!endIndex) continue;
+
+    segmentList.push({
+      startPoint: line.startPoint,
+      endPoint: lineList[endIndex].endPoint,
+      trend: line.trend,
+      type,
+    });
+
+    i = endIndex;
+  }
+
+  // return fixGap(segmentList);
+  return segmentList;
+};
