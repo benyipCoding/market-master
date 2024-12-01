@@ -20,6 +20,7 @@ import {
   setGraphType,
 } from "@/store/commonSlice";
 import hotkeys from "hotkeys-js";
+import { removeIndicator, removeSeries } from "@/utils/helpers";
 
 const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
   className,
@@ -64,29 +65,19 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
       tChartRef.current;
     if (dialogVisible) return;
     if (selectedSeries) {
-      chart.removeSeries(selectedSeries);
-      const { id } = selectedSeries.options();
-
-      setChildSeries((prev) => prev.filter((s) => s.options().id !== id));
-
-      setDrawedLineList((prev) =>
-        prev.filter((lineOptions) => lineOptions.id !== id)
-      );
-      dispatch(setSelectedSeries(null));
-
-      setLineId_equation((prev) => {
-        const newObj = { ...prev };
-        delete newObj[id];
-        return newObj;
+      removeSeries({
+        chart,
+        selectedSeries,
+        setChildSeries,
+        setDrawedLineList,
+        setLineId_equation,
       });
+
+      dispatch(setSelectedSeries(null));
     }
 
     if (selectedIndicator) {
-      chart.removeSeries(selectedIndicator);
-      const { id } = selectedIndicator.options();
-      setTechnicalIndicatorLines((prev) =>
-        prev.filter((item) => item.options.id !== id)
-      );
+      removeIndicator({ chart, selectedIndicator, setTechnicalIndicatorLines });
       dispatch(setSelectedIndicator(null));
     }
   }, [selectedSeries, selectedIndicator]);

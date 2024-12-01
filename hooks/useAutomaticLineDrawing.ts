@@ -35,9 +35,6 @@ export const useAutomaticLineDrawing = ({
   const iterator = useMemo(() => lineList[Symbol.iterator](), [lineList]);
   const [lineValue, setLineValue] = useState<LineState | null>(null);
   const [autoDrawing, setAutoDrawing] = useState(false);
-  const [lineSeriesRecord, setLineSeriesRecord] = useState<
-    ISeriesApi<"Line", Time>[]
-  >([]);
 
   const generateLinePoint = (time: Time, price: number) => {
     const { x, y, logic } = calcCoordinate({
@@ -187,45 +184,134 @@ export const useAutomaticLineDrawing = ({
     return lines;
   };
 
-  const drawSegment = () => {};
+  const canDrawSegment = (
+    rootPen: LineState,
+    rootIndex: number,
+    pens: LineState[]
+  ) => {
+    let reference: LineState = rootPen;
+    let endIndex: number | undefined = undefined;
+    let isFirstTime = true;
+
+    for (let i = rootIndex + 2; i < pens.length; i += 2) {
+      const currentTrend = reference.trend;
+      const currentStartPrice = reference.startPoint.price;
+      const currentEndPrice = reference.endPoint.price;
+      const prevPen = pens[rootIndex - 1];
+
+      const nextSameTrendLine = pens[i];
+      const nextStartPrice = nextSameTrendLine.startPoint.price;
+      const nextEndPrice = nextSameTrendLine.endPoint.price;
+
+      // 1. 趋势不可能持续的情况
+
+      const canNotGrow =
+        rootPen.trend === TrendType.Up
+          ? nextStartPrice < rootPen.startPoint.price
+          : nextStartPrice > rootPen.startPoint.price;
+
+      if (canNotGrow) {
+        return endIndex;
+      }
+
+      if (endIndex) {
+        const nextReversePen = pens[i - 1];
+        const reverseEndIndex = canDrawSegment(nextReversePen, i - 1, pens);
+        if (reverseEndIndex) {
+          return endIndex;
+        }
+      }
+      if (i - rootIndex < 4) continue;
+
+      // 2. 可持续情况一
+      const canGrow1 =
+        currentTrend === TrendType.Up
+          ? (nextStartPrice > currentStartPrice ||
+              nextStartPrice > rootPen.startPoint.price) &&
+            nextEndPrice > currentEndPrice
+          : (nextStartPrice < currentStartPrice ||
+              nextStartPrice < rootPen.startPoint.price) &&
+            nextEndPrice < currentEndPrice;
+      if (canGrow1) {
+        endIndex = i;
+        reference = pens[i];
+        isFirstTime = false;
+        continue;
+      }
+
+      // 3. 可持续情况二
+      if (!prevPen || !isFirstTime) continue;
+      const prevStartPrice = prevPen.startPoint.price;
+      const canGrow2 =
+        currentTrend === TrendType.Up
+          ? currentEndPrice > prevStartPrice && nextEndPrice > prevStartPrice
+          : currentEndPrice < prevStartPrice && nextEndPrice < prevStartPrice;
+      if (canGrow2) {
+        endIndex = i;
+        reference = pens[i];
+        isFirstTime = false;
+        continue;
+      }
+    }
+
+    return endIndex;
+  };
+
+  const segmentWillBeBroken = (
+    rootPen: LineState,
+    endIndex: number,
+    pens: LineState[]
+  ): boolean => {
+    const rootPrice = rootPen.startPoint.price;
+    const segmentTrend = rootPen.trend;
+    for (let i = endIndex + 1; i < endIndex + 4; i += 2) {
+      const nextReverseEndPrice = pens[i]?.endPoint?.price;
+      const isBroken =
+        segmentTrend === TrendType.Up
+          ? nextReverseEndPrice < rootPrice
+          : nextReverseEndPrice > rootPrice;
+      if (isBroken) return true;
+    }
+    return false;
+  };
+
+  const generateLineSegment = (
+    pens: LineState[],
+    type: CustomLineSeriesType = CustomLineSeriesType.SegmentDrawed
+  ): LineState[] => {
+    const segmentList: LineState[] = [];
+
+    for (let i = 0; i < pens.length; i++) {
+      const rootPen = pens[i];
+      const endIndex = canDrawSegment(rootPen, i, pens);
+
+      if (!endIndex) continue;
+      segmentList.push({
+        startPoint: rootPen.startPoint,
+        endPoint: pens[endIndex].endPoint,
+        trend: rootPen.trend,
+        type,
+      });
+
+      i = endIndex;
+    }
+
+    return segmentList;
+  };
+
+  const drawSegment = () => {
+    const segmentList = generateLineSegment(performDrawing()!);
+    setLineList(segmentList);
+  };
 
   const lineSeriesCreatedHandler = (series: ISeriesApi<SeriesType, Time>) => {
     console.log("lineSeriesCreatedHandler");
     setAddtionalSeries(series);
   };
 
-  const deleteLines = (type?: CustomLineSeriesType) => {
-    if (!tChartRef.current) return;
-
-    const needToRemoveLines = lineSeriesRecord.filter((series) =>
-      type ? series.options().customType === type : true
-    );
-    setLineSeriesRecord((prev) =>
-      prev.filter((series) =>
-        type ? series.options().customType !== type : false
-      )
-    );
-
-    needToRemoveLines.forEach((series) => {
-      const id = series.options().id;
-      setDrawedLineList((prev) => prev.filter((option) => option.id !== id));
-      tChartRef.current!.setLineId_equation((prev) => {
-        const newObj = { ...prev };
-        delete newObj[id];
-        return newObj;
-      });
-
-      tChartRef.current!.chart.removeSeries(series);
-    });
-  };
-
   useEffect(() => {
     if (!addtionalSeries) return;
     try {
-      setLineSeriesRecord((prev) => [
-        ...prev,
-        addtionalSeries as ISeriesApi<"Line", Time>,
-      ]);
       const lineData = generateLineData(
         lineValue?.startPoint!,
         lineValue?.endPoint!,
@@ -297,7 +383,7 @@ export const useAutomaticLineDrawing = ({
     performDrawing,
     drawSegment,
     autoDrawing,
-    deleteLines,
+
     setLineList,
   };
 };

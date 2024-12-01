@@ -9,7 +9,7 @@ import {
   Time,
 } from "lightweight-charts";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { throttle } from "@/utils/helpers";
+import { removeIndicator, removeSeries, throttle } from "@/utils/helpers";
 import { TChartRef } from "@/components/interfaces/TChart";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
@@ -166,7 +166,28 @@ const Playground = () => {
   // Monitor changes in the current period and symbol values
   useEffect(() => {
     if (!currentPeriod?.id || !currentSymbol?.id) return;
-    asideRef.current?.deleteLines();
+    const { chart, setLineId_equation, setChildSeries, childSeries } =
+      tChartRef.current!;
+    childSeries.forEach((series) => {
+      if (!series.options().customType) return;
+
+      if (series.options().customType === CustomLineSeriesType.Indicator) {
+        return removeIndicator({
+          chart,
+          selectedIndicator: series,
+          setTechnicalIndicatorLines,
+        });
+      }
+
+      return removeSeries({
+        chart,
+        selectedSeries: series,
+        setChildSeries,
+        setDrawedLineList,
+        setLineId_equation,
+      });
+    });
+
     getCandlestickData();
   }, [currentPeriod, currentSymbol]);
 
@@ -199,9 +220,7 @@ const Playground = () => {
               dialogVisible={dialogVisible}
             >
               {currentSymbol && (
-                <CandlestickSeries
-                  seriesData={candlestickData.slice(0, 2000)}
-                />
+                <CandlestickSeries seriesData={candlestickData} />
               )}
               {drawedLineList.map((lineOption) => (
                 <LineSeries

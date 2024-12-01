@@ -1,3 +1,4 @@
+import { TechnicalIndicatorLine } from "@/components/interfaces/TechnicalIndexForm";
 import { CustomLineSeriesType } from "../hooks/interfaces";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
@@ -8,6 +9,9 @@ import {
   IChartApi,
   LineData,
   CandlestickData,
+  DeepPartial,
+  LineStyleOptions,
+  SeriesOptionsCommon,
 } from "lightweight-charts";
 
 export const calcMouseCoordinate = (
@@ -480,4 +484,57 @@ export const generateLinePoint = (
     time,
     customValues: { x, y, logic, price },
   };
+};
+
+export const removeSeries = ({
+  chart,
+  selectedSeries,
+  setChildSeries,
+  setDrawedLineList,
+  setLineId_equation,
+}: {
+  chart: IChartApi;
+  selectedSeries: ISeriesApi<SeriesType, Time>;
+  setChildSeries: React.Dispatch<
+    React.SetStateAction<ISeriesApi<SeriesType, Time>[]>
+  >;
+  setDrawedLineList: React.Dispatch<
+    React.SetStateAction<DeepPartial<LineStyleOptions & SeriesOptionsCommon>[]>
+  >;
+  setLineId_equation: React.Dispatch<
+    React.SetStateAction<Record<string, Equation>>
+  >;
+}) => {
+  chart.removeSeries(selectedSeries);
+  const { id } = selectedSeries.options();
+
+  setChildSeries((prev) => prev.filter((s) => s.options().id !== id));
+
+  setDrawedLineList((prev) =>
+    prev.filter((lineOptions) => lineOptions.id !== id)
+  );
+
+  setLineId_equation((prev) => {
+    const newObj = { ...prev };
+    delete newObj[id];
+    return newObj;
+  });
+};
+
+export const removeIndicator = ({
+  chart,
+  selectedIndicator,
+  setTechnicalIndicatorLines,
+}: {
+  chart: IChartApi;
+  selectedIndicator: ISeriesApi<SeriesType, Time>;
+  setTechnicalIndicatorLines: React.Dispatch<
+    React.SetStateAction<TechnicalIndicatorLine[]>
+  >;
+}) => {
+  chart.removeSeries(selectedIndicator);
+  const { id } = selectedIndicator.options();
+  setTechnicalIndicatorLines((prev) =>
+    prev.filter((item) => item.options.id !== id)
+  );
 };

@@ -24,7 +24,7 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     [asideOpen]
   );
 
-  const { performDrawing, autoDrawing, deleteLines, drawSegment, setLineList } =
+  const { performDrawing, autoDrawing, drawSegment, setLineList } =
     useAutomaticLineDrawing({
       setDrawedLineList,
       tChartRef,
@@ -85,7 +85,6 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
 
   useImperativeHandle(ref, () => ({
     container: asideRef.current,
-    deleteLines,
   }));
 
   return (
@@ -98,13 +97,13 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
           <Button onClick={drawSegment} disabled={autoDrawing}>
             {autoDrawing ? <Loading /> : "Auto draw segment"}
           </Button>
-          <Button
+          {/* <Button
             onClick={() => deleteLines(CustomLineSeriesType.AutomaticDrawed)}
             disabled={autoDrawing}
             variant={"destructive"}
           >
             Delete Base Line
-          </Button>
+          </Button> */}
           <Button variant={"outline"} onClick={login}>
             登录测试按钮
           </Button>
