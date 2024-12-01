@@ -86,13 +86,13 @@ const UploadForm = () => {
       )) as unknown as CandlestickData<Time>[];
 
       const toFixedNum = calculateToFixedNum(data);
-      const result = verifyOpenAndClose(data);
-      if (result < 0.9)
-        data = data.map((item) => ({
-          ...item,
-          open: item.close,
-          close: item.open,
-        }));
+      // const result = verifyOpenAndClose(data);
+      // if (result < 0.9)
+      //   data = data.map((item) => ({
+      //     ...item,
+      //     open: item.close,
+      //     close: item.open,
+      //   }));
 
       const interval = calculateInterval(data);
       const noVol = data.some((item) => !(ColumnHeaders.VOL in item));
