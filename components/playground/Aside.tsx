@@ -113,9 +113,9 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
           {/* <Button variant={"outline"} onClick={getKLineDataAction}>
             Get KLine Data
           </Button> */}
-          {/* <Button variant={"destructive"} onClick={cleanDataAction}>
+          <Button variant={"destructive"} onClick={cleanDataAction}>
             Delete meaningless data
-          </Button> */}
+          </Button>
           <Button variant={"default"} onClick={getSegmentList}>
             获取当前线段数组
           </Button>
