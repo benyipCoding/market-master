@@ -383,7 +383,7 @@ export const useAutomaticLineDrawing = ({
     performDrawing,
     drawSegment,
     autoDrawing,
-
+    generateLineSegment,
     setLineList,
   };
 };

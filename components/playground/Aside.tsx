@@ -24,11 +24,16 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     [asideOpen]
   );
 
-  const { performDrawing, autoDrawing, drawSegment, setLineList } =
-    useAutomaticLineDrawing({
-      setDrawedLineList,
-      tChartRef,
-    });
+  const {
+    performDrawing,
+    autoDrawing,
+    drawSegment,
+    setLineList,
+    generateLineSegment,
+  } = useAutomaticLineDrawing({
+    setDrawedLineList,
+    tChartRef,
+  });
 
   const login = async () => {
     const payload = {
@@ -81,7 +86,34 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     return segmentList;
   };
 
-  const drawGreateSegment = () => {};
+  const drawGreateSegment = () => {
+    // 1.先获取当前所有线段
+    const { childSeries } = tChartRef.current!;
+    const segmentList: LineState[] = childSeries
+      .filter(
+        (series) =>
+          series.options().customType === CustomLineSeriesType.SegmentDrawed
+      )
+      .map((series) => {
+        const data = (series.data() as any[]).sort((a, b) => a.time - b.time);
+        const startPrice = data[0].customValues?.price! as number;
+        const endPrice = data[1].customValues?.price! as number;
+        return {
+          startPoint: { price: startPrice, time: data[0].time },
+          endPoint: { price: endPrice, time: data[1].time },
+          trend: startPrice < endPrice ? TrendType.Up : TrendType.Down,
+          type: CustomLineSeriesType.SegmentDrawed,
+        };
+      });
+
+    console.log(segmentList);
+
+    const greateSegmentList = generateLineSegment(
+      segmentList,
+      CustomLineSeriesType.GreatSegmentDrawed
+    );
+    setLineList(greateSegmentList);
+  };
 
   useImperativeHandle(ref, () => ({
     container: asideRef.current,
