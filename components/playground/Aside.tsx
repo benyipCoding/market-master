@@ -87,7 +87,6 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   };
 
   const drawGreateSegment = () => {
-    // 1.先获取当前所有线段
     const { childSeries } = tChartRef.current!;
     const segmentList: LineState[] = childSeries
       .filter(
@@ -105,8 +104,6 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
           type: CustomLineSeriesType.SegmentDrawed,
         };
       });
-
-    console.log(segmentList);
 
     const greateSegmentList = generateLineSegment(
       segmentList,

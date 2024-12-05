@@ -311,6 +311,7 @@ export const useAutomaticLineDrawing = ({
 
   useEffect(() => {
     if (!addtionalSeries) return;
+
     try {
       const lineData = generateLineData(
         lineValue?.startPoint!,
@@ -377,7 +378,7 @@ export const useAutomaticLineDrawing = ({
     return () => {
       emittery?.off(OnSeriesCreate.LineSeries, lineSeriesCreatedHandler);
     };
-  }, []);
+  }, [emittery]);
 
   return {
     performDrawing,
