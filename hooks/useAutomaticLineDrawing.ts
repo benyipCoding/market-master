@@ -420,7 +420,6 @@ export const useAutomaticLineDrawing = ({
   };
 
   const lineSeriesCreatedHandler = (series: ISeriesApi<SeriesType, Time>) => {
-    console.log("lineSeriesCreatedHandler");
     setAddtionalSeries(series);
   };
 
@@ -465,6 +464,19 @@ export const useAutomaticLineDrawing = ({
         return;
       }
       setLineValue(value);
+
+      // 当前可视范围
+      const { from, to } = tChartRef
+        .current!.chart.timeScale()
+        .getVisibleRange()!;
+      // 当前线段起始点时间
+      if (value.startPoint.time < from || value.startPoint.time > to) {
+        const timeScale = tChartRef.current.chart.timeScale();
+        const coordinate = timeScale.timeToCoordinate(value.startPoint.time)!;
+        const logical = timeScale.coordinateToLogical(coordinate)!;
+        timeScale.setVisibleLogicalRange({ from: logical, to: logical + 2200 });
+      }
+
       const mainSeries = tChartRef.current.childSeries[0];
       const lineId = `${mainSeries.options().id}_line_${Date.now()}`;
 

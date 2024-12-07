@@ -12,6 +12,7 @@ import { Tokens } from "@/utils/cookieHelper";
 import { getKLines, ListKLineDto } from "@/app/playground/actions/getKLines";
 import { cleanData } from "@/app/playground/actions/cleanData";
 import { CustomLineSeriesType, LineState, TrendType } from "@/hooks/interfaces";
+import { Time } from "lightweight-charts";
 
 const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   { className, asideOpen, setDrawedLineList, tChartRef },
@@ -112,6 +113,17 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     setLineList(greateSegmentList);
   };
 
+  const scrollToRealTime = () => {
+    const mainSeries = tChartRef.current?.childSeries[0];
+
+    // tChartRef.current?.chart.timeScale().scrollToRealTime();
+    const position = tChartRef.current?.chart.timeScale().setVisibleRange({
+      from: new Date("2024-01-19 00:00:00").getTime() as Time,
+      to: new Date("2024-10-19 00:00:00").getTime() as Time,
+    });
+    console.log(position);
+  };
+
   useImperativeHandle(ref, () => ({
     container: asideRef.current,
   }));
@@ -142,14 +154,17 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
           {/* <Button variant={"outline"} onClick={getKLineDataAction}>
             Get KLine Data
           </Button> */}
-          <Button variant={"destructive"} onClick={cleanDataAction}>
+          {/* <Button variant={"destructive"} onClick={cleanDataAction}>
             Delete meaningless data
-          </Button>
-          <Button variant={"default"} onClick={getSegmentList}>
+          </Button> */}
+          {/* <Button variant={"default"} onClick={getSegmentList}>
             获取当前线段数组
-          </Button>
+          </Button> */}
           <Button variant={"default"} onClick={drawGreateSegment}>
             Draw greate segment
+          </Button>
+          <Button variant={"default"} onClick={scrollToRealTime}>
+            Scroll to realtime
           </Button>
         </div>
       )}
