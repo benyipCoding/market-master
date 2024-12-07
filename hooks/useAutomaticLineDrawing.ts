@@ -281,9 +281,8 @@ export const useAutomaticLineDrawing = ({
 
     for (let i = 0; i < segmentList.length; i++) {
       const currentSegment = segmentList[i];
-      const nextSegment = segmentList[i + 1];
 
-      if (!nextSegment || !newSegmentList.length) {
+      if (!newSegmentList.length) {
         newSegmentList.push({ ...currentSegment });
         continue;
       }
