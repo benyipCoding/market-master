@@ -385,8 +385,6 @@ export const useAutomaticLineDrawing = ({
         });
         continue;
       }
-
-      newSegmentList.push({ ...currentSegment });
     }
 
     return newSegmentList;
