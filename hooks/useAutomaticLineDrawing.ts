@@ -20,6 +20,7 @@ import {
 import { useContext, useEffect, useMemo, useState } from "react";
 import { EmitteryContext, OnSeriesCreate } from "@/providers/EmitteryProvider";
 import { SeriesColors } from "@/constants/seriesOptions";
+import { time } from "console";
 
 export const useAutomaticLineDrawing = ({
   setDrawedLineList,
@@ -275,6 +276,122 @@ export const useAutomaticLineDrawing = ({
     return false;
   };
 
+  const fixGap = (segmentList: LineState[]): LineState[] => {
+    const newSegmentList: LineState[] = [];
+
+    for (let i = 0; i < segmentList.length; i++) {
+      const currentSegment = segmentList[i];
+      const nextSegment = segmentList[i + 1];
+
+      if (!nextSegment || !newSegmentList.length) {
+        newSegmentList.push({ ...currentSegment });
+        continue;
+      }
+
+      const prevSegment = newSegmentList[newSegmentList.length - 1];
+
+      const noGap =
+        prevSegment.endPoint.price === currentSegment.startPoint.price &&
+        prevSegment.endPoint.time === currentSegment.startPoint.time;
+
+      if (noGap) {
+        newSegmentList.push({ ...currentSegment });
+        continue;
+      }
+
+      // 当前线段跟上一条线段同向
+      if (currentSegment.trend === prevSegment.trend) {
+        // 右包含
+        const rightContains =
+          currentSegment.trend === TrendType.Up
+            ? currentSegment.startPoint.price < prevSegment.startPoint.price &&
+              currentSegment.endPoint.price > prevSegment.endPoint.price
+            : currentSegment.startPoint.price > prevSegment.startPoint.price &&
+              currentSegment.endPoint.price < prevSegment.endPoint.price;
+        // 左包含
+        const leftContains =
+          currentSegment.trend === TrendType.Up
+            ? prevSegment.startPoint.price < currentSegment.startPoint.price &&
+              prevSegment.endPoint.price > currentSegment.endPoint.price
+            : prevSegment.startPoint.price > currentSegment.startPoint.price &&
+              prevSegment.endPoint.price < currentSegment.endPoint.price;
+
+        if (rightContains) {
+          const prevprevSegment = newSegmentList[newSegmentList.length - 2];
+          prevprevSegment.endPoint.price = currentSegment.startPoint.price;
+          prevprevSegment.endPoint.time = currentSegment.startPoint.time;
+          newSegmentList.pop();
+          newSegmentList.push({ ...currentSegment });
+          continue;
+        }
+
+        if (leftContains) {
+          continue;
+        }
+
+        // 既不是左包含，也不是右包含
+        const sortedStartPoint = [
+          currentSegment.startPoint,
+          prevSegment.startPoint,
+        ].sort((a, b) => a.price - b.price);
+        const sortedEndPoint = [
+          currentSegment.endPoint,
+          prevSegment.endPoint,
+        ].sort((a, b) => a.price - b.price);
+
+        const commonStartPoint =
+          currentSegment.trend === TrendType.Up
+            ? sortedStartPoint[0]
+            : sortedStartPoint[1];
+        const commonEndPoint =
+          currentSegment.trend === TrendType.Up
+            ? sortedEndPoint[1]
+            : sortedEndPoint[0];
+        newSegmentList.pop();
+        newSegmentList.push({
+          ...currentSegment,
+          startPoint: {
+            ...currentSegment.startPoint,
+            price: commonStartPoint.price,
+            time: commonStartPoint.time,
+          },
+          endPoint: {
+            ...currentSegment.endPoint,
+            price: commonEndPoint.price,
+            time: commonEndPoint.time,
+          },
+        });
+        continue;
+      }
+      // 当前线段跟上一条线段反向
+      else {
+        const sorted = [prevSegment.endPoint, currentSegment.startPoint].sort(
+          (a, b) => a.price - b.price
+        );
+
+        const connectPoint =
+          currentSegment.trend === TrendType.Up ? sorted[0] : sorted[1];
+
+        prevSegment.endPoint.price = connectPoint.price;
+        prevSegment.endPoint.time = connectPoint.time;
+
+        newSegmentList.push({
+          ...currentSegment,
+          startPoint: {
+            ...currentSegment.startPoint,
+            price: connectPoint.price,
+            time: connectPoint.time,
+          },
+        });
+        continue;
+      }
+
+      newSegmentList.push({ ...currentSegment });
+    }
+
+    return newSegmentList;
+  };
+
   const generateLineSegment = (
     pens: LineState[],
     type: CustomLineSeriesType = CustomLineSeriesType.SegmentDrawed
@@ -296,7 +413,8 @@ export const useAutomaticLineDrawing = ({
       i = endIndex;
     }
 
-    return segmentList;
+    return fixGap(segmentList);
+    // return segmentList;
   };
 
   const drawSegment = () => {
