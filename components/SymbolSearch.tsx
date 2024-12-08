@@ -8,6 +8,7 @@ import {
   fetchCategories,
   fetchFavSymbols,
   setCurrentCategory,
+  setCurrentSymbol,
   Symbol,
 } from "@/store/fetchDataSlice";
 import { cn } from "@/lib/utils";
@@ -22,7 +23,7 @@ const SymbolSearch: React.FC = () => {
   const [searchValue, setSearchValue] = useState("");
   const [showCollects, setShowCollects] = useState(false);
   const { favSymIds } = useSelector((state: RootState) => state.fetchData);
-  const [chosenSymbol, setChosenSymbol] = useState<Symbol>();
+  const [chosenSymbol, setChosenSymbol] = useState<Symbol | null>(null);
   const { setDialogVisible } = useContext(DialogContext);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -58,6 +59,11 @@ const SymbolSearch: React.FC = () => {
     const res = await addToFav(symbol_id);
     if (res.status !== Status.OK) return;
     dispatch(fetchFavSymbols());
+  };
+
+  const selectSymbolAction = () => {
+    dispatch(setCurrentSymbol(chosenSymbol?.id!));
+    setDialogVisible(false);
   };
 
   useEffect(() => {
@@ -142,7 +148,7 @@ const SymbolSearch: React.FC = () => {
             </div>
             <Separator
               className={cn(
-                "absolute bottom-0 w-full",
+                "absolute bottom-0 w-[98%] left-1/2 -translate-x-1/2",
                 chosenSymbol?.id === s.id && "bg-primary"
               )}
             />
@@ -153,13 +159,27 @@ const SymbolSearch: React.FC = () => {
       <div className="flex items-center justify-end gap-4">
         <Button
           type="button"
+          variant={"ghost"}
+          size="sm"
+          onClick={() => setChosenSymbol(null)}
+        >
+          Reset
+        </Button>
+        <Button
+          type="button"
           variant={"secondary"}
           size="sm"
           onClick={() => setDialogVisible(false)}
         >
           Cancel
         </Button>
-        <Button type="button" variant={"default"} size="sm">
+        <Button
+          type="button"
+          variant={"default"}
+          size="sm"
+          disabled={!chosenSymbol}
+          onClick={selectSymbolAction}
+        >
           Submit
         </Button>
       </div>

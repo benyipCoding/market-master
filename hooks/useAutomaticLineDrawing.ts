@@ -474,7 +474,14 @@ export const useAutomaticLineDrawing = ({
         const timeScale = tChartRef.current.chart.timeScale();
         const coordinate = timeScale.timeToCoordinate(value.startPoint.time)!;
         const logical = timeScale.coordinateToLogical(coordinate)!;
-        timeScale.setVisibleLogicalRange({ from: logical, to: logical + 2200 });
+        const mainSeries = tChartRef.current.childSeries[0];
+        const maxLogical = mainSeries.data().length;
+        const regularTo = logical + 2000;
+
+        timeScale.setVisibleLogicalRange({
+          from: logical,
+          to: Math.min(regularTo, maxLogical),
+        });
       }
 
       const mainSeries = tChartRef.current.childSeries[0];

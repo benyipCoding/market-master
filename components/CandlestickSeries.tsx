@@ -43,6 +43,10 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   }, [series]);
 
   useEffect(() => {
+    series?.applyOptions(customOptions);
+  }, [customOptions]);
+
+  useEffect(() => {
     if (!seriesData.length) return;
 
     // 求平均振幅

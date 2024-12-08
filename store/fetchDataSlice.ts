@@ -82,6 +82,9 @@ export const fetchDataSlice = createSlice({
     setAvgAmplitude(state, action: PayloadAction<number>) {
       state.avgAmplitude = action.payload;
     },
+    setCurrentSymbol(state, action: PayloadAction<number>) {
+      state.currentSymbol = state.symbols?.find((s) => s.id === action.payload);
+    },
   },
   extraReducers(builder) {
     builder.addCase(fetchPeriods.fulfilled, (state, action) => {
@@ -122,7 +125,11 @@ export const symbolToSeriesOptions = createSelector(
   })
 );
 
-export const { setCurrentPeriod, setCurrentCategory, setAvgAmplitude } =
-  fetchDataSlice.actions;
+export const {
+  setCurrentPeriod,
+  setCurrentCategory,
+  setAvgAmplitude,
+  setCurrentSymbol,
+} = fetchDataSlice.actions;
 
 export default fetchDataSlice.reducer;
