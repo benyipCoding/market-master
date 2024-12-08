@@ -95,7 +95,9 @@ const Playground = () => {
       period: currentPeriod?.id!,
     });
 
-    if (res?.status !== 200) return toast.error(res.msg);
+    if (res?.status !== 200) {
+      return toast.error(res.msg);
+    }
 
     setCandlestickData(
       res.data.map((item: any) => ({
@@ -239,7 +241,10 @@ const Playground = () => {
                   seriesData={line.data}
                 />
               ))}
-              <Tooltips productName="XAUUSD" tChartRef={tChartRef} />
+              <Tooltips
+                productName={currentSymbol?.label!}
+                tChartRef={tChartRef}
+              />
             </TChart>
 
             <div
