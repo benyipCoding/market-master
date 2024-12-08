@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { LoginTest } from "@/app/auth/login/login";
 import { getMe } from "@/app/auth/login/getMe";
 import { Tokens } from "@/utils/cookieHelper";
-import { getKLines, ListKLineDto } from "@/app/playground/actions/getKLines";
 import { cleanData } from "@/app/playground/actions/cleanData";
 import { CustomLineSeriesType, LineState, TrendType } from "@/hooks/interfaces";
 import { Time } from "lightweight-charts";
@@ -50,17 +49,6 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
 
   const getMeAction = async () => {
     const res = await getMe();
-    if (res.status !== Status.OK) return toast.error(res.msg);
-    console.log(res.data);
-  };
-
-  const getKLineDataAction = async () => {
-    const params: ListKLineDto = {
-      symbol: 1,
-      period: 1,
-    };
-
-    const res = await getKLines(params);
     if (res.status !== Status.OK) return toast.error(res.msg);
     console.log(res.data);
   };

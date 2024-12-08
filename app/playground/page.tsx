@@ -37,6 +37,7 @@ import UploadForm from "@/components/playground/UploadForm";
 import { fetchPeriods, fetchSymbols } from "@/store/fetchDataSlice";
 import { getKLines } from "./actions/getKLines";
 import { CustomLineSeriesType } from "@/hooks/interfaces";
+import { toast } from "sonner";
 
 const Playground = () => {
   // TChart component instance
@@ -94,6 +95,8 @@ const Playground = () => {
       period: currentPeriod?.id!,
     });
 
+    if (res?.status !== 200) return toast.error(res.msg);
+
     setCandlestickData(
       res.data.map((item: any) => ({
         ...item,
@@ -134,12 +137,12 @@ const Playground = () => {
   };
 
   useEffect(() => {
-    window.addEventListener("resize", throttle(resizeHandler, 100));
+    window.addEventListener("resize", throttle(resizeHandler, 0));
     dispatch(fetchPeriods());
     dispatch(fetchSymbols());
     // dispatch(fetchProfile());
     return () => {
-      window.removeEventListener("resize", throttle(resizeHandler, 100));
+      window.removeEventListener("resize", throttle(resizeHandler, 0));
     };
   }, []);
 
