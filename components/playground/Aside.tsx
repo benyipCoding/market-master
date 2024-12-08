@@ -13,6 +13,7 @@ import { getKLines, ListKLineDto } from "@/app/playground/actions/getKLines";
 import { cleanData } from "@/app/playground/actions/cleanData";
 import { CustomLineSeriesType, LineState, TrendType } from "@/hooks/interfaces";
 import { Time } from "lightweight-charts";
+import { Status } from "@/utils/apis/response";
 
 const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   { className, asideOpen, setDrawedLineList, tChartRef },
@@ -49,7 +50,7 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
 
   const getMeAction = async () => {
     const res = await getMe();
-    if (res.status !== 200) return toast.error(res.msg);
+    if (res.status !== Status.OK) return toast.error(res.msg);
     console.log(res.data);
   };
 
@@ -60,7 +61,7 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     };
 
     const res = await getKLines(params);
-    if (res.status !== 200) return toast.error(res.msg);
+    if (res.status !== Status.OK) return toast.error(res.msg);
     console.log(res.data);
   };
 

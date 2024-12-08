@@ -8,6 +8,8 @@ import {
   PayloadAction,
 } from "@reduxjs/toolkit";
 import { RootState } from ".";
+import { getProfile } from "@/app/playground/actions/getProfile";
+import { getFavSymbols } from "@/app/playground/actions/getFavSymbols";
 
 type BaseLabelType = { id: number; label: string };
 export interface SymbolCategory {
@@ -24,6 +26,7 @@ export interface Symbol {
   basic_point_place: number;
   minMove: number;
   precision: number;
+  isFav?: boolean;
 }
 
 interface FetchDataState {
@@ -34,6 +37,7 @@ interface FetchDataState {
   currentSymbol: Symbol | undefined;
   currentCategory: SymbolCategory | undefined;
   avgAmplitude: number | undefined;
+  favSymIds: Array<number>;
 }
 
 const initialState: FetchDataState = {
@@ -44,6 +48,7 @@ const initialState: FetchDataState = {
   currentSymbol: undefined,
   currentCategory: undefined,
   avgAmplitude: undefined,
+  favSymIds: [],
 };
 
 export const fetchPeriods = createAsyncThunk("fetch/periods", () => {
@@ -56,6 +61,10 @@ export const fetchSymbols = createAsyncThunk("fetch/symbols", () => {
 
 export const fetchCategories = createAsyncThunk("fetch/categories", () => {
   return getCategories();
+});
+
+export const fetchFavSymbols = createAsyncThunk("fetch/favSymbols", () => {
+  return getFavSymbols();
 });
 
 export const fetchDataSlice = createSlice({
@@ -92,6 +101,9 @@ export const fetchDataSlice = createSlice({
       arr.unshift({ id: 0, name: "All", parent_id: null });
       state.categories = arr;
       state.currentCategory = arr[0];
+    });
+    builder.addCase(fetchFavSymbols.fulfilled, (state, action) => {
+      state.favSymIds = action.payload.data.fav_sym_ids;
     });
   },
 });

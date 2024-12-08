@@ -137,6 +137,7 @@ const Playground = () => {
     window.addEventListener("resize", throttle(resizeHandler, 100));
     dispatch(fetchPeriods());
     dispatch(fetchSymbols());
+    // dispatch(fetchProfile());
     return () => {
       window.removeEventListener("resize", throttle(resizeHandler, 100));
     };

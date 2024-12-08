@@ -1,19 +1,29 @@
 import { Search } from "lucide-react";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
-import { fetchCategories, setCurrentCategory } from "@/store/fetchDataSlice";
+import {
+  fetchCategories,
+  fetchFavSymbols,
+  setCurrentCategory,
+  Symbol,
+} from "@/store/fetchDataSlice";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "./ui/scroll-area";
 import { Separator } from "./ui/separator";
 import { TiStarFullOutline, TiStarOutline } from "react-icons/ti";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
 import { addToFav } from "@/app/playground/actions/addToFav";
+import { Status } from "@/utils/apis/response";
+import { DialogContext } from "@/context/Dialog";
 const SymbolSearch: React.FC = () => {
   const [searchValue, setSearchValue] = useState("");
   const [showCollects, setShowCollects] = useState(false);
+  const { favSymIds } = useSelector((state: RootState) => state.fetchData);
+  const [chosenSymbol, setChosenSymbol] = useState<Symbol>();
+  const { setDialogVisible } = useContext(DialogContext);
 
   const dispatch = useDispatch<AppDispatch>();
   const { categories, currentCategory, symbols } = useSelector(
@@ -25,16 +35,19 @@ const SymbolSearch: React.FC = () => {
   );
 
   const displaySymbols = useMemo(() => {
-    const arr = symbols?.filter((s) =>
-      s.label.includes(searchValue.trim().toUpperCase())
-    );
+    const arr = symbols
+      ?.filter((s) => s.label.includes(searchValue.trim().toUpperCase()))
+      .map((symbol) => ({
+        ...symbol,
+        isFav: favSymIds.some((id) => symbol.id === id),
+      }));
 
     if (currentCategory?.id === 0) return arr;
     return arr?.filter((s) => s.category_id === currentCategory?.id);
-  }, [currentCategory?.id, symbols, searchValue]);
+  }, [currentCategory?.id, symbols, searchValue, favSymIds]);
 
-  const onSelectSymbol = (symbol_id: number) => {
-    console.log(symbol_id);
+  const onSelectSymbol = (symbol: Symbol) => {
+    setChosenSymbol(symbol);
   };
 
   const addToFavAction = async (
@@ -42,17 +55,18 @@ const SymbolSearch: React.FC = () => {
     symbol_id: number
   ) => {
     e.stopPropagation();
-    // TODO: 调接口收藏该品种
     const res = await addToFav(symbol_id);
-    console.log(res.data);
+    if (res.status !== Status.OK) return;
+    dispatch(fetchFavSymbols());
   };
 
   useEffect(() => {
+    dispatch(fetchFavSymbols());
     if (!categories) dispatch(fetchCategories());
   }, []);
 
   return (
-    <div className="w-fit md:w-[500px] lg:w-[750px] flex flex-col gap-4">
+    <div className="w-fit md:w-[500px] lg:w-[750px] flex flex-col gap-4 ">
       <div className="flex items-center">
         <div className="relative w-full">
           <Input
@@ -98,23 +112,57 @@ const SymbolSearch: React.FC = () => {
       <ScrollArea className="h-96" thumbClass="dark:bg-primary-foreground">
         {displaySymbols?.map((s) => (
           <div
-            className="h-12 flex items-center px-2 border-b-1 box-border cursor-pointer hover:bg-secondary rounded-md relative"
+            className={cn(
+              "h-12 flex items-center pl-2 border-b-1 box-border cursor-pointer hover:bg-secondary rounded-md relative",
+              chosenSymbol?.id === s.id && "hover:bg-primary bg-primary"
+            )}
             key={s.id}
-            onClick={() => onSelectSymbol(s.id)}
+            onClick={() => onSelectSymbol(s)}
           >
-            <span className="flex-1 text-primary">{s.label}</span>
+            <span
+              className={cn(
+                "flex-1 text-primary ",
+                chosenSymbol?.id === s.id && "text-secondary font-semibold"
+              )}
+            >
+              {s.label}
+            </span>
             <span className="flex-1 text-slate-300 text-sm truncate">
               {s.description}
             </span>
-            <div className="flex-1 text-sm flex justify-center items-center">
-              <span onClick={(e) => addToFavAction(e, s.id)}>
+            <div
+              className="flex-1 text-sm flex justify-center items-center h-full w-full"
+              onClick={(e) => addToFavAction(e, s.id)}
+            >
+              {s.isFav ? (
+                <IoIosHeart size={24} className="text-rose-500" />
+              ) : (
                 <IoIosHeartEmpty size={24} className="text-slate-300" />
-              </span>
+              )}
             </div>
-            <Separator className="absolute bottom-0 w-full" />
+            <Separator
+              className={cn(
+                "absolute bottom-0 w-full",
+                chosenSymbol?.id === s.id && "bg-primary"
+              )}
+            />
           </div>
         ))}
       </ScrollArea>
+
+      <div className="flex items-center justify-end gap-4">
+        <Button
+          type="button"
+          variant={"secondary"}
+          size="sm"
+          onClick={() => setDialogVisible(false)}
+        >
+          Cancel
+        </Button>
+        <Button type="button" variant={"default"} size="sm">
+          Submit
+        </Button>
+      </div>
     </div>
   );
 };

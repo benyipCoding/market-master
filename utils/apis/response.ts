@@ -5,9 +5,14 @@ export interface CustomResponseType<T = any> {
   timestamp: number;
 }
 
+export enum Status {
+  OK = 200,
+  Fail = 400,
+}
+
 export const ErrorResponse = (
   msg: string,
-  status: number = 400
+  status: number = Status.Fail
 ): CustomResponseType => ({
   status,
   msg,
@@ -16,7 +21,7 @@ export const ErrorResponse = (
 });
 
 export const SuccessResponse = <T = any>(data: T): CustomResponseType<T> => ({
-  status: 200,
+  status: Status.OK,
   msg: "success",
   data,
   timestamp: Date.now(),
