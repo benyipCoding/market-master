@@ -16,6 +16,7 @@ import {
   calcCoordinate,
   makeLineData,
   recordEquationHandler,
+  removeSeries,
 } from "@/utils/helpers";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { EmitteryContext, OnSeriesCreate } from "@/providers/EmitteryProvider";
@@ -65,10 +66,11 @@ export const useAutomaticLineDrawing = ({
     return makeLineData(lineStart, lineEnd, lineId);
   };
 
-  const performDrawing = (drawAction: boolean = false) => {
+  const performDrawing = (data?: CandlestickData<Time>[]) => {
     if (!tChartRef.current) return;
     const candlestickData =
-      tChartRef.current.childSeries[0].data() as CandlestickData<Time>[];
+      data ||
+      (tChartRef.current.childSeries[0].data() as CandlestickData<Time>[]);
 
     const high: AutomaticLinePoint = {
       index: 0,
@@ -181,7 +183,6 @@ export const useAutomaticLineDrawing = ({
       }
     });
 
-    drawAction && setLineList(lines);
     return lines;
   };
 
@@ -256,24 +257,6 @@ export const useAutomaticLineDrawing = ({
     }
 
     return endIndex;
-  };
-
-  const segmentWillBeBroken = (
-    rootPen: LineState,
-    endIndex: number,
-    pens: LineState[]
-  ): boolean => {
-    const rootPrice = rootPen.startPoint.price;
-    const segmentTrend = rootPen.trend;
-    for (let i = endIndex + 1; i < endIndex + 4; i += 2) {
-      const nextReverseEndPrice = pens[i]?.endPoint?.price;
-      const isBroken =
-        segmentTrend === TrendType.Up
-          ? nextReverseEndPrice < rootPrice
-          : nextReverseEndPrice > rootPrice;
-      if (isBroken) return true;
-    }
-    return false;
   };
 
   const fixGap = (segmentList: LineState[]): LineState[] => {
@@ -423,6 +406,56 @@ export const useAutomaticLineDrawing = ({
     setAddtionalSeries(series);
   };
 
+  const drawLineInVisibleRange = () => {
+    // 先把原有的清除干净
+    const { chart, childSeries, setChildSeries, setLineId_equation } =
+      tChartRef.current!;
+    const needToDel = childSeries.filter(
+      (series) =>
+        series.options().customType === CustomLineSeriesType.AutomaticDrawed
+    );
+    if (needToDel.length) {
+      needToDel.forEach((series) => {
+        removeSeries({
+          chart,
+          selectedSeries: series,
+          setChildSeries,
+          setDrawedLineList,
+          setLineId_equation,
+        });
+      });
+    }
+    // 再画新的
+    const timeScale = chart.timeScale();
+    const mainData = childSeries[0].data();
+    const { to, from } = timeScale?.getVisibleRange()!;
+    const sliceData = mainData?.filter(
+      (data) => data.time >= from && data.time <= to
+    );
+
+    const lines = performDrawing(sliceData as CandlestickData<Time>[]);
+    setLineList(lines!);
+  };
+
+  const deletePens = () => {
+    const { chart, childSeries, setChildSeries, setLineId_equation } =
+      tChartRef.current!;
+    const penSeries = childSeries.filter(
+      (series) =>
+        series.options().customType === CustomLineSeriesType.AutomaticDrawed
+    );
+    console.log(penSeries);
+    penSeries.forEach((series) => {
+      removeSeries({
+        chart,
+        selectedSeries: series,
+        setChildSeries,
+        setDrawedLineList,
+        setLineId_equation,
+      });
+    });
+  };
+
   useEffect(() => {
     if (!addtionalSeries) return;
 
@@ -515,10 +548,11 @@ export const useAutomaticLineDrawing = ({
   }, [emittery]);
 
   return {
-    performDrawing,
     drawSegment,
     autoDrawing,
     generateLineSegment,
     setLineList,
+    drawLineInVisibleRange,
+    deletePens,
   };
 };

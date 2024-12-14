@@ -26,11 +26,12 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   );
 
   const {
-    performDrawing,
     autoDrawing,
     drawSegment,
     setLineList,
     generateLineSegment,
+    drawLineInVisibleRange,
+    deletePens,
   } = useAutomaticLineDrawing({
     setDrawedLineList,
     tChartRef,
@@ -105,12 +106,10 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   const scrollToRealTime = () => {
     const mainSeries = tChartRef.current?.childSeries[0];
 
-    // tChartRef.current?.chart.timeScale().scrollToRealTime();
     const position = tChartRef.current?.chart.timeScale().setVisibleRange({
       from: new Date("2024-01-19 00:00:00").getTime() as Time,
       to: new Date("2024-10-19 00:00:00").getTime() as Time,
     });
-    console.log(position);
   };
 
   useImperativeHandle(ref, () => ({
@@ -121,7 +120,7 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     <div className={cn(className)} ref={asideRef} style={{ width }}>
       {asideOpen && (
         <div className="flex flex-col gap-4">
-          <Button onClick={() => performDrawing(true)} disabled={autoDrawing}>
+          <Button onClick={drawLineInVisibleRange} disabled={autoDrawing}>
             {autoDrawing ? <Loading /> : "Automatic Line"}
           </Button>
           <Button onClick={drawSegment} disabled={autoDrawing}>
@@ -154,6 +153,9 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
           </Button>
           <Button variant={"default"} onClick={scrollToRealTime}>
             Scroll to realtime
+          </Button>
+          <Button variant={"destructive"} onClick={deletePens}>
+            Delete pens
           </Button>
         </div>
       )}

@@ -194,3 +194,21 @@ const generateLineSegment2 = (
   // return fixGap(segmentList);
   return segmentList;
 };
+
+const segmentWillBeBroken = (
+  rootPen: LineState,
+  endIndex: number,
+  pens: LineState[]
+): boolean => {
+  const rootPrice = rootPen.startPoint.price;
+  const segmentTrend = rootPen.trend;
+  for (let i = endIndex + 1; i < endIndex + 4; i += 2) {
+    const nextReverseEndPrice = pens[i]?.endPoint?.price;
+    const isBroken =
+      segmentTrend === TrendType.Up
+        ? nextReverseEndPrice < rootPrice
+        : nextReverseEndPrice > rootPrice;
+    if (isBroken) return true;
+  }
+  return false;
+};

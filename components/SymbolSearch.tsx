@@ -116,44 +116,55 @@ const SymbolSearch: React.FC = () => {
       </div>
 
       <ScrollArea className="h-96" thumbClass="dark:bg-primary-foreground">
-        {displaySymbols?.map((s) => (
-          <div
-            className={cn(
-              "h-12 flex items-center pl-2 border-b-1 box-border cursor-pointer hover:bg-secondary rounded-md relative",
-              chosenSymbol?.id === s.id && "hover:bg-primary bg-primary"
-            )}
-            key={s.id}
-            onClick={() => onSelectSymbol(s)}
-          >
-            <span
-              className={cn(
-                "flex-1 text-primary ",
-                chosenSymbol?.id === s.id && "text-secondary font-semibold"
-              )}
-            >
-              {s.label}
-            </span>
-            <span className="flex-1 text-slate-300 text-sm truncate">
-              {s.description}
-            </span>
+        {displaySymbols?.map((s) => {
+          const isSelected = chosenSymbol?.id === s.id;
+          return (
             <div
-              className="flex-1 text-sm flex justify-center items-center h-full w-full"
-              onClick={(e) => addToFavAction(e, s.id)}
-            >
-              {s.isFav ? (
-                <IoIosHeart size={24} className="text-rose-500" />
-              ) : (
-                <IoIosHeartEmpty size={24} className="text-slate-300" />
-              )}
-            </div>
-            <Separator
               className={cn(
-                "absolute bottom-0 w-[98%] left-1/2 -translate-x-1/2",
-                chosenSymbol?.id === s.id && "bg-primary"
+                "h-12 flex items-center pl-2 border-b-1 box-border cursor-pointer hover:bg-secondary rounded-md relative",
+                isSelected && "hover:bg-primary bg-primary"
               )}
-            />
-          </div>
-        ))}
+              key={s.id}
+              onClick={() => onSelectSymbol(s)}
+            >
+              {/* Label */}
+              <span
+                className={cn(
+                  "flex-1 text-primary select-none",
+                  isSelected && "text-secondary font-semibold"
+                )}
+              >
+                {s.label}
+              </span>
+              {/* Description */}
+              <span
+                className={cn(
+                  "flex-1 text-slate-300 text-sm truncate select-none",
+                  isSelected && "text-secondary font-semibold"
+                )}
+              >
+                {s.description}
+              </span>
+              {/* Heart icon */}
+              <div
+                className="flex-1 text-sm flex justify-center items-center h-full w-full"
+                onClick={(e) => addToFavAction(e, s.id)}
+              >
+                {s.isFav ? (
+                  <IoIosHeart size={24} className="text-rose-500" />
+                ) : (
+                  <IoIosHeartEmpty size={24} className="text-slate-300" />
+                )}
+              </div>
+              <Separator
+                className={cn(
+                  "absolute bottom-0 w-[98%] left-1/2 -translate-x-1/2",
+                  chosenSymbol?.id === s.id && "bg-primary"
+                )}
+              />
+            </div>
+          );
+        })}
       </ScrollArea>
 
       <div className="flex items-center justify-end gap-4">
