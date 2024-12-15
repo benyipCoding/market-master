@@ -7,7 +7,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import hotkeys from "hotkeys-js";
 import { Badge } from "../ui/badge";
-import { Hourglass, Search, Upload } from "lucide-react";
+import {
+  ArrowLeftToLine,
+  ArrowRightToLine,
+  CalendarSearch,
+  Hourglass,
+  Search,
+  Trash2,
+  Upload,
+} from "lucide-react";
 import { FcComboChart } from "react-icons/fc";
 import { Button } from "../ui/button";
 import { BiCandles } from "react-icons/bi";
@@ -20,17 +28,26 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { ScrollArea } from "../ui/scroll-area";
 import { setCurrentPeriod } from "@/store/fetchDataSlice";
+import { ITimeScaleApi, Time } from "lightweight-charts";
+import { PiLineSegments } from "react-icons/pi";
+import { SeriesColors } from "@/constants/seriesOptions";
+import { useAutomaticLineDrawing } from "@/hooks/useAutomaticLineDrawing";
+import { LineState, CustomLineSeriesType, TrendType } from "@/hooks/interfaces";
+import { CiEraser } from "react-icons/ci";
 
 const Navbar: React.FC<NavbarProps> = ({
   className,
   setDialogVisible,
   dialogVisible,
+  tChartRef,
+  setDrawedLineList,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { dialogContent } = useSelector((state: RootState) => state.dialog);
@@ -38,6 +55,30 @@ const Navbar: React.FC<NavbarProps> = ({
   const { periods, currentPeriod, currentSymbol } = useSelector(
     (state: RootState) => state.fetchData
   );
+  const yellow = useMemo(
+    () => SeriesColors.find((c) => c.label === "yellow")?.value,
+    []
+  );
+  const green = useMemo(
+    () => SeriesColors.find((c) => c.label === "green")?.value,
+    []
+  );
+  const orange = useMemo(
+    () => SeriesColors.find((c) => c.label === "orange")?.value,
+    []
+  );
+
+  const {
+    autoDrawing,
+    drawSegment,
+    setLineList,
+    generateLineSegment,
+    drawLineInVisibleRange,
+    deleteAutomaticLines,
+  } = useAutomaticLineDrawing({
+    setDrawedLineList,
+    tChartRef,
+  });
 
   const openDialogHandler = (type: DialogContentType) => {
     if (dialogVisible && dialogContent !== type) return;
@@ -60,15 +101,70 @@ const Navbar: React.FC<NavbarProps> = ({
     openDialogHandler(DialogContentType.UploadData);
   }, [dialogVisible, dialogContent]);
 
+  const getRange = (timeScale: ITimeScaleApi<Time>): number => {
+    const { from, to } = timeScale?.getVisibleLogicalRange()!;
+    return Math.floor(to - from);
+  };
+
+  const scrollToStart = () => {
+    const timeScale = tChartRef.current?.chart.timeScale();
+    if (!timeScale) return;
+    const range = getRange(timeScale);
+    timeScale?.setVisibleLogicalRange({ from: 0, to: range });
+  };
+
+  const scrollToEnd = () => {
+    const timeScale = tChartRef.current?.chart.timeScale();
+    if (!timeScale) return;
+    const range = getRange(timeScale);
+    const maxLogic = tChartRef.current?.childSeries[0].data().length! - 1;
+    timeScale?.setVisibleLogicalRange({ from: maxLogic - range, to: maxLogic });
+  };
+
+  const drawGreateSegment = (
+    e: KeyboardEvent | React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    const { childSeries } = tChartRef.current!;
+    const segmentList: LineState[] = childSeries
+      .filter(
+        (series) =>
+          series.options().customType === CustomLineSeriesType.SegmentDrawed
+      )
+      .map((series) => {
+        const data = (series.data() as any[]).sort((a, b) => a.time - b.time);
+        const startPrice = data[0].customValues?.price! as number;
+        const endPrice = data[1].customValues?.price! as number;
+        return {
+          startPoint: { price: startPrice, time: data[0].time },
+          endPoint: { price: endPrice, time: data[1].time },
+          trend: startPrice < endPrice ? TrendType.Up : TrendType.Down,
+          type: CustomLineSeriesType.SegmentDrawed,
+        };
+      });
+
+    const greateSegmentList = generateLineSegment(
+      segmentList,
+      CustomLineSeriesType.GreatSegmentDrawed
+    );
+    setLineList(greateSegmentList);
+  };
+
   useEffect(() => {
     hotkeys("i", openTechnicalIndexDialog);
     hotkeys("s", openSymbolSearch);
     hotkeys("u", openUploadForm);
+    hotkeys("f", drawLineInVisibleRange);
+    hotkeys("r", drawSegment);
+    hotkeys("ctrl+r", drawGreateSegment);
 
     return () => {
       hotkeys.unbind("i");
       hotkeys.unbind("s");
       hotkeys.unbind("u");
+      hotkeys.unbind("f");
+      hotkeys.unbind("r");
+      hotkeys.unbind("ctrl+r");
     };
   }, [openTechnicalIndexDialog]);
 
@@ -116,7 +212,6 @@ const Navbar: React.FC<NavbarProps> = ({
         </Tooltip>
 
         {/* Period */}
-
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -181,6 +276,153 @@ const Navbar: React.FC<NavbarProps> = ({
             <span className="short-cut">I</span>
           </TooltipContent>
         </Tooltip>
+
+        {/* Scroll to start */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className={cn("nav-item px-2 gap-2 active:scale-100")}
+              variant={"ghost"}
+              onClick={scrollToStart}
+              disabled={autoDrawing}
+            >
+              <ArrowLeftToLine size={24} />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="flex">
+            <p>Scroll to start</p>
+            {/* <span className="short-cut"></span> */}
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className={cn("nav-item px-2 gap-2 active:scale-100 -ml-2")}
+              variant={"ghost"}
+              disabled={autoDrawing}
+            >
+              <CalendarSearch size={22} />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="flex">
+            <p>Scroll to date</p>
+          </TooltipContent>
+        </Tooltip>
+
+        {/* Scroll to end */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className={cn(
+                "nav-item px-2 gap-2 active:scale-100 nav-item-divider -ml-2"
+              )}
+              variant={"ghost"}
+              onClick={scrollToEnd}
+              disabled={autoDrawing}
+            >
+              <ArrowRightToLine size={24} />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="flex">
+            <p>Scroll to end</p>
+            {/* <span className="short-cut"></span> */}
+          </TooltipContent>
+        </Tooltip>
+
+        {/* 画笔 */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className={cn("nav-item px-2 gap-2 active:scale-100")}
+              variant={"ghost"}
+              onClick={drawLineInVisibleRange}
+              disabled={autoDrawing}
+            >
+              <PiLineSegments size={24} color={yellow} />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="flex">
+            <p className="nav-item-divider">Pens</p>
+            <span className="short-cut">F</span>
+          </TooltipContent>
+        </Tooltip>
+
+        {/* 画线段 */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className={cn("nav-item px-2 gap-2 active:scale-100 -ml-2")}
+              variant={"ghost"}
+              onClick={drawSegment}
+              disabled={autoDrawing}
+            >
+              <PiLineSegments size={24} color={green} />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="flex">
+            <p className="nav-item-divider">Segments</p>
+            <span className="short-cut">R</span>
+          </TooltipContent>
+        </Tooltip>
+
+        {/* 画大线段 */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className={cn("nav-item px-2 gap-2 active:scale-100 -ml-2")}
+              variant={"ghost"}
+              disabled={autoDrawing}
+              onClick={drawGreateSegment}
+            >
+              <PiLineSegments size={24} color={orange} />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="flex">
+            <p className="nav-item-divider">Greate Segments</p>
+            <span className="short-cut px-1">Ctrl + R</span>
+          </TooltipContent>
+        </Tooltip>
+
+        {/* 删除按钮 */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild disabled={autoDrawing}>
+            <Button
+              className="nav-item px-2 gap-2 active:scale-100 nav-item-divider -ml-2"
+              variant={"ghost"}
+            >
+              <CiEraser size={26} />
+              <span className="sr-only">Select Period</span>
+            </Button>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent className="w-fit">
+            <DropdownMenuItem
+              onClick={() =>
+                deleteAutomaticLines(CustomLineSeriesType.AutomaticDrawed)
+              }
+            >
+              <PiLineSegments color={yellow} />
+              Pens
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() =>
+                deleteAutomaticLines(CustomLineSeriesType.SegmentDrawed)
+              }
+            >
+              <PiLineSegments color={green} />
+              Segments
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() =>
+                deleteAutomaticLines(CustomLineSeriesType.GreatSegmentDrawed)
+              }
+            >
+              <PiLineSegments color={orange} />
+              Greate Segments
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <div className="absolute right-14 h-full flex py-1 gap-4 items-center">
           {/* Upload data */}

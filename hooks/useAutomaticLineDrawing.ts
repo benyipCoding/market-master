@@ -21,7 +21,6 @@ import {
 import { useContext, useEffect, useMemo, useState } from "react";
 import { EmitteryContext, OnSeriesCreate } from "@/providers/EmitteryProvider";
 import { SeriesColors } from "@/constants/seriesOptions";
-import { time } from "console";
 
 export const useAutomaticLineDrawing = ({
   setDrawedLineList,
@@ -437,14 +436,12 @@ export const useAutomaticLineDrawing = ({
     setLineList(lines!);
   };
 
-  const deletePens = () => {
+  const deleteAutomaticLines = (type: CustomLineSeriesType) => {
     const { chart, childSeries, setChildSeries, setLineId_equation } =
       tChartRef.current!;
     const penSeries = childSeries.filter(
-      (series) =>
-        series.options().customType === CustomLineSeriesType.AutomaticDrawed
+      (series) => series.options().customType === type
     );
-    console.log(penSeries);
     penSeries.forEach((series) => {
       removeSeries({
         chart,
@@ -553,6 +550,6 @@ export const useAutomaticLineDrawing = ({
     generateLineSegment,
     setLineList,
     drawLineInVisibleRange,
-    deletePens,
+    deleteAutomaticLines,
   };
 };

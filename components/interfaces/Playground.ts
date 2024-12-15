@@ -36,6 +36,10 @@ export interface NavbarProps {
   className?: string;
   setDialogVisible: React.Dispatch<React.SetStateAction<boolean>>;
   dialogVisible: boolean;
+  tChartRef: React.RefObject<TChartRef>;
+  setDrawedLineList: React.Dispatch<
+    React.SetStateAction<DeepPartial<LineStyleOptions & SeriesOptionsCommon>[]>
+  >;
 }
 
 export interface RightAsideBtnsProps {

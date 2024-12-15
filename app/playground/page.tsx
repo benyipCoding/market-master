@@ -204,6 +204,8 @@ const Playground = () => {
           className="h-11"
           setDialogVisible={setDialogVisible}
           dialogVisible={dialogVisible}
+          tChartRef={tChartRef}
+          setDrawedLineList={setDrawedLineList}
         />
         <main className="flex-1 flex overflow-hidden">
           <LeftAsideBtns
