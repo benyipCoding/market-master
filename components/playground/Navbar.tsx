@@ -385,44 +385,51 @@ const Navbar: React.FC<NavbarProps> = ({
         </Tooltip>
 
         {/* 删除按钮 */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild disabled={autoDrawing}>
-            <Button
-              className="nav-item px-2 gap-2 active:scale-100 nav-item-divider -ml-2"
-              variant={"ghost"}
-            >
-              <CiEraser size={26} />
-              <span className="sr-only">Select Period</span>
-            </Button>
-          </DropdownMenuTrigger>
+        <Tooltip>
+          <DropdownMenu>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild disabled={autoDrawing}>
+                <Button
+                  className="nav-item px-2 gap-2 active:scale-100 nav-item-divider -ml-2"
+                  variant={"ghost"}
+                >
+                  <CiEraser size={26} />
+                  <span className="sr-only">Select Period</span>
+                </Button>
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
 
-          <DropdownMenuContent className="w-fit">
-            <DropdownMenuItem
-              onClick={() =>
-                deleteAutomaticLines(CustomLineSeriesType.AutomaticDrawed)
-              }
-            >
-              <PiLineSegments color={yellow} />
-              Pens
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() =>
-                deleteAutomaticLines(CustomLineSeriesType.SegmentDrawed)
-              }
-            >
-              <PiLineSegments color={green} />
-              Segments
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() =>
-                deleteAutomaticLines(CustomLineSeriesType.GreatSegmentDrawed)
-              }
-            >
-              <PiLineSegments color={orange} />
-              Greate Segments
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            <DropdownMenuContent className="w-fit">
+              <DropdownMenuItem
+                onClick={() =>
+                  deleteAutomaticLines(CustomLineSeriesType.AutomaticDrawed)
+                }
+              >
+                <PiLineSegments color={yellow} />
+                Pens
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  deleteAutomaticLines(CustomLineSeriesType.SegmentDrawed)
+                }
+              >
+                <PiLineSegments color={green} />
+                Segments
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  deleteAutomaticLines(CustomLineSeriesType.GreatSegmentDrawed)
+                }
+              >
+                <PiLineSegments color={orange} />
+                Greate Segments
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <TooltipContent className="flex">
+            <p className="">Eraser</p>
+          </TooltipContent>
+        </Tooltip>
 
         <div className="absolute right-14 h-full flex py-1 gap-4 items-center">
           {/* Upload data */}
