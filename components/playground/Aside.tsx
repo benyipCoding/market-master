@@ -61,9 +61,9 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
             登录测试按钮
           </Button>
 
-          {/* <Button variant={"destructive"} onClick={deletePens}>
-            Delete pens
-          </Button> */}
+          <Button variant={"destructive"} onClick={cleanDataAction}>
+            Clean data
+          </Button>
         </div>
       )}
     </div>
