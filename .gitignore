@@ -38,3 +38,5 @@ next-env.d.ts
 
 # workspace
 *.code-workspace
+
+deploy.sh
