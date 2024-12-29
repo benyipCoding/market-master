@@ -397,6 +397,7 @@ export const useAutomaticLineDrawing = ({
   };
 
   const drawSegment = () => {
+    if (autoDrawing) return;
     const segmentList = generateLineSegment(performDrawing()!);
     setLineList(segmentList);
   };
@@ -406,6 +407,7 @@ export const useAutomaticLineDrawing = ({
   };
 
   const drawLineInVisibleRange = () => {
+    if (autoDrawing) return;
     // 先把原有的清除干净
     const { chart, childSeries, setChildSeries, setLineId_equation } =
       tChartRef.current!;

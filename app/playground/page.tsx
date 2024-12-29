@@ -34,7 +34,11 @@ import Aside from "@/components/playground/Aside";
 import { AsideRef } from "@/components/interfaces/Playground";
 import SymbolSearch from "@/components/SymbolSearch";
 import UploadForm from "@/components/playground/UploadForm";
-import { fetchPeriods, fetchSymbols } from "@/store/fetchDataSlice";
+import {
+  fetchPeriods,
+  fetchSymbols,
+  setCandleDataSlice,
+} from "@/store/fetchDataSlice";
 import { getKLines } from "./actions/getKLines";
 import { CustomLineSeriesType } from "@/hooks/interfaces";
 import { toast } from "sonner";
@@ -48,9 +52,13 @@ const Playground = () => {
   const [asideOpen, setAsideOpen] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
   const { dialogContent } = useSelector((state: RootState) => state.dialog);
-  const { currentPeriod, currentSymbol } = useSelector(
-    (state: RootState) => state.fetchData
-  );
+  const {
+    currentPeriod,
+    currentSymbol,
+    isBackTestMode,
+    sliceLeft,
+    sliceRight,
+  } = useSelector((state: RootState) => state.fetchData);
   const isDrawedLineSettings = useMemo(
     () => dialogContent === DialogContentType.DrawedLineSettings,
     [dialogContent]
@@ -75,6 +83,14 @@ const Playground = () => {
   const [candlestickData, setCandlestickData] = useState<
     CandlestickData<Time>[]
   >([]);
+  //
+  const displayCandlestickData = useMemo(
+    () =>
+      isBackTestMode
+        ? candlestickData.slice(sliceLeft, sliceRight)
+        : candlestickData,
+    [candlestickData, isBackTestMode, sliceLeft, sliceRight]
+  );
 
   // The list of drawed line series
   const [drawedLineList, setDrawedLineList] = useState<
@@ -99,12 +115,14 @@ const Playground = () => {
       return toast.error(res.msg);
     }
 
-    setCandlestickData(
-      res.data.map((item: any) => ({
-        ...item,
-        time: item.timestamp,
-      }))
-    );
+    const data = res.data.map((item: any) => ({
+      ...item,
+      time: item.timestamp,
+    }));
+
+    setCandlestickData(data);
+
+    return data.length;
   };
 
   const crosshairMoveHandler = (param: MouseEventParams<Time>) => {
@@ -194,7 +212,9 @@ const Playground = () => {
       });
     });
 
-    getCandlestickData();
+    getCandlestickData().then((length: number) =>
+      dispatch(setCandleDataSlice([length - 2000, length]))
+    );
   }, [currentPeriod, currentSymbol]);
 
   return (
@@ -228,7 +248,7 @@ const Playground = () => {
               dialogVisible={dialogVisible}
             >
               {currentSymbol && (
-                <CandlestickSeries seriesData={candlestickData} />
+                <CandlestickSeries seriesData={displayCandlestickData} />
               )}
               {drawedLineList.map((lineOption) => (
                 <LineSeries

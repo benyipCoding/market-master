@@ -8,7 +8,6 @@ import {
   PayloadAction,
 } from "@reduxjs/toolkit";
 import { RootState } from ".";
-import { getProfile } from "@/app/playground/actions/getProfile";
 import { getFavSymbols } from "@/app/playground/actions/getFavSymbols";
 
 type BaseLabelType = { id: number; label: string };
@@ -38,6 +37,9 @@ interface FetchDataState {
   currentCategory: SymbolCategory | undefined;
   avgAmplitude: number | undefined;
   favSymIds: Array<number>;
+  sliceLeft: number;
+  sliceRight: number;
+  isBackTestMode: boolean;
 }
 
 const initialState: FetchDataState = {
@@ -49,6 +51,9 @@ const initialState: FetchDataState = {
   currentCategory: undefined,
   avgAmplitude: undefined,
   favSymIds: [],
+  sliceLeft: 0, // candlestickData.slice的第一个参数，逐渐减少到0
+  sliceRight: 0, // candlestickData.slice的第二个参数，逐渐增加到数组长度
+  isBackTestMode: false,
 };
 
 export const fetchPeriods = createAsyncThunk("fetch/periods", () => {
@@ -84,6 +89,13 @@ export const fetchDataSlice = createSlice({
     },
     setCurrentSymbol(state, action: PayloadAction<number>) {
       state.currentSymbol = state.symbols?.find((s) => s.id === action.payload);
+    },
+    setCandleDataSlice(state, action: PayloadAction<number[]>) {
+      action.payload[0] && (state.sliceLeft = action.payload[0]);
+      action.payload[1] && (state.sliceRight = action.payload[1]);
+    },
+    setIsBackTestMode(state, action: PayloadAction<boolean>) {
+      state.isBackTestMode = action.payload;
     },
   },
   extraReducers(builder) {
@@ -130,6 +142,8 @@ export const {
   setCurrentCategory,
   setAvgAmplitude,
   setCurrentSymbol,
+  setCandleDataSlice,
+  setIsBackTestMode,
 } = fetchDataSlice.actions;
 
 export default fetchDataSlice.reducer;

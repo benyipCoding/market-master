@@ -13,6 +13,7 @@ import {
   CalendarSearch,
   Hourglass,
   Search,
+  StepForward,
   Trash2,
   Upload,
 } from "lucide-react";
@@ -34,13 +35,18 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { ScrollArea } from "../ui/scroll-area";
-import { setCurrentPeriod } from "@/store/fetchDataSlice";
+import {
+  setCandleDataSlice,
+  setCurrentPeriod,
+  setIsBackTestMode,
+} from "@/store/fetchDataSlice";
 import { ITimeScaleApi, Time } from "lightweight-charts";
 import { PiLineSegments } from "react-icons/pi";
 import { SeriesColors } from "@/constants/seriesOptions";
 import { useAutomaticLineDrawing } from "@/hooks/useAutomaticLineDrawing";
 import { LineState, CustomLineSeriesType, TrendType } from "@/hooks/interfaces";
 import { CiEraser } from "react-icons/ci";
+import { IoPlayBackOutline } from "react-icons/io5";
 
 const Navbar: React.FC<NavbarProps> = ({
   className,
@@ -52,9 +58,8 @@ const Navbar: React.FC<NavbarProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const { dialogContent } = useSelector((state: RootState) => state.dialog);
 
-  const { periods, currentPeriod, currentSymbol } = useSelector(
-    (state: RootState) => state.fetchData
-  );
+  const { periods, currentPeriod, currentSymbol, sliceLeft, isBackTestMode } =
+    useSelector((state: RootState) => state.fetchData);
   const yellow = useMemo(
     () => SeriesColors.find((c) => c.label === "yellow")?.value,
     []
@@ -125,6 +130,7 @@ const Navbar: React.FC<NavbarProps> = ({
     e: KeyboardEvent | React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
+    if (autoDrawing) return;
     const { childSeries } = tChartRef.current!;
     const segmentList: LineState[] = childSeries
       .filter(
@@ -148,6 +154,15 @@ const Navbar: React.FC<NavbarProps> = ({
       CustomLineSeriesType.GreatSegmentDrawed
     );
     setLineList(greateSegmentList);
+  };
+
+  const onNextTick = () => {
+    if (!isBackTestMode) return;
+    dispatch(setCandleDataSlice([sliceLeft - 1]));
+  };
+
+  const enableBackTest = () => {
+    dispatch(setIsBackTestMode(true));
   };
 
   useEffect(() => {
@@ -428,6 +443,46 @@ const Navbar: React.FC<NavbarProps> = ({
           </DropdownMenu>
           <TooltipContent className="flex">
             <p className="">Eraser</p>
+          </TooltipContent>
+        </Tooltip>
+
+        {/* Back test */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className="nav-item px-2 gap-2 active:scale-100 "
+              variant={"ghost"}
+              onClick={enableBackTest}
+            >
+              <IoPlayBackOutline size={24} />
+              Back test
+              <span className="sr-only">Back test</span>
+            </Button>
+          </TooltipTrigger>
+
+          <TooltipContent className="flex">
+            <p className="nav-item-divider">Back test</p>
+            <span className="short-cut">T</span>
+          </TooltipContent>
+        </Tooltip>
+
+        {/* Next tick */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className="nav-item px-2 gap-2 active:scale-100 nav-item-divider -ml-2"
+              variant={"ghost"}
+              onClick={onNextTick}
+              disabled={!isBackTestMode}
+            >
+              <StepForward size={23} />
+              <span className="sr-only">Next Tick</span>
+            </Button>
+          </TooltipTrigger>
+
+          <TooltipContent className="flex">
+            <p className="nav-item-divider">Next Tick</p>
+            <span className="short-cut">N</span>
           </TooltipContent>
         </Tooltip>
 
