@@ -40,6 +40,7 @@ interface FetchDataState {
   sliceLeft: number;
   sliceRight: number;
   isBackTestMode: boolean;
+  isPreselect: boolean;
 }
 
 const initialState: FetchDataState = {
@@ -54,6 +55,7 @@ const initialState: FetchDataState = {
   sliceLeft: 0, // candlestickData.slice的第一个参数，逐渐减少到0
   sliceRight: 0, // candlestickData.slice的第二个参数，逐渐增加到数组长度
   isBackTestMode: false,
+  isPreselect: false,
 };
 
 export const fetchPeriods = createAsyncThunk("fetch/periods", () => {
@@ -91,11 +93,14 @@ export const fetchDataSlice = createSlice({
       state.currentSymbol = state.symbols?.find((s) => s.id === action.payload);
     },
     setCandleDataSlice(state, action: PayloadAction<number[]>) {
-      action.payload[0] && (state.sliceLeft = action.payload[0]);
+      action.payload[0] >= 0 && (state.sliceLeft = action.payload[0]);
       action.payload[1] && (state.sliceRight = action.payload[1]);
     },
     setIsBackTestMode(state, action: PayloadAction<boolean>) {
       state.isBackTestMode = action.payload;
+    },
+    setIsPreselect(state, action: PayloadAction<boolean>) {
+      state.isPreselect = action.payload;
     },
   },
   extraReducers(builder) {
@@ -144,6 +149,7 @@ export const {
   setCurrentSymbol,
   setCandleDataSlice,
   setIsBackTestMode,
+  setIsPreselect,
 } = fetchDataSlice.actions;
 
 export default fetchDataSlice.reducer;

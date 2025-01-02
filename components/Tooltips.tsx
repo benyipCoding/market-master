@@ -23,6 +23,9 @@ const Tooltips: React.FC<TooltipsProps> = ({ productName, tChartRef }) => {
   const { mouseClickEventParam } = useSelector(
     (state: RootState) => state.common
   );
+
+  const { isPreselect } = useSelector((state: RootState) => state.fetchData);
+
   const [position, setPosition] = useState<{
     x: number;
     y: number;
@@ -70,7 +73,9 @@ const Tooltips: React.FC<TooltipsProps> = ({ productName, tChartRef }) => {
     if (!data) return;
 
     setCurrentCandlestick(data);
-    setVisible(true);
+    if (!isPreselect) {
+      setVisible(true);
+    }
   }, [mouseClickEventParam]);
 
   useEffect(() => {

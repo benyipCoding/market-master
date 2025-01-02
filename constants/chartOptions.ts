@@ -1,10 +1,10 @@
 import { timestampToDateStr } from "@/utils/helpers";
-import dayjs from "dayjs";
 import {
   ChartOptions,
   ColorType,
   CrosshairMode,
   DeepPartial,
+  LineStyle,
   TickMarkType,
   Time,
 } from "lightweight-charts";
@@ -65,5 +65,30 @@ export const darkModeOptions: DeepPartial<ChartOptions> = {
   layout: {
     // background: { type: ColorType.Solid, color: "black" },
     textColor: "white", // 文本颜色
+  },
+};
+
+export const preselectBackTestOptions: DeepPartial<ChartOptions> = {
+  crosshair: {
+    horzLine: {
+      visible: false,
+    },
+    vertLine: {
+      color: "#de7900",
+      style: LineStyle.Solid,
+    },
+  },
+};
+
+export const normalCrossHair: DeepPartial<ChartOptions> = {
+  crosshair: {
+    mode: CrosshairMode.Normal,
+    vertLine: {
+      style: LineStyle.LargeDashed,
+      color: "#515151",
+    },
+    horzLine: {
+      visible: true,
+    },
   },
 };

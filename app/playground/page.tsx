@@ -38,6 +38,7 @@ import {
   fetchPeriods,
   fetchSymbols,
   setCandleDataSlice,
+  setIsBackTestMode,
 } from "@/store/fetchDataSlice";
 import { getKLines } from "./actions/getKLines";
 import { CustomLineSeriesType } from "@/hooks/interfaces";
@@ -190,6 +191,9 @@ const Playground = () => {
   // Monitor changes in the current period and symbol values
   useEffect(() => {
     if (!currentPeriod?.id || !currentSymbol?.id) return;
+
+    isBackTestMode && dispatch(setIsBackTestMode(false));
+
     const { chart, setLineId_equation, setChildSeries, childSeries } =
       tChartRef.current!;
     childSeries.forEach((series) => {
@@ -212,9 +216,9 @@ const Playground = () => {
       });
     });
 
-    getCandlestickData().then((length: number) =>
-      dispatch(setCandleDataSlice([length - 2000, length]))
-    );
+    getCandlestickData().then((length: number) => {
+      dispatch(setCandleDataSlice([0, length]));
+    });
   }, [currentPeriod, currentSymbol]);
 
   return (

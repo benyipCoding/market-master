@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { NavbarProps } from "../interfaces/Playground";
 import { setSelectedIndicator, setSelectedSeries } from "@/store/commonSlice";
 import { setDialogContent, DialogContentType } from "@/store/dialogSlice";
@@ -14,7 +14,6 @@ import {
   Hourglass,
   Search,
   StepForward,
-  Trash2,
   Upload,
 } from "lucide-react";
 import { FcComboChart } from "react-icons/fc";
@@ -39,14 +38,25 @@ import {
   setCandleDataSlice,
   setCurrentPeriod,
   setIsBackTestMode,
+  setIsPreselect,
 } from "@/store/fetchDataSlice";
-import { ITimeScaleApi, Time } from "lightweight-charts";
+import {
+  ChartOptions,
+  DeepPartial,
+  ITimeScaleApi,
+  Time,
+} from "lightweight-charts";
 import { PiLineSegments } from "react-icons/pi";
 import { SeriesColors } from "@/constants/seriesOptions";
 import { useAutomaticLineDrawing } from "@/hooks/useAutomaticLineDrawing";
 import { LineState, CustomLineSeriesType, TrendType } from "@/hooks/interfaces";
 import { CiEraser } from "react-icons/ci";
 import { IoPlayBackOutline } from "react-icons/io5";
+import {
+  normalCrossHair,
+  preselectBackTestOptions,
+} from "@/constants/chartOptions";
+import Loading from "../Loading";
 
 const Navbar: React.FC<NavbarProps> = ({
   className,
@@ -58,8 +68,19 @@ const Navbar: React.FC<NavbarProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const { dialogContent } = useSelector((state: RootState) => state.dialog);
 
-  const { periods, currentPeriod, currentSymbol, sliceLeft, isBackTestMode } =
-    useSelector((state: RootState) => state.fetchData);
+  const {
+    periods,
+    currentPeriod,
+    currentSymbol,
+    sliceLeft,
+    isBackTestMode,
+    isPreselect,
+  } = useSelector((state: RootState) => state.fetchData);
+
+  const { mouseClickEventParam } = useSelector(
+    (state: RootState) => state.common
+  );
+
   const yellow = useMemo(
     () => SeriesColors.find((c) => c.label === "yellow")?.value,
     []
@@ -126,10 +147,7 @@ const Navbar: React.FC<NavbarProps> = ({
     timeScale?.setVisibleLogicalRange({ from: maxLogic - range, to: maxLogic });
   };
 
-  const drawGreateSegment = (
-    e: KeyboardEvent | React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
+  const drawGreateSegment = () => {
     if (autoDrawing) return;
     const { childSeries } = tChartRef.current!;
     const segmentList: LineState[] = childSeries
@@ -156,22 +174,101 @@ const Navbar: React.FC<NavbarProps> = ({
     setLineList(greateSegmentList);
   };
 
-  const onNextTick = () => {
-    if (!isBackTestMode) return;
+  const onNextTick = useCallback(() => {
+    if (!isBackTestMode || sliceLeft === 0) return;
     dispatch(setCandleDataSlice([sliceLeft - 1]));
+  }, [isBackTestMode, sliceLeft]);
+
+  const preselectBackTest = useCallback(() => {
+    if (!isPreselect && !isBackTestMode) dispatch(setIsPreselect(true));
+
+    if (isBackTestMode) {
+      exitBackTestMode();
+    }
+  }, [isBackTestMode, isPreselect]);
+
+  const freezeRange = (callback: (...args: any[]) => void): Promise<void> => {
+    return new Promise((resolve) => {
+      const range = tChartRef
+        .current!.chart.timeScale()
+        .getVisibleLogicalRange();
+      tChartRef.current?.chart.applyOptions({
+        rightPriceScale: { autoScale: false },
+      });
+      callback();
+      tChartRef.current!.chart.timeScale().setVisibleLogicalRange(range!);
+      resolve();
+    });
   };
 
-  const enableBackTest = () => {
-    dispatch(setIsBackTestMode(true));
+  const enterBackTestMode = () => {
+    if (!tChartRef.current) return;
+    freezeRange(() => {
+      const length = tChartRef.current!.childSeries[0].data().length;
+      dispatch(
+        setCandleDataSlice([length - 1 - mouseClickEventParam?.logical!])
+      );
+      dispatch(setIsPreselect(false));
+      dispatch(setIsBackTestMode(true));
+    });
   };
+
+  const exitBackTestMode = async () => {
+    if (!tChartRef.current) return;
+    await freezeRange(() => {
+      dispatch(setIsBackTestMode(false));
+    });
+    dispatch(setCandleDataSlice([length - 1 - mouseClickEventParam?.logical!]));
+  };
+
+  const autoDrawAction = (
+    e: KeyboardEvent | React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    type: CustomLineSeriesType
+  ) => {
+    e.preventDefault();
+    tChartRef.current?.chart.applyOptions({
+      rightPriceScale: {
+        autoScale: true,
+      },
+    });
+    type === CustomLineSeriesType.AutomaticDrawed && drawLineInVisibleRange();
+    type === CustomLineSeriesType.SegmentDrawed && drawSegment();
+    type === CustomLineSeriesType.GreatSegmentDrawed && drawGreateSegment();
+  };
+
+  const exitPreselect = () => {
+    dispatch(setIsPreselect(false));
+  };
+
+  useEffect(() => {
+    if (isPreselect && tChartRef.current) {
+      enterBackTestMode();
+    }
+  }, [mouseClickEventParam]);
+
+  useEffect(() => {
+    if (!tChartRef.current?.chart) return;
+    if (isPreselect) {
+      tChartRef.current.chart.applyOptions(preselectBackTestOptions);
+      // 监听鼠标右键
+      document.addEventListener("contextmenu", exitPreselect);
+    } else {
+      document.removeEventListener("contextmenu", exitPreselect);
+      tChartRef.current.chart.applyOptions(normalCrossHair);
+    }
+  }, [isPreselect]);
 
   useEffect(() => {
     hotkeys("i", openTechnicalIndexDialog);
     hotkeys("s", openSymbolSearch);
     hotkeys("u", openUploadForm);
-    hotkeys("f", drawLineInVisibleRange);
-    hotkeys("r", drawSegment);
-    hotkeys("ctrl+r", drawGreateSegment);
+    hotkeys("f", (e) =>
+      autoDrawAction(e, CustomLineSeriesType.AutomaticDrawed)
+    );
+    hotkeys("r", (e) => autoDrawAction(e, CustomLineSeriesType.SegmentDrawed));
+    hotkeys("ctrl+r", (e) =>
+      autoDrawAction(e, CustomLineSeriesType.GreatSegmentDrawed)
+    );
 
     return () => {
       hotkeys.unbind("i");
@@ -182,6 +279,22 @@ const Navbar: React.FC<NavbarProps> = ({
       hotkeys.unbind("ctrl+r");
     };
   }, [openTechnicalIndexDialog]);
+
+  useEffect(() => {
+    hotkeys("t", preselectBackTest);
+
+    return () => {
+      hotkeys.unbind("t");
+    };
+  }, [preselectBackTest]);
+
+  useEffect(() => {
+    hotkeys("n", onNextTick);
+
+    return () => {
+      hotkeys.unbind("n");
+    };
+  }, [onNextTick]);
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -450,12 +563,15 @@ const Navbar: React.FC<NavbarProps> = ({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              className="nav-item px-2 gap-2 active:scale-100 "
+              className={cn(
+                "nav-item px-2 gap-2 active:scale-100 nav-item-divider",
+                (isBackTestMode || isPreselect) && "bg-primary hover:bg-primary"
+              )}
               variant={"ghost"}
-              onClick={enableBackTest}
+              onClick={preselectBackTest}
             >
-              <IoPlayBackOutline size={24} />
-              Back test
+              {isBackTestMode ? <Loading /> : <IoPlayBackOutline size={24} />}
+              {isBackTestMode ? "Back testing..." : "Back test"}
               <span className="sr-only">Back test</span>
             </Button>
           </TooltipTrigger>
@@ -465,27 +581,6 @@ const Navbar: React.FC<NavbarProps> = ({
             <span className="short-cut">T</span>
           </TooltipContent>
         </Tooltip>
-
-        {/* Next tick */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              className="nav-item px-2 gap-2 active:scale-100 nav-item-divider -ml-2"
-              variant={"ghost"}
-              onClick={onNextTick}
-              disabled={!isBackTestMode}
-            >
-              <StepForward size={23} />
-              <span className="sr-only">Next Tick</span>
-            </Button>
-          </TooltipTrigger>
-
-          <TooltipContent className="flex">
-            <p className="nav-item-divider">Next Tick</p>
-            <span className="short-cut">N</span>
-          </TooltipContent>
-        </Tooltip>
-
         <div className="absolute right-14 h-full flex py-1 gap-4 items-center">
           {/* Upload data */}
           <Tooltip>

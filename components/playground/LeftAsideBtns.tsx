@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { LeftAsideBtnsProps } from "../interfaces/Playground";
 import { PiLineSegment } from "react-icons/pi";
 import { Button } from "../ui/button";
@@ -21,6 +21,7 @@ import {
 } from "@/store/commonSlice";
 import hotkeys from "hotkeys-js";
 import { removeIndicator, removeSeries } from "@/utils/helpers";
+import { BsArrowsVertical } from "react-icons/bs";
 
 const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
   className,
@@ -32,6 +33,14 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
   const { isDrawing, selectedSeries, selectedIndicator, graphType } =
     useSelector((state: RootState) => state.common);
   const dispatch = useDispatch<AppDispatch>();
+
+  const isAutoResize = useMemo<boolean>(
+    () =>
+      !!tChartRef.current
+        ? tChartRef.current?.chart.options().rightPriceScale.autoScale
+        : false,
+    [tChartRef.current?.chart.options().rightPriceScale.autoScale]
+  );
 
   const toggleDrawingLineSegment = useCallback(() => {
     if (!tChartRef.current) return;
@@ -82,13 +91,32 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
     }
   }, [selectedSeries, selectedIndicator]);
 
+  const toggleAutoResize = useCallback(() => {
+    if (isAutoResize) {
+      tChartRef.current?.chart.applyOptions({
+        rightPriceScale: {
+          autoScale: false,
+        },
+      });
+    } else {
+      tChartRef.current?.chart.applyOptions({
+        rightPriceScale: {
+          autoScale: true,
+        },
+      });
+    }
+  }, [isAutoResize]);
+
   // L key
   useEffect(() => {
     hotkeys("l", toggleDrawingLineSegment);
+    hotkeys("v", toggleAutoResize);
+
     return () => {
       hotkeys.unbind("l");
+      hotkeys.unbind("v");
     };
-  }, [toggleDrawingLineSegment]);
+  }, [toggleDrawingLineSegment, toggleAutoResize]);
 
   // Delete key
   useEffect(() => {
@@ -115,6 +143,27 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
           className
         )}
       >
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              type="button"
+              variant={"ghost"}
+              className={cn(
+                "hover:bg-muted p-1",
+                isAutoResize && "bg-primary hover:bg-primary"
+              )}
+              onClick={toggleAutoResize}
+            >
+              <BsArrowsVertical className="w-full h-full" />
+              <span className="sr-only">Auto Resize</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right" className="flex">
+            <p className="nav-item-divider">Auto Resize</p>
+            <span className="short-cut">V</span>
+          </TooltipContent>
+        </Tooltip>
+
         <Tooltip>
           <TooltipTrigger asChild>
             <Button

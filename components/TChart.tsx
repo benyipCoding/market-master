@@ -73,6 +73,7 @@ const TChart: React.ForwardRefRenderFunction<
     hoveringSeries,
     hoveringIndicator,
   } = useSelector((state: RootState) => state.common);
+  const { isPreselect } = useSelector((state: RootState) => state.fetchData);
   const [chart, setChart] = useState<IChartApi>();
   const [lineId_equation, setLineId_equation] = useState<
     Record<string, Equation>
@@ -89,7 +90,10 @@ const TChart: React.ForwardRefRenderFunction<
   const dispatch = useDispatch<AppDispatch>();
   const { theme } = useTheme();
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
-  const contextMenuTriggerDisable = useMemo(() => isDrawing, [isDrawing]);
+  const contextMenuTriggerDisable = useMemo(
+    () => isDrawing || isPreselect,
+    [isDrawing, isPreselect]
+  );
   const contextMenuRef = useRef<TChartContextMenuRef>(null);
 
   // Activate the function of drawing straight lines
