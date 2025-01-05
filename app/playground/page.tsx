@@ -158,6 +158,30 @@ const Playground = () => {
     setAsideOpen((prev) => !prev);
   };
 
+  const cleanLineSeries = () => {
+    const { chart, setLineId_equation, setChildSeries, childSeries } =
+      tChartRef.current!;
+    childSeries.forEach((series) => {
+      if (!series.options().customType) return;
+
+      if (series.options().customType === CustomLineSeriesType.Indicator) {
+        return removeIndicator({
+          chart,
+          selectedIndicator: series,
+          setTechnicalIndicatorLines,
+        });
+      }
+
+      return removeSeries({
+        chart,
+        selectedSeries: series,
+        setChildSeries,
+        setDrawedLineList,
+        setLineId_equation,
+      });
+    });
+  };
+
   useEffect(() => {
     window.addEventListener("resize", throttle(resizeHandler, 0));
     dispatch(fetchPeriods());
@@ -192,35 +216,21 @@ const Playground = () => {
   // Monitor changes in the current period and symbol values
   useEffect(() => {
     if (!currentPeriod?.id || !currentSymbol?.id) return;
-
     isBackTestMode && dispatch(setIsBackTestMode(false));
-
-    const { chart, setLineId_equation, setChildSeries, childSeries } =
-      tChartRef.current!;
-    childSeries.forEach((series) => {
-      if (!series.options().customType) return;
-
-      if (series.options().customType === CustomLineSeriesType.Indicator) {
-        return removeIndicator({
-          chart,
-          selectedIndicator: series,
-          setTechnicalIndicatorLines,
-        });
-      }
-
-      return removeSeries({
-        chart,
-        selectedSeries: series,
-        setChildSeries,
-        setDrawedLineList,
-        setLineId_equation,
-      });
-    });
-
+    cleanLineSeries();
     getCandlestickData().then((length: number) => {
       dispatch(setCandleDataSlice([0, length]));
     });
   }, [currentPeriod, currentSymbol]);
+
+  // 监听清除LineSeries的信号
+  const { emittery } = useContext(EmitteryContext);
+  useEffect(() => {
+    emittery?.on(OnContronPanel.cleanLineSeries, cleanLineSeries);
+    return () => {
+      emittery?.off(OnContronPanel.cleanLineSeries, cleanLineSeries);
+    };
+  }, [emittery]);
 
   return (
     <>

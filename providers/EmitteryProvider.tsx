@@ -43,4 +43,5 @@ export enum OnContronPanel {
   nextTick = "panel_next_tick",
   prevTick = "pannel_previous_tick",
   stopPlaying = "stop_playing",
+  cleanLineSeries = "clean_line_series",
 }

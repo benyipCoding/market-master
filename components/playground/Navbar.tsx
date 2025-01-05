@@ -64,6 +64,7 @@ import {
 } from "@/constants/chartOptions";
 import Loading from "../Loading";
 import { EmitteryContext, OnContronPanel } from "@/providers/EmitteryProvider";
+import { removeIndicator, removeSeries } from "@/utils/helpers";
 
 const Navbar: React.FC<NavbarProps> = ({
   className,
@@ -221,7 +222,11 @@ const Navbar: React.FC<NavbarProps> = ({
 
   const enterBackTestMode = () => {
     if (!tChartRef.current) return;
-    const length = tChartRef.current!.childSeries[0].data().length;
+    // 清除所有线
+    emittery?.emit(OnContronPanel.cleanLineSeries);
+
+    const { childSeries } = tChartRef.current!;
+    const length = childSeries[0].data().length;
     freezeRange(() => {
       dispatch(
         setCandleDataSlice([length - 1 - mouseClickEventParam?.logical!])
@@ -233,6 +238,9 @@ const Navbar: React.FC<NavbarProps> = ({
 
   const exitBackTestMode = async () => {
     if (!tChartRef.current) return;
+    // 清除所有线
+    emittery?.emit(OnContronPanel.cleanLineSeries);
+
     freezeRange(() => {
       dispatch(setIsBackTestMode(false));
     });

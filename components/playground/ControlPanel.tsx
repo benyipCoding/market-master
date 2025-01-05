@@ -26,7 +26,6 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ dragConstraints }) => {
   const dragControls = useDragControls();
   const { emittery } = useContext(EmitteryContext);
   const [isPlaying, setIsPlaying] = useState(false);
-  // const { isBackTestMode } = useSelector((state: RootState) => state.fetchData);
   const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
 
   const startDrag = (event: React.PointerEvent<HTMLDivElement>) => {
