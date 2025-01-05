@@ -8,7 +8,7 @@ import {
   MouseEventParams,
   Time,
 } from "lightweight-charts";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { removeIndicator, removeSeries, throttle } from "@/utils/helpers";
 import { TChartRef } from "@/components/interfaces/TChart";
 import { useDispatch, useSelector } from "react-redux";
@@ -43,6 +43,7 @@ import {
 import { getKLines } from "./actions/getKLines";
 import { CustomLineSeriesType } from "@/hooks/interfaces";
 import { toast } from "sonner";
+import { EmitteryContext, OnContronPanel } from "@/providers/EmitteryProvider";
 
 const Playground = () => {
   // TChart component instance

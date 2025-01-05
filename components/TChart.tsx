@@ -44,6 +44,7 @@ import TChartContextMenu from "./TChartContextMenu";
 import { TChartContextMenuRef } from "./interfaces/TChartContextMenu";
 import { DialogContentType, setDialogContent } from "@/store/dialogSlice";
 import { cn } from "@/lib/utils";
+import ControlPanel from "./playground/ControlPanel";
 
 export const ChartContext = createContext<IChartContext>({});
 
@@ -73,7 +74,9 @@ const TChart: React.ForwardRefRenderFunction<
     hoveringSeries,
     hoveringIndicator,
   } = useSelector((state: RootState) => state.common);
-  const { isPreselect } = useSelector((state: RootState) => state.fetchData);
+  const { isPreselect, isBackTestMode } = useSelector(
+    (state: RootState) => state.fetchData
+  );
   const [chart, setChart] = useState<IChartApi>();
   const [lineId_equation, setLineId_equation] = useState<
     Record<string, Equation>
@@ -287,6 +290,8 @@ const TChart: React.ForwardRefRenderFunction<
         setDialogVisible={setDialogVisible}
         dialogVisible={dialogVisible}
       />
+
+      {isBackTestMode && <ControlPanel dragConstraints={container} />}
     </ContextMenu>
   );
 };

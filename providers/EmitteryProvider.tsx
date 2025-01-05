@@ -37,3 +37,10 @@ export enum OnApply {
 export enum OnSeriesCreate {
   LineSeries = "lineSeriesCreate",
 }
+
+export enum OnContronPanel {
+  exit = "panel_exit",
+  nextTick = "panel_next_tick",
+  prevTick = "pannel_previous_tick",
+  stopPlaying = "stop_playing",
+}

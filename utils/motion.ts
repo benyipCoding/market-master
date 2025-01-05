@@ -146,3 +146,21 @@ export const popIn = () => {
     },
   };
 };
+
+export const controlPanelSlideIn = () => {
+  return {
+    hidden: {
+      x: "-50%",
+      y: "-210%",
+      opacity: 0,
+    },
+    show: {
+      x: "-50%",
+      y: "10%",
+      opacity: 1,
+      transition: {
+        duration: 0.3,
+      },
+    },
+  };
+};

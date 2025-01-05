@@ -1,5 +1,11 @@
 import { cn } from "@/lib/utils";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { NavbarProps } from "../interfaces/Playground";
 import { setSelectedIndicator, setSelectedSeries } from "@/store/commonSlice";
 import { setDialogContent, DialogContentType } from "@/store/dialogSlice";
@@ -57,6 +63,7 @@ import {
   preselectBackTestOptions,
 } from "@/constants/chartOptions";
 import Loading from "../Loading";
+import { EmitteryContext, OnContronPanel } from "@/providers/EmitteryProvider";
 
 const Navbar: React.FC<NavbarProps> = ({
   className,
@@ -67,6 +74,7 @@ const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { dialogContent } = useSelector((state: RootState) => state.dialog);
+  const { emittery } = useContext(EmitteryContext);
 
   const {
     periods,
@@ -175,8 +183,18 @@ const Navbar: React.FC<NavbarProps> = ({
   };
 
   const onNextTick = useCallback(() => {
-    if (!isBackTestMode || sliceLeft === 0) return;
+    if (!isBackTestMode) return;
+    if (sliceLeft === 0) {
+      emittery?.emit(OnContronPanel.stopPlaying);
+      return;
+    }
     dispatch(setCandleDataSlice([sliceLeft - 1]));
+  }, [isBackTestMode, sliceLeft]);
+
+  const onPrevTick = useCallback(() => {
+    const length = tChartRef.current?.childSeries[0].data().length;
+    if (!isBackTestMode || sliceLeft === length) return;
+    dispatch(setCandleDataSlice([sliceLeft + 1]));
   }, [isBackTestMode, sliceLeft]);
 
   const preselectBackTest = useCallback(() => {
@@ -203,8 +221,8 @@ const Navbar: React.FC<NavbarProps> = ({
 
   const enterBackTestMode = () => {
     if (!tChartRef.current) return;
+    const length = tChartRef.current!.childSeries[0].data().length;
     freezeRange(() => {
-      const length = tChartRef.current!.childSeries[0].data().length;
       dispatch(
         setCandleDataSlice([length - 1 - mouseClickEventParam?.logical!])
       );
@@ -215,10 +233,9 @@ const Navbar: React.FC<NavbarProps> = ({
 
   const exitBackTestMode = async () => {
     if (!tChartRef.current) return;
-    await freezeRange(() => {
+    freezeRange(() => {
       dispatch(setIsBackTestMode(false));
     });
-    dispatch(setCandleDataSlice([length - 1 - mouseClickEventParam?.logical!]));
   };
 
   const autoDrawAction = (
@@ -290,11 +307,19 @@ const Navbar: React.FC<NavbarProps> = ({
 
   useEffect(() => {
     hotkeys("n", onNextTick);
+    hotkeys("b", onPrevTick);
+    emittery?.on(OnContronPanel.exit, exitBackTestMode);
+    emittery?.on(OnContronPanel.nextTick, onNextTick);
+    emittery?.on(OnContronPanel.prevTick, onPrevTick);
 
     return () => {
       hotkeys.unbind("n");
+      hotkeys.unbind("b");
+      emittery?.off(OnContronPanel.exit, exitBackTestMode);
+      emittery?.off(OnContronPanel.nextTick, onNextTick);
+      emittery?.off(OnContronPanel.prevTick, onPrevTick);
     };
-  }, [onNextTick]);
+  }, [emittery, onNextTick]);
 
   return (
     <TooltipProvider delayDuration={0}>
