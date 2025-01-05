@@ -160,7 +160,7 @@ export const useAutomaticLineDrawing = ({
       }
     };
 
-    candlestickData.forEach((candle, index) => {
+    candlestickData.forEach((candle, index, arr) => {
       if (index === 0) return;
       const currentHigh = Math.max(candle.open, candle.close);
       const currentLow = Math.min(candle.open, candle.close);
@@ -179,6 +179,15 @@ export const useAutomaticLineDrawing = ({
         low.price = currentLow;
         low.time = candle.time;
         updateTrend(TrendType.Down, currentHigh, currentLow, index, candle);
+      }
+
+      if (index === arr.length - 1 && startPoint && endPoint) {
+        lines.push({
+          startPoint,
+          endPoint,
+          trend: currentTrend!,
+          type: CustomLineSeriesType.AutomaticDrawed,
+        });
       }
     });
 
