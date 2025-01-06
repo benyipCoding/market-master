@@ -384,6 +384,9 @@ export const useAutomaticLineDrawing = ({
     pens: LineState[],
     type: CustomLineSeriesType = CustomLineSeriesType.SegmentDrawed
   ): LineState[] => {
+    // 如果有存在已有的线段，先清除
+    deleteAutomaticLines(type);
+
     const segmentList: LineState[] = [];
 
     for (let i = 0; i < pens.length; i++) {
@@ -418,23 +421,9 @@ export const useAutomaticLineDrawing = ({
   const drawLineInVisibleRange = () => {
     if (autoDrawing) return;
     // 先把原有的清除干净
-    const { chart, childSeries, setChildSeries, setLineId_equation } =
-      tChartRef.current!;
-    const needToDel = childSeries.filter(
-      (series) =>
-        series.options().customType === CustomLineSeriesType.AutomaticDrawed
-    );
-    if (needToDel.length) {
-      needToDel.forEach((series) => {
-        removeSeries({
-          chart,
-          selectedSeries: series,
-          setChildSeries,
-          setDrawedLineList,
-          setLineId_equation,
-        });
-      });
-    }
+    const { chart, childSeries } = tChartRef.current!;
+    deleteAutomaticLines(CustomLineSeriesType.AutomaticDrawed);
+
     // 再画新的
     const timeScale = chart.timeScale();
     const mainData = childSeries[0].data();
