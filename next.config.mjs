@@ -5,6 +5,7 @@ const nextConfig = {
     serverActions: {
       allowedOrigins: [
         "localhost:3001", // localhost
+        "42.193.192.227",
       ],
     },
   },
