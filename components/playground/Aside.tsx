@@ -27,16 +27,16 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   //   tChartRef,
   // });
 
-  const login = async () => {
-    const payload = {
-      email: "benyip5207@gmail.com",
-      password: "5207logiNN",
-    };
+  // const login = async () => {
+  //   const payload = {
+  //     email: "benyip5207@gmail.com",
+  //     password: "5207logiNN",
+  //   };
 
-    const res = await LoginTest<Tokens>(payload);
-    if (res?.status !== 200) return toast.error(res.msg);
-    console.log(res.data);
-  };
+  //   const res = await LoginTest<Tokens>(payload);
+  //   if (res?.status !== 200) return toast.error(res.msg);
+  //   console.log(res.data);
+  // };
 
   const getMeAction = async () => {
     const res = await getMe();
@@ -57,13 +57,13 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     <div className={cn(className)} ref={asideRef} style={{ width }}>
       {asideOpen && (
         <div className="flex flex-col gap-4">
-          <Button variant={"outline"} onClick={login}>
+          {/* <Button variant={"outline"} onClick={login}>
             登录测试按钮
-          </Button>
+          </Button> */}
 
-          <Button variant={"destructive"} onClick={cleanDataAction}>
+          {/* <Button variant={"destructive"} onClick={cleanDataAction}>
             Clean data
-          </Button>
+          </Button> */}
         </div>
       )}
     </div>
