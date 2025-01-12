@@ -6,8 +6,8 @@ const HomeLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <div className="bg-black h-full relative">
-      <nav className="absolute top-0 h-12 bg-zinc-950/50 backdrop-blur z-50 w-full px-10 md:px-40 flex items-center">
+    <div className="bg-black h-full">
+      <nav className="fixed top-0 h-12 bg-background/50 backdrop-blur z-50 w-full px-10 md:px-40 flex items-center border-b-[1px]">
         Logo
       </nav>
       {children}
