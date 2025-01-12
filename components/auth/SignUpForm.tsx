@@ -3,26 +3,31 @@ import React from "react";
 import { Label } from "@/components/ui/labelVer2";
 import { Input } from "@/components/ui/inputVer2";
 import { cn } from "@/lib/utils";
+import { Button } from "../ui/button";
+import { BackgroundGradient } from "../ui/background-gradient";
 // import {
 //   IconBrandGithub,
 //   IconBrandGoogle,
 //   IconBrandOnlyfans,
 // } from "@tabler/icons-react";
 
-export default function SignupFormDemo() {
+export default function SignupForm() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Form submitted");
   };
   return (
-    <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
+    <BackgroundGradient
+      //   containerClassName="p-2"
+      className="max-w-md w-full mx-auto rounded-3xl p-4 md:p-8 shadow-input bg-white dark:bg-black"
+    >
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
         Welcome to TradingCamp
       </h2>
-      <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
+      {/* <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
         Login to aceternity if you can because we don&apos;t have a login flow
         yet
-      </p>
+      </p> */}
 
       <form className="my-8" onSubmit={handleSubmit}>
         <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
@@ -52,16 +57,21 @@ export default function SignupFormDemo() {
           />
         </LabelInputContainer> */}
 
-        <button
+        {/* <button
           className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
           type="submit"
         >
           Sign up &rarr;
-          <BottomGradient />
+        </button> */}
+        <button className="inline-flex w-full h-12 animate-shimmer items-center justify-center rounded-md border border-slate-800 bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] px-6 font-medium text-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50">
+          Sign up
         </button>
 
-        <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
+        <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent mt-8 mb-4 h-[1px] w-full" />
 
+        <Button variant={"link"} className="w-full text-md active:scale-100">
+          Already has account?
+        </Button>
         {/* <div className="flex flex-col space-y-4">
           <button
             className=" relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
@@ -95,7 +105,7 @@ export default function SignupFormDemo() {
           </button>
         </div> */}
       </form>
-    </div>
+    </BackgroundGradient>
   );
 }
 

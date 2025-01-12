@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import { cookies } from "next/headers";
-import { tokenRefresh } from "@/app/auth/login/tokenRefresh";
+import { tokenRefresh } from "@/app/(root)/auth/login/tokenRefresh";
 import { RefreshTokenKey } from "../cookieHelper";
 
 const BASE_URL = process.env.BASE_URL + "/api";
