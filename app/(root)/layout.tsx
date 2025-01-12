@@ -7,7 +7,7 @@ const HomeLayout = ({
 }>) => {
   return (
     <div className="bg-black h-full">
-      <nav className="fixed top-0 h-12 bg-background/50 backdrop-blur z-50 w-full px-10 md:px-40 flex items-center border-b-[1px]">
+      <nav className="fixed top-0 h-12 bg-background/50 backdrop-blur z-50 w-full px-10 md:px-48 flex items-center border-b-[1px]">
         Logo
       </nav>
       {children}
