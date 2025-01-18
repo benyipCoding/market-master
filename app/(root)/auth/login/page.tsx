@@ -6,10 +6,8 @@ import React from "react";
 const LoginPage = () => {
   return (
     <Vortex
-      // backgroundColor="black"
       rangeY={800}
       particleCount={200}
-      //   // baseHue={120}
       className="flex items-center flex-col justify-center h-full"
     >
       <SignupForm />

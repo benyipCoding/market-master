@@ -27,7 +27,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <motion.div
         animate={{
-          x: isShake ? [0, -100, 100, -100, 100, 0] : 0, // x轴抖动的值
+          x: isShake ? [0, -10, 10, -10, 10, 0] : 0, // x轴抖动的值
         }}
         transition={{
           duration: 0.6, // 动画的持续时间

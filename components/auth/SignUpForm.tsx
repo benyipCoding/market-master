@@ -3,7 +3,6 @@ import React, { useCallback, useState } from "react";
 import { Label } from "@/components/ui/labelVer2";
 import { Input } from "@/components/ui/inputVer2";
 import { cn } from "@/lib/utils";
-import { Button } from "../ui/button";
 import { BackgroundGradient } from "../ui/background-gradient";
 
 interface IAuthForm {

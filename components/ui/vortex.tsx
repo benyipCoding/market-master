@@ -45,6 +45,7 @@ export const Vortex = (props: VortexProps) => {
   const HALF_PI: number = 0.5 * Math.PI;
   const TAU: number = 2 * Math.PI;
   const TO_RAD: number = Math.PI / 180;
+  let animationId: number;
   const rand = (n: number): number => n * Math.random();
   const randRange = (n: number): number => n - rand(2 * n);
   const fadeInOut = (t: number, m: number): number => {
@@ -99,17 +100,14 @@ export const Vortex = (props: VortexProps) => {
 
   const draw = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => {
     tick++;
-
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
     drawParticles(ctx);
     renderGlow(canvas, ctx);
     renderToScreen(canvas, ctx);
 
-    window.requestAnimationFrame(() => draw(canvas, ctx));
+    animationId = window.requestAnimationFrame(() => draw(canvas, ctx));
   };
 
   const drawParticles = (ctx: CanvasRenderingContext2D) => {
@@ -225,15 +223,31 @@ export const Vortex = (props: VortexProps) => {
     ctx.restore();
   };
 
+  const resizeHandler = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (canvas && ctx) {
+      resize(canvas, ctx);
+    }
+  };
+
   useEffect(() => {
     setup();
-    window.addEventListener("resize", () => {
-      const canvas = canvasRef.current;
-      const ctx = canvas?.getContext("2d");
-      if (canvas && ctx) {
-        resize(canvas, ctx);
+    window.addEventListener("resize", resizeHandler);
+
+    return () => {
+      const canvas = document.getElementById("myCanvas") as HTMLCanvasElement;
+      if (canvas) {
+        const ctx = canvas.getContext("2d");
+        ctx?.clearRect(0, 0, canvas.width, canvas.height);
       }
-    });
+
+      window.removeEventListener("resize", resizeHandler);
+
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+    };
   }, []);
 
   return (
@@ -244,7 +258,7 @@ export const Vortex = (props: VortexProps) => {
         ref={containerRef}
         className="absolute h-full w-full inset-0 z-0 bg-transparent flex items-center justify-center"
       >
-        <canvas ref={canvasRef}></canvas>
+        <canvas ref={canvasRef} id="myCanvas"></canvas>
       </motion.div>
 
       <div className={cn("relative z-10", props.className)}>
