@@ -5,10 +5,12 @@ import { cn } from "@/lib/utils";
 import { useMotionTemplate, useMotionValue, motion } from "framer-motion";
 
 export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {}
+  extends React.InputHTMLAttributes<HTMLInputElement> {
+  isShake: boolean;
+}
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, ...props }, ref) => {
+  ({ className, type, isShake, ...props }, ref) => {
     const radius = 100; // change this to increase the rdaius of the hover effect
     const [visible, setVisible] = React.useState(false);
 
@@ -21,8 +23,17 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       mouseX.set(clientX - left);
       mouseY.set(clientY - top);
     }
+
     return (
       <motion.div
+        animate={{
+          x: isShake ? [0, -100, 100, -100, 100, 0] : 0, // x轴抖动的值
+        }}
+        transition={{
+          duration: 0.6, // 动画的持续时间
+          ease: "easeInOut", // 动画的缓动函数
+          times: [0, 0.2, 0.4, 0.6, 0.8, 1], // 动画中各个位置的时间点
+        }}
         style={{
           background: useMotionTemplate`
         radial-gradient(

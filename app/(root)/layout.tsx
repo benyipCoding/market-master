@@ -18,7 +18,7 @@ const HomeLayout = ({
     <div className="bg-black h-full">
       <h1 className="sr-only">TradingCamp</h1>
       <nav className="fixed top-0 h-12 bg-background/30 backdrop-blur z-50 w-full px-10 md:px-48 flex items-center border-b-[1px]">
-        <Link href={"/home"} className="mr-16">
+        <Link href={"/home"} className="mr-12">
           <Image
             src={"/tc-high-resolution-logo-transparent.png"}
             alt="logo"
