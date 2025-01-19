@@ -118,7 +118,7 @@ export default function SignupForm() {
   return (
     <BackgroundGradient className="max-w-md w-full mx-auto rounded-3xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
-        Welcome to TradingCamp
+        Welcome to TradeCamp
       </h2>
 
       <form className="my-8 min-w-96" onSubmit={handleSubmit}>
