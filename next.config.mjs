@@ -5,7 +5,7 @@ const nextConfig = {
     serverActions: {
       allowedOrigins: [
         "localhost:3001", // localhost
-        "tradingcamp.cn",
+        "101.32.18.76",
       ],
     },
   },
