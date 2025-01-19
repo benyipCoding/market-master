@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/providers/ThemeProvider";
 import { cn } from "@/lib/utils";
 import EmitteryProvider from "@/providers/EmitteryProvider";
 import { Toaster } from "@/components/ui/sonner";
+import AuthProvider from "@/context/Auth";
 
 const fontSans = FontSans({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -34,7 +35,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <StoreProvider>
-            <EmitteryProvider>{children}</EmitteryProvider>
+            <EmitteryProvider>
+              <AuthProvider>{children}</AuthProvider>
+            </EmitteryProvider>
           </StoreProvider>
         </ThemeProvider>
         <Toaster position="top-right" duration={2000} />

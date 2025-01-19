@@ -4,9 +4,9 @@ const unauthorizedRoutes = [
   "/home",
   "/favicon.ico",
   "/auth/login",
-  "/playground",
-  "/test",
-  "/dashboard",
+  // "/playground",
+  // "/test",
+  // "/dashboard",
 ];
 export function middleware(request: NextRequest) {
   const auth = request.cookies.get("Authentication")?.value;
@@ -21,7 +21,7 @@ export function middleware(request: NextRequest) {
       request.nextUrl.pathname.startsWith(route)
     )
   ) {
-    console.log("未经身份认证，不能访问受保护网页");
+    // console.log("未经身份认证，不能访问受保护网页");
     return Response.redirect(new URL("/auth/login", request.url));
   }
 }

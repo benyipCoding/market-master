@@ -34,3 +34,9 @@ export type Tokens = {
   accessToken: string;
   refreshToken?: string;
 };
+
+export function removeAuthCookie() {
+  // 删除认证相关的 cookies
+  cookies().delete(AuthCookieKey);
+  cookies().delete(RefreshTokenKey);
+}

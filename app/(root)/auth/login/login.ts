@@ -7,9 +7,10 @@ import {
   SuccessResponse,
 } from "@/utils/apis/response";
 import { setAuthCookie } from "@/utils/cookieHelper";
+import { IAuthForm } from "./register";
 
-export const LoginTest = async <T = any>(
-  data: Record<string, string>
+export const loginAction = async <T = any>(
+  data: Pick<IAuthForm, "email" | "password">
 ): Promise<CustomResponseType<T>> => {
   try {
     const res = await request.post("/auth/login", data);

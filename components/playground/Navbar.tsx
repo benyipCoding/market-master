@@ -1,11 +1,5 @@
 import { cn } from "@/lib/utils";
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { useCallback, useContext, useEffect, useMemo } from "react";
 import { NavbarProps } from "../interfaces/Playground";
 import { setSelectedIndicator, setSelectedSeries } from "@/store/commonSlice";
 import { setDialogContent, DialogContentType } from "@/store/dialogSlice";
@@ -19,7 +13,6 @@ import {
   CalendarSearch,
   Hourglass,
   Search,
-  StepForward,
   Upload,
 } from "lucide-react";
 import { FcComboChart } from "react-icons/fc";
@@ -46,12 +39,7 @@ import {
   setIsBackTestMode,
   setIsPreselect,
 } from "@/store/fetchDataSlice";
-import {
-  ChartOptions,
-  DeepPartial,
-  ITimeScaleApi,
-  Time,
-} from "lightweight-charts";
+import { ITimeScaleApi, Time } from "lightweight-charts";
 import { PiLineSegments } from "react-icons/pi";
 import { SeriesColors } from "@/constants/seriesOptions";
 import { useAutomaticLineDrawing } from "@/hooks/useAutomaticLineDrawing";
@@ -64,7 +52,9 @@ import {
 } from "@/constants/chartOptions";
 import Loading from "../Loading";
 import { EmitteryContext, OnContronPanel } from "@/providers/EmitteryProvider";
-import { removeIndicator, removeSeries } from "@/utils/helpers";
+import { logout } from "@/app/(root)/auth/login/logout";
+import { useRouter } from "next/navigation";
+import { GrLogout } from "react-icons/gr";
 
 const Navbar: React.FC<NavbarProps> = ({
   className,
@@ -76,6 +66,7 @@ const Navbar: React.FC<NavbarProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const { dialogContent } = useSelector((state: RootState) => state.dialog);
   const { emittery } = useContext(EmitteryContext);
+  const router = useRouter();
 
   const {
     periods,
@@ -263,6 +254,11 @@ const Navbar: React.FC<NavbarProps> = ({
 
   const exitPreselect = () => {
     dispatch(setIsPreselect(false));
+  };
+
+  const logoutAction = async () => {
+    await logout();
+    router.refresh();
   };
 
   useEffect(() => {
@@ -630,6 +626,24 @@ const Navbar: React.FC<NavbarProps> = ({
             <TooltipContent className="flex">
               <p className="nav-item-divider">Upload Data</p>
               <span className="short-cut">U</span>
+            </TooltipContent>
+          </Tooltip>
+
+          {/* Logout button */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant={"ghost"}
+                className={cn("nav-item px-2")}
+                onClick={logoutAction}
+              >
+                <GrLogout size={20} />
+                <span className="sr-only">Logout</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="flex">
+              <p>Logout</p>
+              {/* <span className="short-cut">U</span> */}
             </TooltipContent>
           </Tooltip>
         </div>
