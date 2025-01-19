@@ -50,7 +50,9 @@ const HomeLayout = ({
             <NavigationMenuItem className="fixed right-48">
               <Link href="/auth/login" legacyBehavior passHref>
                 <NavigationMenuLink asChild>
-                  <Button variant={"ghost"}>Sign In</Button>
+                  <Button variant={"ghost"} className="active:scale-100">
+                    Sign In
+                  </Button>
                 </NavigationMenuLink>
               </Link>
             </NavigationMenuItem>

@@ -111,6 +111,7 @@ export default function SignupForm() {
 
   const toggleAuthAction = useCallback(() => {
     setInvalidateMsg(defaultValue);
+    setAuthForm(defaultValue);
     if (authAction === "register") setAuthAction("login");
     else setAuthAction("register");
   }, [authAction]);
