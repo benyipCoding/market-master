@@ -2,12 +2,8 @@
 import { cn } from "@/lib/utils";
 import React, { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
 import { AsideRef, AsideProps } from "../interfaces/Playground";
-import { Button } from "../ui/button";
-import { useAutomaticLineDrawing } from "@/hooks/useAutomaticLineDrawing";
 import { toast } from "sonner";
-import { LoginTest } from "@/app/(root)/auth/login/login";
 import { getMe } from "@/app/(root)/auth/login/getMe";
-import { Tokens } from "@/utils/cookieHelper";
 import { cleanData } from "@/app/playground/actions/cleanData";
 import { Status } from "@/utils/apis/response";
 
@@ -21,22 +17,6 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     () => (asideOpen ? "19rem" : "0rem"),
     [asideOpen]
   );
-
-  // const { deletePens } = useAutomaticLineDrawing({
-  //   setDrawedLineList,
-  //   tChartRef,
-  // });
-
-  // const login = async () => {
-  //   const payload = {
-  //     email: "benyip5207@gmail.com",
-  //     password: "5207logiNN",
-  //   };
-
-  //   const res = await LoginTest<Tokens>(payload);
-  //   if (res?.status !== 200) return toast.error(res.msg);
-  //   console.log(res.data);
-  // };
 
   const getMeAction = async () => {
     const res = await getMe();
