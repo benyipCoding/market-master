@@ -53,8 +53,8 @@ import {
 import Loading from "../Loading";
 import { EmitteryContext, OnContronPanel } from "@/providers/EmitteryProvider";
 import { logout } from "@/app/(root)/auth/login/logout";
-import { useRouter } from "next/navigation";
 import { GrLogout } from "react-icons/gr";
+import { AuthContext } from "@/context/Auth";
 
 const Navbar: React.FC<NavbarProps> = ({
   className,
@@ -66,7 +66,7 @@ const Navbar: React.FC<NavbarProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const { dialogContent } = useSelector((state: RootState) => state.dialog);
   const { emittery } = useContext(EmitteryContext);
-  const router = useRouter();
+  const { userInfo } = useContext(AuthContext);
 
   const {
     periods,
@@ -258,7 +258,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
   const logoutAction = async () => {
     await logout();
-    router.refresh();
+    window.location.reload();
   };
 
   useEffect(() => {
@@ -612,22 +612,24 @@ const Navbar: React.FC<NavbarProps> = ({
         </Tooltip>
         <div className="absolute right-14 h-full flex py-1 gap-4 items-center">
           {/* Upload data */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant={"ghost"}
-                className={cn("nav-item px-2")}
-                onClick={openUploadForm}
-              >
-                <Upload size={20} />
-                <span className="sr-only">Upload Data</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent className="flex">
-              <p className="nav-item-divider">Upload Data</p>
-              <span className="short-cut">U</span>
-            </TooltipContent>
-          </Tooltip>
+          {userInfo?.is_staff && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={"ghost"}
+                  className={cn("nav-item px-2")}
+                  onClick={openUploadForm}
+                >
+                  <Upload size={20} />
+                  <span className="sr-only">Upload Data</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="flex">
+                <p className="nav-item-divider">Upload Data</p>
+                <span className="short-cut">U</span>
+              </TooltipContent>
+            </Tooltip>
+          )}
 
           {/* Logout button */}
           <Tooltip>
