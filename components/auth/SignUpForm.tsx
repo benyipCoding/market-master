@@ -89,9 +89,10 @@ export default function SignupForm() {
 
         const res =
           authAction === "register"
-            ? await register(authForm)
+            ? await register(authForm).then(() => loginAction(authForm))
             : await loginAction(authForm);
         if (res.status !== Status.OK) return toast.error(res.msg);
+
         const userInfo = await getMe().then((res) => res.data);
         setUserInfo(userInfo);
         router.push(process.env.NEXT_PUBLIC_AFTER_LOGIN_PATH as string);
