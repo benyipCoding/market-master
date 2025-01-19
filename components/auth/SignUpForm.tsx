@@ -89,9 +89,13 @@ export default function SignupForm() {
 
         const res =
           authAction === "register"
-            ? await register(authForm).then(() => loginAction(authForm))
+            ? await register(authForm)
             : await loginAction(authForm);
         if (res.status !== Status.OK) return toast.error(res.msg);
+
+        if (authAction === "register") {
+          await loginAction(authForm);
+        }
 
         const userInfo = await getMe().then((res) => res.data);
         setUserInfo(userInfo);
