@@ -9,7 +9,7 @@ const unauthorizedRoutes = [
   // "/dashboard",
 ];
 export function middleware(request: NextRequest) {
-  const auth = request.cookies.get("Authentication")?.value;
+  const auth = request.cookies.get("RefreshToken")?.value;
 
   if (request.nextUrl.pathname === "/") {
     return Response.redirect(new URL("/home", request.url));
