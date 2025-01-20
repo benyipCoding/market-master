@@ -6,6 +6,7 @@ const nextConfig = {
       allowedOrigins: [
         "localhost:3001", // localhost
         "tradecamp.site",
+        "www.tradecamp.site",
       ],
     },
   },
