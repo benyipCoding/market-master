@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { tokenRefresh } from "@/app/(root)/auth/login/tokenRefresh";
 import { RefreshTokenKey } from "../cookieHelper";
 
-const BASE_URL = process.env.BASE_URL + "/api";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL + "/api";
 
 const request = axios.create({
   baseURL: BASE_URL,

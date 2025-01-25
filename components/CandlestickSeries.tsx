@@ -40,14 +40,17 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     return () => {
       emittery?.off(OnApply.ResetMainSeriesData, resetDataHandler);
     };
-  }, [series]);
+  }, [series, emittery]);
 
   useEffect(() => {
     series?.applyOptions(customOptions);
   }, [customOptions]);
 
   useEffect(() => {
-    if (!seriesData.length) return;
+    if (!seriesData.length) {
+      series?.setData([]);
+      return;
+    }
 
     // 求平均振幅
     const totalAmplitude = seriesData.reduce(

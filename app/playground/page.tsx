@@ -85,7 +85,7 @@ const Playground = () => {
   const [candlestickData, setCandlestickData] = useState<
     CandlestickData<Time>[]
   >([]);
-  //
+
   const displayCandlestickData = useMemo(
     () =>
       isBackTestMode
@@ -108,6 +108,7 @@ const Playground = () => {
   const [dialogVisible, setDialogVisible] = useState(false);
 
   const getCandlestickData = async () => {
+    setCandlestickData(() => []);
     const res = await getKLines({
       symbol: currentSymbol?.id!,
       period: currentPeriod?.id!,
@@ -121,8 +122,7 @@ const Playground = () => {
       ...item,
       time: item.timestamp,
     }));
-
-    setCandlestickData(data);
+    setCandlestickData(() => data);
 
     return data.length;
   };
