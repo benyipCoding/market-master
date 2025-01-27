@@ -131,7 +131,7 @@ const UploadForm = () => {
       precision: formValue.toFixedNum,
     };
 
-    const count = 1000;
+    const count = 500;
     const tasks: Array<Promise<any>> = [];
     for (let i = 0; i < payload.data.length; i += count) {
       const newPayload: PayloadForCreateKlines = {

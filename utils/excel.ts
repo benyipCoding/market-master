@@ -1,7 +1,5 @@
 import dayjs from "dayjs";
 import ExcelJS from "exceljs";
-// import customParseFormat from "dayjs/plugin/customParseFormat";
-// import { parse as csvParse } from "papaparse";
 import { indexOfVol, isValidTime, transferToDateStr } from "./helpers";
 import { CandlestickData, Time } from "lightweight-charts";
 
@@ -29,7 +27,6 @@ export function analyzeExcelData(
 
         // Read the first worksheet
         const worksheet = workbook.worksheets[0];
-        // console.log({ worksheet });
 
         const data: Array<
           ExcelJS.CellValue[] | { [key: string]: ExcelJS.CellValue }
@@ -87,7 +84,10 @@ export function analyzeExcelData(
               .map((cell) => Number(cell));
 
             // High
-            const highIndex = rowData.indexOf(Math.max(...numArr));
+            // const highIndex = rowData.indexOf(Math.max(...numArr));
+            const highIndex = rowData.findLastIndex(
+              (d) => d === Math.max(...numArr)
+            );
             headerMap.set(highIndex, ColumnHeaders.HIGH);
 
             // Low

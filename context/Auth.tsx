@@ -1,9 +1,12 @@
 "use client";
+import { getMe } from "@/app/(root)/auth/login/getMe";
+import { Status } from "@/utils/apis/response";
 import {
   createContext,
   Dispatch,
   PropsWithChildren,
   SetStateAction,
+  useEffect,
   useState,
 } from "react";
 
@@ -41,6 +44,13 @@ export const AuthContext = createContext<IAuthContext>({
 
 const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [userInfo, setUserInfo] = useState<User | null>(null);
+
+  useEffect(() => {
+    getMe().then((res) => {
+      if (!res || res.status !== Status.OK) return;
+      setUserInfo(res.data);
+    });
+  }, []);
 
   return (
     <AuthContext.Provider value={{ setUserInfo, userInfo }}>

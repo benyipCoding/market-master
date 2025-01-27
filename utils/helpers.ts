@@ -456,7 +456,11 @@ export function transferToDateStr(date: Date) {
 export function indexOfVol(arr: Array<any>): number {
   if (!arr || !arr.length) return -1;
   if (arr.length < 6) return -1;
-  return arr.indexOf(Math.max(...arr));
+
+  const copy = [...arr];
+  copy.shift();
+
+  return arr.indexOf(Math.max(...copy));
 }
 
 export function adjustTimeZoneOffset(date: Date) {
