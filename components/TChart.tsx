@@ -45,7 +45,6 @@ import { TChartContextMenuRef } from "./interfaces/TChartContextMenu";
 import { DialogContentType, setDialogContent } from "@/store/dialogSlice";
 import { cn } from "@/lib/utils";
 import ControlPanel from "./playground/ControlPanel";
-// import { defaultCandleStickOptions } from "@/constants/seriesOptions";
 
 export const ChartContext = createContext<IChartContext>({});
 
@@ -60,11 +59,10 @@ const TChart: React.ForwardRefRenderFunction<
     drawedLineList,
     setDialogVisible,
     dialogVisible,
-    // displayCandlestickData,
+    width,
   },
   ref
 ) => {
-  const [width, setWidth] = useState("");
   const container = useRef<HTMLDivElement>(null);
   const {
     isDrawing,
@@ -100,17 +98,6 @@ const TChart: React.ForwardRefRenderFunction<
     [isDrawing, isPreselect]
   );
   const contextMenuRef = useRef<TChartContextMenuRef>(null);
-  // const volumeSeries = useMemo(
-  //   () =>
-  //     chart?.addHistogramSeries({
-  //       priceFormat: {
-  //         type: "volume",
-  //       },
-  //       priceScaleId: "left", // set as an overlay by setting a blank priceScaleId
-  //     }),
-
-  //   [chart]
-  // );
 
   // Activate the function of drawing straight lines
   const { drawStart, cleanUp: cleanUp1 } = useEnableDrawingLine({
@@ -255,57 +242,12 @@ const TChart: React.ForwardRefRenderFunction<
     } else contextMenuRef.current?.setSeriesSettingsDisable(true);
   }, [contextMenuVisible]);
 
-  // // 交易量series初始化
-  // useEffect(() => {
-  //   if (!volumeSeries) return;
-  //   volumeSeries.priceScale().applyOptions({
-  //     // set the positioning of the volume series
-  //     scaleMargins: {
-  //       top: 0.85, // highest point of the series will be 70% away from the top
-  //       bottom: 0,
-  //     },
-  //   });
-  // }, [volumeSeries]);
-
-  // useEffect(() => {
-  //   if (!displayCandlestickData.length) return;
-
-  //   if (hasVol) {
-  //     console.log(displayCandlestickData);
-  //     chart?.applyOptions({
-  //       leftPriceScale: {
-  //         visible: true,
-  //       },
-  //     });
-  //     const volumeDatas = displayCandlestickData
-  //       .sort((a: any, b: any) => a.time - b.time)
-  //       .map((d: any) => ({
-  //         time: d.time,
-  //         value: d.volume,
-  //         color:
-  //           d.open >= d.close
-  //             ? defaultCandleStickOptions.upColor
-  //             : defaultCandleStickOptions.downColor,
-  //       }));
-
-  //     volumeSeries?.setData(volumeDatas);
-  //   } else {
-  //     chart?.applyOptions({
-  //       leftPriceScale: {
-  //         visible: false,
-  //       },
-  //     });
-  //     volumeSeries?.setData([]);
-  //     chart?.removeSeries(volumeSeries!);
-  //   }
-  // }, [displayCandlestickData, hasVol]);
-
   useImperativeHandle(ref, () => ({
     chart: chart!,
     childSeries: childSeries,
     chartContainer: container,
     dialogVisible,
-    setWidth,
+
     setLineId_equation,
     setChildSeries,
   }));
@@ -319,8 +261,7 @@ const TChart: React.ForwardRefRenderFunction<
           className,
           isCanGrab && "cursor-grab",
           mousePressing && "cursor-grabbing",
-          isDrawing && !mousePressing && "cursor-crosshair",
-          !width && "flex-1"
+          isDrawing && !mousePressing && "cursor-crosshair"
         )}
         style={{ width }}
         ref={container}

@@ -8,7 +8,14 @@ import {
   MouseEventParams,
   Time,
 } from "lightweight-charts";
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { removeIndicator, removeSeries, throttle } from "@/utils/helpers";
 import { TChartRef } from "@/components/interfaces/TChart";
 import { useDispatch, useSelector } from "react-redux";
@@ -140,22 +147,7 @@ const Playground = () => {
     dispatch(setMouseDblClickEventParam(param));
   };
 
-  const calculateTChartWidth = () => {
-    const width =
-      mainWrapper.current?.offsetWidth! -
-      asideRef.current?.container?.offsetWidth! -
-      dividerRef.current?.offsetWidth!;
-
-    tChartRef.current?.setWidth(`${width}px`);
-  };
-
-  const resizeHandler = () => {
-    tChartRef.current?.setWidth("0px");
-    Promise.resolve().then(() => calculateTChartWidth());
-  };
-
   const toggleAsideOpen = () => {
-    resizeHandler();
     setAsideOpen((prev) => !prev);
   };
 
@@ -183,18 +175,59 @@ const Playground = () => {
     });
   };
 
+  const [isResizing, setIsResizing] = useState(false);
+
+  const dividerDragStart = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    setIsResizing(true);
+  };
+
+  const [maxChartWidth, setMaxChartWidth] = useState<number>();
+  const [tChartWidth, setTChartWidth] = useState<number>(0);
+
+  const resizingAside = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.preventDefault();
+    if (
+      !isResizing ||
+      !mainWrapper.current ||
+      !dividerRef.current ||
+      !asideOpen
+    )
+      return;
+
+    const chartWidth = e.clientX - mainWrapper.current?.offsetLeft!;
+    const realWidth = chartWidth > maxChartWidth! ? maxChartWidth! : chartWidth;
+    setTChartWidth(realWidth);
+  };
+
+  const calculateMaxChartWidth = useCallback(() => {
+    if (!mainWrapper?.current || !dividerRef?.current) return;
+    const maxWidth =
+      mainWrapper.current.offsetWidth - 288 - dividerRef.current.offsetWidth;
+    setMaxChartWidth(maxWidth);
+    if (!tChartWidth || tChartWidth > maxWidth) {
+      setTChartWidth(maxWidth);
+    }
+  }, [tChartWidth]);
+
   useEffect(() => {
-    window.addEventListener("resize", throttle(resizeHandler, 0));
     dispatch(fetchPeriods());
     dispatch(fetchSymbols());
-    // dispatch(fetchProfile());
-    return () => {
-      window.removeEventListener("resize", throttle(resizeHandler, 0));
-    };
   }, []);
 
   useEffect(() => {
+    window.addEventListener("resize", calculateMaxChartWidth);
+
+    return () => {
+      window.removeEventListener("resize", calculateMaxChartWidth);
+    };
+  }, [calculateMaxChartWidth]);
+
+  useEffect(() => {
     if (!tChartRef.current?.chart) return;
+    calculateMaxChartWidth();
 
     const { chart } = tChartRef.current!;
     // Subscribe event when chart init
@@ -237,7 +270,11 @@ const Playground = () => {
 
   return (
     <>
-      <div className="h-full flex bg-slate-100 dark:bg-black flex-col gap-2">
+      <div
+        className="h-full flex bg-slate-100 dark:bg-black flex-col gap-2"
+        onMouseUp={() => setIsResizing(false)}
+        onMouseMove={resizingAside}
+      >
         <Navbar
           className="h-11"
           setDialogVisible={setDialogVisible}
@@ -246,6 +283,7 @@ const Playground = () => {
           setDrawedLineList={setDrawedLineList}
         />
         <main className="flex-1 flex overflow-hidden">
+          {/* 左侧边栏 */}
           <LeftAsideBtns
             className="w-12 mr-2"
             tChartRef={tChartRef}
@@ -253,18 +291,23 @@ const Playground = () => {
             setDialogVisible={setDialogVisible}
             setTechnicalIndicatorLines={setTechnicalIndicatorLines}
           />
+
           <div
             className="flex-1 flex bg-slate-100 dark:bg-black rounded-md overflow-hidden"
             ref={mainWrapper}
           >
+            {/* Chart */}
             <TChart
-              className="bg-background rounded-md z-10"
+              className={cn(
+                "bg-background rounded-md z-10",
+                !asideOpen && "flex-1"
+              )}
               setDrawedLineList={setDrawedLineList}
               drawedLineList={drawedLineList}
               ref={tChartRef}
               setDialogVisible={setDialogVisible}
               dialogVisible={dialogVisible}
-              // displayCandlestickData={displayCandlestickData}
+              width={tChartWidth}
             >
               {currentSymbol && (
                 <CandlestickSeries seriesData={displayCandlestickData} />
@@ -287,23 +330,25 @@ const Playground = () => {
                 tChartRef={tChartRef}
               />
             </TChart>
-
+            {/* 滑块 */}
             <div
-              className="w-2 bg-transparent cursor-col-resize"
+              className="w-2 bg-transparent cursor-col-resize flex-shrink-0"
               ref={dividerRef}
-              onPointerDown={toggleAsideOpen}
+              onMouseDown={dividerDragStart}
             ></div>
-            <Aside
-              className={cn(
-                "bg-background rounded-md overflow-auto max-md:hidden p-2",
-                !asideOpen && "p-0"
-              )}
-              ref={asideRef}
-              asideOpen={asideOpen}
-              setDrawedLineList={setDrawedLineList}
-              tChartRef={tChartRef}
-            />
+            {/* 可伸缩侧边栏 */}
+            {asideOpen && (
+              <Aside
+                className={cn(
+                  "bg-background rounded-md overflow-auto max-md:hidden p-2 flex-1 min-w-72"
+                )}
+                ref={asideRef}
+                setDrawedLineList={setDrawedLineList}
+                tChartRef={tChartRef}
+              />
+            )}
           </div>
+          {/* 右侧边栏 */}
           <RightAsideBtns
             className={cn("w-12 ml-2 max-md:ml-0", !asideOpen && "ml-0")}
             asideOpen={asideOpen}

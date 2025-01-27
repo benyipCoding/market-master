@@ -8,15 +8,10 @@ import { cleanData } from "@/app/playground/actions/cleanData";
 import { Status } from "@/utils/apis/response";
 
 const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
-  { className, asideOpen, setDrawedLineList, tChartRef },
+  { className, setDrawedLineList, tChartRef },
   ref
 ) => {
   const asideRef = useRef<HTMLDivElement>(null);
-
-  const width = useMemo<string>(
-    () => (asideOpen ? "19rem" : "0rem"),
-    [asideOpen]
-  );
 
   const getMeAction = async () => {
     const res = await getMe();
@@ -34,18 +29,16 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   }));
 
   return (
-    <div className={cn(className)} ref={asideRef} style={{ width }}>
-      {asideOpen && (
-        <div className="flex flex-col gap-4">
-          {/* <Button variant={"outline"} onClick={login}>
+    <div className={cn(className)} ref={asideRef}>
+      <div className="flex flex-col gap-4">
+        {/* <Button variant={"outline"} onClick={login}>
             登录测试按钮
           </Button> */}
 
-          {/* <Button variant={"destructive"} onClick={cleanDataAction}>
+        {/* <Button variant={"destructive"} onClick={cleanDataAction}>
             Clean data
           </Button> */}
-        </div>
-      )}
+      </div>
     </div>
   );
 };

@@ -9,7 +9,6 @@ import { CustomLineSeriesType } from "@/hooks/interfaces";
 
 export interface AsideProps {
   className?: string;
-  asideOpen: boolean;
   setDrawedLineList: React.Dispatch<
     React.SetStateAction<DeepPartial<LineStyleOptions & SeriesOptionsCommon>[]>
   >;
