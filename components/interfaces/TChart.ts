@@ -8,6 +8,7 @@ import {
   ISeriesApi,
   SeriesType,
   Time,
+  // CandlestickData,
 } from "lightweight-charts";
 
 export interface TChartProps {
@@ -19,6 +20,7 @@ export interface TChartProps {
   drawedLineList: LineSeriesPartialOptions[];
   setDialogVisible: React.Dispatch<React.SetStateAction<boolean>>;
   dialogVisible: boolean;
+  // displayCandlestickData: CandlestickData<Time>[];
 }
 
 export interface IChartContext {

@@ -38,6 +38,7 @@ import {
   fetchPeriods,
   fetchSymbols,
   setCandleDataSlice,
+  setHasVol,
   setIsBackTestMode,
 } from "@/store/fetchDataSlice";
 import { getKLines } from "./actions/getKLines";
@@ -107,7 +108,7 @@ const Playground = () => {
   // dialog trigger
   const [dialogVisible, setDialogVisible] = useState(false);
 
-  const getCandlestickData = async () => {
+  const getCandlestickData: () => Promise<any[]> = async () => {
     setCandlestickData(() => []);
     const res = await getKLines({
       symbol: currentSymbol?.id!,
@@ -124,7 +125,7 @@ const Playground = () => {
     }));
     setCandlestickData(() => data);
 
-    return data.length;
+    return data;
   };
 
   const crosshairMoveHandler = (param: MouseEventParams<Time>) => {
@@ -218,8 +219,10 @@ const Playground = () => {
     if (!currentPeriod?.id || !currentSymbol?.id) return;
     isBackTestMode && dispatch(setIsBackTestMode(false));
     cleanLineSeries();
-    getCandlestickData().then((length: number) => {
-      dispatch(setCandleDataSlice([0, length]));
+    getCandlestickData().then((data: any[]) => {
+      dispatch(setCandleDataSlice([0, data.length]));
+      if (!data.length) return;
+      dispatch(setHasVol(data.some((d) => !!d.volume)));
     });
   }, [currentPeriod, currentSymbol]);
 
@@ -261,6 +264,7 @@ const Playground = () => {
               ref={tChartRef}
               setDialogVisible={setDialogVisible}
               dialogVisible={dialogVisible}
+              // displayCandlestickData={displayCandlestickData}
             >
               {currentSymbol && (
                 <CandlestickSeries seriesData={displayCandlestickData} />

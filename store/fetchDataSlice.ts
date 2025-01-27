@@ -41,6 +41,7 @@ interface FetchDataState {
   sliceRight: number;
   isBackTestMode: boolean;
   isPreselect: boolean;
+  hasVol: boolean;
 }
 
 const initialState: FetchDataState = {
@@ -56,6 +57,7 @@ const initialState: FetchDataState = {
   sliceRight: 0, // candlestickData.slice的第二个参数，逐渐增加到数组长度
   isBackTestMode: false,
   isPreselect: false,
+  hasVol: false,
 };
 
 export const fetchPeriods = createAsyncThunk("fetch/periods", () => {
@@ -101,6 +103,9 @@ export const fetchDataSlice = createSlice({
     },
     setIsPreselect(state, action: PayloadAction<boolean>) {
       state.isPreselect = action.payload;
+    },
+    setHasVol(state, action: PayloadAction<boolean>) {
+      state.hasVol = action.payload;
     },
   },
   extraReducers(builder) {
@@ -150,6 +155,7 @@ export const {
   setCandleDataSlice,
   setIsBackTestMode,
   setIsPreselect,
+  setHasVol,
 } = fetchDataSlice.actions;
 
 export default fetchDataSlice.reducer;
