@@ -337,7 +337,7 @@ const Playground = () => {
               onMouseDown={dividerDragStart}
             ></div>
             {/* 可伸缩侧边栏 */}
-            {asideOpen && (
+            {asideOpen && !!tChartWidth && (
               <Aside
                 className={cn(
                   "bg-background rounded-md overflow-auto max-md:hidden p-2 flex-1 min-w-72"

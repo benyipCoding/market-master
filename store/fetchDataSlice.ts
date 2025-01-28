@@ -110,7 +110,7 @@ export const fetchDataSlice = createSlice({
   },
   extraReducers(builder) {
     builder.addCase(fetchPeriods.fulfilled, (state, action) => {
-      state.periods = action.payload.data;
+      state.periods = action.payload.data.filter((d: any) => d.label !== "H12"); // 过滤掉H12
       state.currentPeriod = (action.payload.data as BaseLabelType[]).find(
         (p) => p.label === "D1"
       );
