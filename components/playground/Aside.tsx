@@ -14,16 +14,7 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
 ) => {
   const asideRef = useRef<HTMLDivElement>(null);
 
-  // const getMeAction = async () => {
-  //   const res = await getMe();
-  //   if (res.status !== Status.OK) return toast.error(res.msg);
-  //   console.log(res.data);
-  // };
-
-  // const cleanDataAction = async () => {
-  //   const res = await cleanData();
-  //   console.log(res);
-  // };
+  // const createMarketOrder = () => {};
 
   useImperativeHandle(ref, () => ({
     container: asideRef.current,
@@ -32,9 +23,17 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   return (
     <div className={cn(className)} ref={asideRef}>
       <div className="flex flex-col gap-4">
-        <Button variant={"default"}>市价单</Button>
+        {/* <Button
+          variant={"default"}
+          className="active:scale-100"
+          onClick={createMarketOrder}
+        >
+          Market Order
+        </Button>
 
-        <Button variant={"default"}>挂单</Button>
+        <Button variant={"default"} className="active:scale-100">
+          Pending Order
+        </Button> */}
       </div>
     </div>
   );

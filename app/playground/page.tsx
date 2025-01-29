@@ -207,10 +207,8 @@ const Playground = () => {
     const maxWidth =
       mainWrapper.current.offsetWidth - 288 - dividerRef.current.offsetWidth;
     setMaxChartWidth(maxWidth);
-    if (!tChartWidth || tChartWidth > maxWidth) {
-      setTChartWidth(maxWidth);
-    }
-  }, [tChartWidth]);
+    setTChartWidth(maxWidth);
+  }, []);
 
   useEffect(() => {
     dispatch(fetchPeriods());

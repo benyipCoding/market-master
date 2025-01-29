@@ -41,7 +41,10 @@ import {
 } from "@/store/fetchDataSlice";
 import { ITimeScaleApi, Time } from "lightweight-charts";
 import { PiLineSegments } from "react-icons/pi";
-import { SeriesColors } from "@/constants/seriesOptions";
+import {
+  defaultCandleStickOptions,
+  SeriesColors,
+} from "@/constants/seriesOptions";
 import { useAutomaticLineDrawing } from "@/hooks/useAutomaticLineDrawing";
 import { LineState, CustomLineSeriesType, TrendType } from "@/hooks/interfaces";
 import { CiEraser } from "react-icons/ci";
@@ -593,7 +596,7 @@ const Navbar: React.FC<NavbarProps> = ({
           <TooltipTrigger asChild>
             <Button
               className={cn(
-                "nav-item px-2 gap-2 active:scale-100 nav-item-divider",
+                "nav-item px-2 gap-2 active:scale-100",
                 (isBackTestMode || isPreselect) && "bg-primary hover:bg-primary"
               )}
               variant={"ghost"}
@@ -610,6 +613,17 @@ const Navbar: React.FC<NavbarProps> = ({
             <span className="short-cut">T</span>
           </TooltipContent>
         </Tooltip>
+
+        {/* order buttons */}
+
+        <Button
+          className={cn("nav-item px-2 gap-1 active:scale-100 -ml-2")}
+          variant={"ghost"}
+        >
+          Trade
+          <span className="sr-only">Trade</span>
+        </Button>
+
         <div className="absolute right-14 h-full flex py-1 gap-4 items-center">
           {/* Upload data */}
           {userInfo?.is_staff && (
