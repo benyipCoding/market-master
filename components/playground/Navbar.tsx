@@ -250,9 +250,22 @@ const Navbar: React.FC<NavbarProps> = ({
         autoScale: true,
       },
     });
-    type === CustomLineSeriesType.AutomaticDrawed && drawLineInVisibleRange();
-    type === CustomLineSeriesType.SegmentDrawed && drawSegment();
-    type === CustomLineSeriesType.GreatSegmentDrawed && drawGreateSegment();
+    deleteAutomaticLines(type);
+
+    switch (type) {
+      case CustomLineSeriesType.AutomaticDrawed:
+        drawLineInVisibleRange();
+        break;
+      case CustomLineSeriesType.SegmentDrawed:
+        drawSegment();
+        break;
+      case CustomLineSeriesType.GreatSegmentDrawed:
+        drawGreateSegment();
+        break;
+
+      default:
+        break;
+    }
   };
 
   const exitPreselect = () => {
@@ -596,7 +609,7 @@ const Navbar: React.FC<NavbarProps> = ({
           <TooltipTrigger asChild>
             <Button
               className={cn(
-                "nav-item px-2 gap-2 active:scale-100",
+                "nav-item px-2 gap-2 active:scale-100 nav-item-divider",
                 (isBackTestMode || isPreselect) && "bg-primary hover:bg-primary"
               )}
               variant={"ghost"}
@@ -617,7 +630,7 @@ const Navbar: React.FC<NavbarProps> = ({
         {/* order buttons */}
 
         <Button
-          className={cn("nav-item px-2 gap-1 active:scale-100 -ml-2")}
+          className={cn("nav-item px-2 gap-1 active:scale-100")}
           variant={"ghost"}
         >
           Trade

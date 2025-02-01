@@ -1,6 +1,6 @@
 import { motion, useDragControls } from "framer-motion";
 import { SkipForward } from "lucide-react";
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { FaPlay } from "react-icons/fa";
 import { FaSquare } from "react-icons/fa";
@@ -14,8 +14,6 @@ import {
   TooltipContent,
 } from "../ui/tooltip";
 import { IoMdPause } from "react-icons/io";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
 import hotkeys from "hotkeys-js";
 
 interface ControlPanelProps {
