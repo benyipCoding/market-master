@@ -468,7 +468,6 @@ export const useAutomaticLineDrawing = ({
     );
     // 数据笔
     const pens = performDrawing()!;
-    console.log(pens);
 
     // 对比最后一根的起始点位时间
     const lastDataPen = pens[pens.length - 1];
@@ -502,7 +501,9 @@ export const useAutomaticLineDrawing = ({
         deleteSeries(lastDrawedPenSeries);
         setLineList([lastDataPen]);
       }
-    } else {
+    } else if (
+      lastDataPen.startPoint.time < lastDrawedPenSeries.data()[0].time
+    ) {
       deleteSeries(lastDrawedPenSeries);
     }
   };
