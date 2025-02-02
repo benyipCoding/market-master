@@ -448,6 +448,65 @@ export const useAutomaticLineDrawing = ({
     });
   };
 
+  const deleteSeries = (series: ISeriesApi<SeriesType, Time>) => {
+    const { chart, setChildSeries, setLineId_equation } = tChartRef.current!;
+    removeSeries({
+      chart,
+      selectedSeries: series,
+      setChildSeries,
+      setDrawedLineList,
+      setLineId_equation,
+    });
+  };
+
+  const getLastPens = () => {
+    const { childSeries } = tChartRef.current!;
+    // 已画笔
+    const penSeriesList = childSeries.filter(
+      (series) =>
+        series.options().customType === CustomLineSeriesType.AutomaticDrawed
+    );
+    // 数据笔
+    const pens = performDrawing()!;
+    console.log(pens);
+
+    // 对比最后一根的起始点位时间
+    const lastDataPen = pens[pens.length - 1];
+    const lastDrawedPenSeries = penSeriesList[penSeriesList.length - 1];
+
+    return { lastDataPen, lastDrawedPenSeries };
+  };
+
+  // 增量画线
+  const incrementalDraw = () => {
+    const { lastDataPen, lastDrawedPenSeries } = getLastPens();
+    if (!lastDrawedPenSeries) return;
+    // 如果最后一笔的时间都相同，则比较终点
+    if (lastDataPen.startPoint.time === lastDrawedPenSeries.data()[0].time) {
+      if (lastDataPen.endPoint.time !== lastDrawedPenSeries.data()[1].time) {
+        deleteSeries(lastDrawedPenSeries);
+        setLineList([lastDataPen]);
+      }
+    } else {
+      setLineList([lastDataPen]);
+    }
+  };
+
+  // 减量画线
+  const decrementalDraw = () => {
+    const { lastDataPen, lastDrawedPenSeries } = getLastPens();
+    if (!lastDrawedPenSeries) return;
+
+    if (lastDataPen.startPoint.time === lastDrawedPenSeries.data()[0].time) {
+      if (lastDataPen.endPoint.time !== lastDrawedPenSeries.data()[1].time) {
+        deleteSeries(lastDrawedPenSeries);
+        setLineList([lastDataPen]);
+      }
+    } else {
+      deleteSeries(lastDrawedPenSeries);
+    }
+  };
+
   useEffect(() => {
     if (!addtionalSeries) return;
 
@@ -546,5 +605,7 @@ export const useAutomaticLineDrawing = ({
     setLineList,
     drawLineInVisibleRange,
     deleteAutomaticLines,
+    incrementalDraw,
+    decrementalDraw,
   };
 };

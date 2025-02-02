@@ -104,6 +104,8 @@ const Navbar: React.FC<NavbarProps> = ({
     generateLineSegment,
     drawLineInVisibleRange,
     deleteAutomaticLines,
+    incrementalDraw,
+    decrementalDraw,
   } = useAutomaticLineDrawing({
     setDrawedLineList,
     tChartRef,
@@ -184,12 +186,18 @@ const Navbar: React.FC<NavbarProps> = ({
       return;
     }
     dispatch(setCandleDataSlice([sliceLeft - 1]));
+    Promise.resolve().then(() => {
+      incrementalDraw();
+    });
   }, [isBackTestMode, sliceLeft]);
 
   const onPrevTick = useCallback(() => {
     const length = tChartRef.current?.childSeries[0].data().length;
     if (!isBackTestMode || sliceLeft === length) return;
     dispatch(setCandleDataSlice([sliceLeft + 1]));
+    Promise.resolve().then(() => {
+      decrementalDraw();
+    });
   }, [isBackTestMode, sliceLeft]);
 
   const preselectBackTest = useCallback(() => {
