@@ -467,31 +467,69 @@ export const useAutomaticLineDrawing = ({
         series.options().customType === CustomLineSeriesType.AutomaticDrawed
     );
     // 数据笔
-    const pens = performDrawing()!;
+    const dataPens = performDrawing()!;
 
     // 对比最后一根的起始点位时间
-    const lastDataPen = pens[pens.length - 1];
+    const lastDataPen = dataPens[dataPens.length - 1];
     const lastDrawedPenSeries = penSeriesList[penSeriesList.length - 1];
 
-    return { lastDataPen, lastDrawedPenSeries };
+    const segmentSeriesList = childSeries.filter(
+      (series) =>
+        series.options().customType === CustomLineSeriesType.SegmentDrawed
+    );
+
+    const dataSegment = generateLineSegment(dataPens);
+    const lastDataSegment: LineState = dataSegment[dataSegment.length - 1];
+    const lastDrawedSegmentSeries =
+      segmentSeriesList[segmentSeriesList.length - 1];
+
+    return {
+      lastDataPen,
+      lastDrawedPenSeries,
+      lastDataSegment,
+      lastDrawedSegmentSeries,
+    };
   };
 
-  // 增量画线
+  // 增量画笔
   const incrementalDraw = () => {
-    const { lastDataPen, lastDrawedPenSeries } = getLastPens();
-    if (!lastDrawedPenSeries) return;
-    // 如果最后一笔的时间都相同，则比较终点
-    if (lastDataPen.startPoint.time === lastDrawedPenSeries.data()[0].time) {
-      if (lastDataPen.endPoint.time !== lastDrawedPenSeries.data()[1].time) {
-        deleteSeries(lastDrawedPenSeries);
-        setLineList([lastDataPen]);
+    const {
+      lastDataPen,
+      lastDrawedPenSeries,
+      lastDataSegment,
+      lastDrawedSegmentSeries,
+    } = getLastPens();
+    if (lastDrawedPenSeries) {
+      // 如果最后一笔的时间都相同，则比较终点
+      if (lastDataPen.startPoint.time === lastDrawedPenSeries.data()[0].time) {
+        if (lastDataPen.endPoint.time !== lastDrawedPenSeries.data()[1].time) {
+          deleteSeries(lastDrawedPenSeries);
+          setLineList((prev) => [...prev, lastDataPen]);
+        }
+      } else {
+        setLineList((prev) => [...prev, lastDataPen]);
       }
-    } else {
-      setLineList([lastDataPen]);
+    }
+
+    if (lastDrawedSegmentSeries) {
+      if (
+        lastDataSegment.startPoint.time ===
+        lastDrawedSegmentSeries.data()[0].time
+      ) {
+        if (
+          lastDataSegment.endPoint.time !==
+          lastDrawedSegmentSeries.data()[1].time
+        ) {
+          deleteSeries(lastDrawedSegmentSeries);
+          setLineList((prev) => [...prev, lastDataSegment]);
+        }
+      } else {
+        setLineList((prev) => [...prev, lastDataSegment]);
+      }
     }
   };
 
-  // 减量画线
+  // 减量画笔
   const decrementalDraw = () => {
     const { lastDataPen, lastDrawedPenSeries } = getLastPens();
     if (!lastDrawedPenSeries) return;
@@ -499,7 +537,7 @@ export const useAutomaticLineDrawing = ({
     if (lastDataPen.startPoint.time === lastDrawedPenSeries.data()[0].time) {
       if (lastDataPen.endPoint.time !== lastDrawedPenSeries.data()[1].time) {
         deleteSeries(lastDrawedPenSeries);
-        setLineList([lastDataPen]);
+        setLineList((prev) => [...prev, lastDataPen]);
       }
     } else if (
       lastDataPen.startPoint.time < lastDrawedPenSeries.data()[0].time
