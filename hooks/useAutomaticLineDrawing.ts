@@ -504,10 +504,10 @@ export const useAutomaticLineDrawing = ({
       if (lastDataPen.startPoint.time === lastDrawedPenSeries.data()[0].time) {
         if (lastDataPen.endPoint.time !== lastDrawedPenSeries.data()[1].time) {
           deleteSeries(lastDrawedPenSeries);
-          setLineList((prev) => [...prev, lastDataPen]);
+          setLineList([lastDataPen]);
         }
       } else {
-        setLineList((prev) => [...prev, lastDataPen]);
+        setLineList([lastDataPen]);
       }
     }
 
@@ -521,10 +521,14 @@ export const useAutomaticLineDrawing = ({
           lastDrawedSegmentSeries.data()[1].time
         ) {
           deleteSeries(lastDrawedSegmentSeries);
-          setLineList((prev) => [...prev, lastDataSegment]);
+          Promise.resolve().then(() => {
+            setLineList([lastDataSegment]);
+          });
         }
       } else {
-        setLineList((prev) => [...prev, lastDataSegment]);
+        Promise.resolve().then(() => {
+          setLineList([lastDataSegment]);
+        });
       }
     }
   };
@@ -537,7 +541,7 @@ export const useAutomaticLineDrawing = ({
     if (lastDataPen.startPoint.time === lastDrawedPenSeries.data()[0].time) {
       if (lastDataPen.endPoint.time !== lastDrawedPenSeries.data()[1].time) {
         deleteSeries(lastDrawedPenSeries);
-        setLineList((prev) => [...prev, lastDataPen]);
+        setLineList([lastDataPen]);
       }
     } else if (
       lastDataPen.startPoint.time < lastDrawedPenSeries.data()[0].time
