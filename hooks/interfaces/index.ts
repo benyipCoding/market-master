@@ -77,3 +77,8 @@ export interface LineState {
   trend: TrendType;
   type?: CustomLineSeriesType;
 }
+
+export enum DifferDrawType {
+  Incremental = "incremental",
+  Decremental = "decremental",
+}

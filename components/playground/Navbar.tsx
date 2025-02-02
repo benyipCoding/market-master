@@ -46,7 +46,12 @@ import {
   SeriesColors,
 } from "@/constants/seriesOptions";
 import { useAutomaticLineDrawing } from "@/hooks/useAutomaticLineDrawing";
-import { LineState, CustomLineSeriesType, TrendType } from "@/hooks/interfaces";
+import {
+  LineState,
+  CustomLineSeriesType,
+  TrendType,
+  DifferDrawType,
+} from "@/hooks/interfaces";
 import { CiEraser } from "react-icons/ci";
 import { IoPlayBackOutline } from "react-icons/io5";
 import {
@@ -104,8 +109,7 @@ const Navbar: React.FC<NavbarProps> = ({
     generateLineSegment,
     drawLineInVisibleRange,
     deleteAutomaticLines,
-    incrementalDraw,
-    decrementalDraw,
+    differDrawAction,
   } = useAutomaticLineDrawing({
     setDrawedLineList,
     tChartRef,
@@ -187,7 +191,7 @@ const Navbar: React.FC<NavbarProps> = ({
     }
     dispatch(setCandleDataSlice([sliceLeft - 1]));
     Promise.resolve().then(() => {
-      incrementalDraw();
+      differDrawAction(DifferDrawType.Incremental);
     });
   }, [isBackTestMode, sliceLeft]);
 
@@ -196,7 +200,7 @@ const Navbar: React.FC<NavbarProps> = ({
     if (!isBackTestMode || sliceLeft === length) return;
     dispatch(setCandleDataSlice([sliceLeft + 1]));
     Promise.resolve().then(() => {
-      decrementalDraw();
+      differDrawAction(DifferDrawType.Decremental);
     });
   }, [isBackTestMode, sliceLeft]);
 

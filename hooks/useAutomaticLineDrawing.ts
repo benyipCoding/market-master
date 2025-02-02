@@ -9,6 +9,7 @@ import {
   AutomaticLineDrawingArgs,
   AutomaticLinePoint,
   CustomLineSeriesType,
+  DifferDrawType,
   LineState,
   TrendType,
 } from "./interfaces";
@@ -402,7 +403,6 @@ export const useAutomaticLineDrawing = ({
     }
 
     return fixGap(segmentList);
-    // return segmentList;
   };
 
   const drawSegment = () => {
@@ -491,8 +491,42 @@ export const useAutomaticLineDrawing = ({
     };
   };
 
+  const differDraw = (
+    type: DifferDrawType,
+    lastDataPen: LineState,
+    lastDrawedPenSeries: ISeriesApi<SeriesType, Time>
+  ) => {
+    const lastDataPenStartTime = lastDataPen.startPoint.time;
+    const lastDataPenEndTime = lastDataPen.endPoint.time;
+    const lastDrawedPenStartTime = lastDrawedPenSeries.data()[0].time;
+    const lastDrawedPenEndTime = lastDrawedPenSeries.data()[1].time;
+
+    if (
+      lastDataPenStartTime !== lastDrawedPenStartTime &&
+      type === DifferDrawType.Incremental
+    ) {
+      setLineList([lastDataPen]);
+      return;
+    }
+
+    if (
+      lastDataPenStartTime !== lastDrawedPenStartTime &&
+      type === DifferDrawType.Decremental
+    ) {
+      lastDataPenStartTime < lastDrawedPenStartTime &&
+        deleteSeries(lastDrawedPenSeries);
+      return;
+    }
+
+    if (lastDataPenEndTime === lastDrawedPenEndTime) return;
+
+    deleteSeries(lastDrawedPenSeries);
+    setLineList([lastDataPen]);
+    return;
+  };
+
   // 增量画笔
-  const incrementalDraw = () => {
+  const differDrawAction = (type: DifferDrawType) => {
     const {
       lastDataPen,
       lastDrawedPenSeries,
@@ -500,53 +534,13 @@ export const useAutomaticLineDrawing = ({
       lastDrawedSegmentSeries,
     } = getLastPens();
     if (lastDrawedPenSeries) {
-      // 如果最后一笔的时间都相同，则比较终点
-      if (lastDataPen.startPoint.time === lastDrawedPenSeries.data()[0].time) {
-        if (lastDataPen.endPoint.time !== lastDrawedPenSeries.data()[1].time) {
-          deleteSeries(lastDrawedPenSeries);
-          setLineList([lastDataPen]);
-        }
-      } else {
-        setLineList([lastDataPen]);
-      }
+      differDraw(type, lastDataPen, lastDrawedPenSeries);
     }
 
     if (lastDrawedSegmentSeries) {
-      if (
-        lastDataSegment.startPoint.time ===
-        lastDrawedSegmentSeries.data()[0].time
-      ) {
-        if (
-          lastDataSegment.endPoint.time !==
-          lastDrawedSegmentSeries.data()[1].time
-        ) {
-          deleteSeries(lastDrawedSegmentSeries);
-          Promise.resolve().then(() => {
-            setLineList([lastDataSegment]);
-          });
-        }
-      } else {
-        Promise.resolve().then(() => {
-          setLineList([lastDataSegment]);
-        });
-      }
-    }
-  };
-
-  // 减量画笔
-  const decrementalDraw = () => {
-    const { lastDataPen, lastDrawedPenSeries } = getLastPens();
-    if (!lastDrawedPenSeries) return;
-
-    if (lastDataPen.startPoint.time === lastDrawedPenSeries.data()[0].time) {
-      if (lastDataPen.endPoint.time !== lastDrawedPenSeries.data()[1].time) {
-        deleteSeries(lastDrawedPenSeries);
-        setLineList([lastDataPen]);
-      }
-    } else if (
-      lastDataPen.startPoint.time < lastDrawedPenSeries.data()[0].time
-    ) {
-      deleteSeries(lastDrawedPenSeries);
+      Promise.resolve().then(() => {
+        differDraw(type, lastDataSegment, lastDrawedSegmentSeries);
+      });
     }
   };
 
@@ -648,7 +642,6 @@ export const useAutomaticLineDrawing = ({
     setLineList,
     drawLineInVisibleRange,
     deleteAutomaticLines,
-    incrementalDraw,
-    decrementalDraw,
+    differDrawAction,
   };
 };
