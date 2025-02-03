@@ -48,4 +48,5 @@ export enum OnContronPanel {
 
 export enum OnOrderMarker {
   add = "add",
+  removeAll = "removeAll",
 }

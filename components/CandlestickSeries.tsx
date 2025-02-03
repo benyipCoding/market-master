@@ -67,10 +67,12 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   useEffect(() => {
     emittery?.on(OnApply.ResetMainSeriesData, resetDataHandler);
     emittery?.on(OnOrderMarker.add, addOrderMarker);
+    emittery?.on(OnOrderMarker.removeAll, removeOrderMarkers);
 
     return () => {
       emittery?.off(OnApply.ResetMainSeriesData, resetDataHandler);
       emittery?.off(OnOrderMarker.add, addOrderMarker);
+      emittery?.off(OnOrderMarker.removeAll, removeOrderMarkers);
     };
   }, [series, emittery]);
 

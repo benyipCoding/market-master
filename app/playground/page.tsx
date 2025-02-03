@@ -51,7 +51,11 @@ import {
 import { getKLines } from "./actions/getKLines";
 import { CustomLineSeriesType } from "@/hooks/interfaces";
 import { toast } from "sonner";
-import { EmitteryContext, OnContronPanel } from "@/providers/EmitteryProvider";
+import {
+  EmitteryContext,
+  OnContronPanel,
+  OnOrderMarker,
+} from "@/providers/EmitteryProvider";
 
 const Playground = () => {
   // TChart component instance
@@ -249,7 +253,11 @@ const Playground = () => {
   useEffect(() => {
     if (!currentPeriod?.id || !currentSymbol?.id) return;
     isBackTestMode && dispatch(setIsBackTestMode(false));
+    // 清除线
     cleanLineSeries();
+    // 清除标记
+    emittery?.emit(OnOrderMarker.removeAll);
+
     getCandlestickData().then((data: any[]) => {
       dispatch(setCandleDataSlice([0, data.length]));
       if (!data.length) return;
