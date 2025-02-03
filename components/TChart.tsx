@@ -186,6 +186,7 @@ const TChart: React.ForwardRefRenderFunction<
   // Mouse click events (exclusive to light weight chart)
   useEffect(() => {
     if (!mouseClickEventParam?.point || !chart) return;
+
     // Find out if the series was hit by a mouse click
     const hoveringSeries = findHoveringSeries({
       childSeries,

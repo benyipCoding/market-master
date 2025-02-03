@@ -86,7 +86,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ dragConstraints }) => {
         dragControls={dragControls}
         dragConstraints={dragConstraints}
         dragTransition={{ power: 0 }}
-        className="bg-background border fixed left-40 z-50 flex p-1 rounded-lg items-center"
+        className="bg-background border fixed left-[46%] z-50 flex p-1 rounded-lg items-center"
       >
         {/* Previous tick */}
         <Tooltip>
