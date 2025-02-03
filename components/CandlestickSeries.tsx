@@ -49,7 +49,7 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
       const marker: SeriesMarker<Time> = {
         time,
         position: side === OrderSide.buy ? "belowBar" : "aboveBar",
-        color: "#1cd66c",
+        color: "#3b82f6",
         shape: side === OrderSide.buy ? "arrowUp" : "arrowDown",
         text: `${price}`,
         size: 2,

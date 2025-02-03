@@ -50,7 +50,7 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
         <Button
           variant={"default"}
           className="active:scale-100 flex-1 text-xl"
-          style={{ backgroundColor: defaultCandleStickOptions.upColor }}
+          style={{ backgroundColor: defaultCandleStickOptions.borderUpColor }}
           onClick={() => marketOrderAction(OrderSide.buy)}
         >
           Buy
@@ -58,7 +58,7 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
         <Button
           variant={"default"}
           className="active:scale-100 flex-1 text-xl"
-          style={{ backgroundColor: defaultCandleStickOptions.downColor }}
+          style={{ backgroundColor: defaultCandleStickOptions.borderDownColor }}
           onClick={() => marketOrderAction(OrderSide.sell)}
         >
           Sell

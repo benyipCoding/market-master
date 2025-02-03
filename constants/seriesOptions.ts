@@ -6,14 +6,14 @@ import {
 
 // default candle stick series options
 export const defaultCandleStickOptions: CandlestickSeriesPartialOptions = {
-  upColor: "#089981", // 阳线颜色为红色
-  downColor: "#f23645", // 阴线颜色为#00ffff
+  upColor: "transparent", // 阳线颜色为红色
+  downColor: "#00ffff", // 阴线颜色为#00ffff
   borderVisible: true, // 蜡烛图边框可见
   wickVisible: true, // 线可见
-  borderUpColor: "#26a69a", // 阳线边框颜色为红色
-  borderDownColor: "#f23645", // 阴线边框颜色为#00ffff
-  wickUpColor: "#26a69a", // 阳线线颜色为红色
-  wickDownColor: "#f23645", // 阴线线颜色为#00ffff
+  borderUpColor: "#ff0000", // 阳线边框颜色为红色
+  borderDownColor: "#00ffff", // 阴线边框颜色为#00ffff
+  wickUpColor: "#ff0000", // 阳线线颜色为红色
+  wickDownColor: "#00ffff", // 阴线线颜色为#00ffff
   priceLineVisible: false,
 };
 
