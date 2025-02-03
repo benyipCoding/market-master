@@ -10,13 +10,7 @@ import React, {
 import { AsideRef, AsideProps } from "../interfaces/Playground";
 import { Button } from "../ui/button";
 import { defaultCandleStickOptions } from "@/constants/seriesOptions";
-import {
-  CandlestickData,
-  createSeriesMarkers,
-  ISeriesApi,
-  SeriesMarker,
-  Time,
-} from "lightweight-charts";
+import { CandlestickData, ISeriesApi, Time } from "lightweight-charts";
 import { EmitteryContext, OnOrderMarker } from "@/providers/EmitteryProvider";
 import { OrderMarkerPayload, OrderSide } from "../interfaces/CandlestickSeries";
 const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (

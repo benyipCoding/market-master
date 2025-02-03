@@ -5,9 +5,7 @@ import { LineSeriesProps } from "./interfaces/LineSeries";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import {
-  createSeriesMarkers,
   DeepPartial,
-  ISeriesMarkersPluginApi,
   LineData,
   LineSeriesPartialOptions,
   LineWidth,
@@ -78,9 +76,9 @@ const LineSeries: React.FC<LineSeriesProps> = ({
     [currentSeriesOptions]
   );
 
-  const seriesMarkerPlugin = useRef<ISeriesMarkersPluginApi<Time>>();
+  // const seriesMarkerPlugin = useRef<ISeriesMarkersPluginApi<Time>>();
   const setLabel = (options: LineSeriesPartialOptions) => {
-    seriesMarkerPlugin.current?.setMarkers([]);
+    series?.setMarkers([]);
     const date = dayjs(series?.data()[1].time as string);
     const markers: SeriesMarker<Time>[] = [
       {
@@ -96,7 +94,7 @@ const LineSeries: React.FC<LineSeriesProps> = ({
         text: options.customTitle,
       },
     ];
-    seriesMarkerPlugin.current?.setMarkers(markers);
+    series?.setMarkers(markers);
   };
 
   const applyHandler = (
@@ -125,7 +123,7 @@ const LineSeries: React.FC<LineSeriesProps> = ({
 
         if (newCurrentSeriesOptions.showLabel)
           setLabel(newCurrentSeriesOptions);
-        else seriesMarkerPlugin.current?.setMarkers([]);
+        else series?.setMarkers([]);
         break;
 
       case OnApply.Data:
@@ -172,14 +170,14 @@ const LineSeries: React.FC<LineSeriesProps> = ({
     };
   }, [series]);
 
-  useEffect(() => {
-    if (!series) return;
-    seriesMarkerPlugin.current = createSeriesMarkers(series);
+  // useEffect(() => {
+  //   if (!series) return;
+  //   seriesMarkerPlugin.current = createSeriesMarkers(series);
 
-    return () => {
-      seriesMarkerPlugin.current?.detach();
-    };
-  }, [series]);
+  //   return () => {
+  //     seriesMarkerPlugin.current?.detach();
+  //   };
+  // }, [series]);
 
   return null;
 };

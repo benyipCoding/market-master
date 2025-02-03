@@ -1,3 +1,4 @@
+import CandlestickSeries from "@/components/CandlestickSeries";
 import { ChartContext } from "@/components/TChart";
 import {
   defaultCandleStickOptions,
@@ -12,9 +13,9 @@ import {
   setDefaultLineOptions,
 } from "@/utils/storage";
 import {
-  CandlestickSeries,
+  // CandlestickSeries,
   ISeriesApi,
-  LineSeries,
+  // LineSeries,
   OhlcData,
   SeriesPartialOptions,
   SeriesType,
@@ -41,8 +42,7 @@ export const useSeries = <T>(
       case "Line":
         if (!hasDefaultLineOptions()) setDefaultLineOptions(defaultLineOptions);
         setSeries(
-          chart.addSeries(
-            LineSeries,
+          chart.addLineSeries(
             Object.assign({}, getDefaultLineOptions(), customOptions)
           )
         );
@@ -52,8 +52,7 @@ export const useSeries = <T>(
         if (!hasDefaultCandlestickOptions())
           setDefaultCandlestickOptions(defaultCandleStickOptions);
         setSeries(
-          chart.addSeries(
-            CandlestickSeries,
+          chart.addCandlestickSeries(
             Object.assign({}, getDefaultCandlestickOptions(), customOptions)
           )
         );

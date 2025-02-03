@@ -5,7 +5,7 @@ import {
   OrderMarkerPayload,
   OrderSide,
 } from "./interfaces/CandlestickSeries";
-import { memo, useContext, useEffect, useMemo, useRef } from "react";
+import { memo, useCallback, useContext, useEffect } from "react";
 import {
   EmitteryContext,
   OnApply,
@@ -16,8 +16,6 @@ import {
   CandlestickStyleOptions,
   CandlestickData,
   Time,
-  createSeriesMarkers,
-  ISeriesMarkersPluginApi,
   SeriesMarker,
 } from "lightweight-charts";
 import { useDispatch, useSelector } from "react-redux";
@@ -34,7 +32,7 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   const { series } = useSeries("Candlestick", seriesData, customOptions);
   const { emittery } = useContext(EmitteryContext);
   const dispatch = useDispatch<AppDispatch>();
-  const seriesMarkerPlugin = useRef<ISeriesMarkersPluginApi<Time>>();
+  // const seriesMarkerPlugin = useRef<ISeriesMarkersPluginApi<Time>>();
 
   const resetDataHandler = ({
     customOptions,
@@ -47,23 +45,26 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     series?.setData(seriesData);
   };
 
-  const addOrderMarker = ({ side, price, time }: OrderMarkerPayload) => {
-    const prevMarkers = seriesMarkerPlugin.current?.markers();
-    const marker: SeriesMarker<Time> = {
-      time,
-      position: side === OrderSide.buy ? "belowBar" : "aboveBar",
-      color: "#1cd66c",
-      shape: side === OrderSide.buy ? "arrowUp" : "arrowDown",
-      text: `${price}`,
-      size: 2,
-    };
-    const markers = prevMarkers ? [...prevMarkers, marker] : [marker];
-    seriesMarkerPlugin.current?.setMarkers(markers);
-  };
+  const addOrderMarker = useCallback(
+    ({ side, price, time }: OrderMarkerPayload) => {
+      const prevMarkers = series?.markers();
+      const marker: SeriesMarker<Time> = {
+        time,
+        position: side === OrderSide.buy ? "belowBar" : "aboveBar",
+        color: "#1cd66c",
+        shape: side === OrderSide.buy ? "arrowUp" : "arrowDown",
+        text: `${price}`,
+        size: 2,
+      };
+      const markers = prevMarkers ? [...prevMarkers, marker] : [marker];
+      series?.setMarkers(markers);
+    },
+    [series]
+  );
 
-  const removeOrderMarkers = () => {
-    seriesMarkerPlugin.current?.setMarkers([]);
-  };
+  const removeOrderMarkers = useCallback(() => {
+    series?.setMarkers([]);
+  }, [series]);
 
   useEffect(() => {
     emittery?.on(OnApply.ResetMainSeriesData, resetDataHandler);
@@ -94,14 +95,14 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     dispatch(setAvgAmplitude(avgAmplitude));
   }, [seriesData]);
 
-  useEffect(() => {
-    if (!series) return;
-    seriesMarkerPlugin.current = createSeriesMarkers(series);
+  // useEffect(() => {
+  //   if (!series) return;
+  //   seriesMarkerPlugin.current = createSeriesMarkers(series);
 
-    return () => {
-      seriesMarkerPlugin.current?.detach();
-    };
-  }, [series]);
+  //   return () => {
+  //     seriesMarkerPlugin.current?.detach();
+  //   };
+  // }, [series]);
 
   return null;
 };

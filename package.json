@@ -41,7 +41,7 @@
     "hotkeys-js": "^3.13.7",
     "immer": "^10.1.1",
     "jwt-decode": "^4.0.0",
-    "lightweight-charts": "^5.0.1",
+    "lightweight-charts": "^4.2.3",
     "lucide-react": "^0.407.0",
     "mathjs": "^13.0.3",
     "next": "14.2.3",
