@@ -45,3 +45,7 @@ export enum OnContronPanel {
   stopPlaying = "stop_playing",
   cleanLineSeries = "clean_line_series",
 }
+
+export enum OnOrderMarker {
+  add = "add",
+}

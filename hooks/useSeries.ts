@@ -12,7 +12,9 @@ import {
   setDefaultLineOptions,
 } from "@/utils/storage";
 import {
+  CandlestickSeries,
   ISeriesApi,
+  LineSeries,
   OhlcData,
   SeriesPartialOptions,
   SeriesType,
@@ -39,7 +41,8 @@ export const useSeries = <T>(
       case "Line":
         if (!hasDefaultLineOptions()) setDefaultLineOptions(defaultLineOptions);
         setSeries(
-          chart.addLineSeries(
+          chart.addSeries(
+            LineSeries,
             Object.assign({}, getDefaultLineOptions(), customOptions)
           )
         );
@@ -49,7 +52,8 @@ export const useSeries = <T>(
         if (!hasDefaultCandlestickOptions())
           setDefaultCandlestickOptions(defaultCandleStickOptions);
         setSeries(
-          chart.addCandlestickSeries(
+          chart.addSeries(
+            CandlestickSeries,
             Object.assign({}, getDefaultCandlestickOptions(), customOptions)
           )
         );
