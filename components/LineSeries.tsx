@@ -1,11 +1,13 @@
 "use client";
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useSeries } from "@/hooks/useSeries";
 import { LineSeriesProps } from "./interfaces/LineSeries";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import {
+  createSeriesMarkers,
   DeepPartial,
+  ISeriesMarkersPluginApi,
   LineData,
   LineSeriesPartialOptions,
   LineWidth,
@@ -76,8 +78,9 @@ const LineSeries: React.FC<LineSeriesProps> = ({
     [currentSeriesOptions]
   );
 
+  const seriesMarkerPlugin = useRef<ISeriesMarkersPluginApi<Time>>();
   const setLabel = (options: LineSeriesPartialOptions) => {
-    series?.setMarkers([]);
+    seriesMarkerPlugin.current?.setMarkers([]);
     const date = dayjs(series?.data()[1].time as string);
     const markers: SeriesMarker<Time>[] = [
       {
@@ -93,7 +96,7 @@ const LineSeries: React.FC<LineSeriesProps> = ({
         text: options.customTitle,
       },
     ];
-    series?.setMarkers(markers);
+    seriesMarkerPlugin.current?.setMarkers(markers);
   };
 
   const applyHandler = (
@@ -122,7 +125,7 @@ const LineSeries: React.FC<LineSeriesProps> = ({
 
         if (newCurrentSeriesOptions.showLabel)
           setLabel(newCurrentSeriesOptions);
-        else series?.setMarkers([]);
+        else seriesMarkerPlugin.current?.setMarkers([]);
         break;
 
       case OnApply.Data:
@@ -166,6 +169,15 @@ const LineSeries: React.FC<LineSeriesProps> = ({
     return () => {
       emittery?.off(OnApply.Property, applyHandler);
       emittery?.off(OnApply.Data, applyHandler);
+    };
+  }, [series]);
+
+  useEffect(() => {
+    if (!series) return;
+    seriesMarkerPlugin.current = createSeriesMarkers(series);
+
+    return () => {
+      seriesMarkerPlugin.current?.detach();
     };
   }, [series]);
 
