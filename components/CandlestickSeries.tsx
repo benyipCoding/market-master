@@ -21,7 +21,6 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { setAvgAmplitude, symbolToSeriesOptions } from "@/store/fetchDataSlice";
-import { defaultCandleStickOptions } from "@/constants/seriesOptions";
 
 const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   seriesData,
@@ -32,7 +31,6 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   const { series } = useSeries("Candlestick", seriesData, customOptions);
   const { emittery } = useContext(EmitteryContext);
   const dispatch = useDispatch<AppDispatch>();
-  // const seriesMarkerPlugin = useRef<ISeriesMarkersPluginApi<Time>>();
 
   const resetDataHandler = ({
     customOptions,
@@ -94,15 +92,6 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     const avgAmplitude = totalAmplitude / seriesData.length;
     dispatch(setAvgAmplitude(avgAmplitude));
   }, [seriesData]);
-
-  // useEffect(() => {
-  //   if (!series) return;
-  //   seriesMarkerPlugin.current = createSeriesMarkers(series);
-
-  //   return () => {
-  //     seriesMarkerPlugin.current?.detach();
-  //   };
-  // }, [series]);
 
   return null;
 };

@@ -13,9 +13,7 @@ import {
   setDefaultLineOptions,
 } from "@/utils/storage";
 import {
-  // CandlestickSeries,
   ISeriesApi,
-  // LineSeries,
   OhlcData,
   SeriesPartialOptions,
   SeriesType,
