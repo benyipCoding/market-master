@@ -5,12 +5,11 @@ export interface CandlestickSeriesProps {
 }
 
 export enum OrderSide {
-  buy = "buy",
-  sell = "sell",
+  BUY = "buy",
+  SELL = "sell",
 }
 
-export type OrderMarkerPayload = {
-  side: OrderSide;
-  price: number;
-  time: Time;
-};
+export enum OrderType {
+  MARKET = "market",
+  LIMIT = "limit",
+}

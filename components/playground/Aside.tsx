@@ -4,7 +4,6 @@ import React, {
   forwardRef,
   useContext,
   useImperativeHandle,
-  useMemo,
   useRef,
 } from "react";
 import { AsideRef, AsideProps } from "../interfaces/Playground";
@@ -12,13 +11,20 @@ import { Button } from "../ui/button";
 import { defaultCandleStickOptions } from "@/constants/seriesOptions";
 import { CandlestickData, ISeriesApi, Time } from "lightweight-charts";
 import { EmitteryContext, OnOrderMarker } from "@/providers/EmitteryProvider";
-import { OrderMarkerPayload, OrderSide } from "../interfaces/CandlestickSeries";
+import { OrderSide, OrderType } from "../interfaces/CandlestickSeries";
+import {
+  CreateOrderDto,
+  postMarketOrder,
+} from "@/app/playground/actions/createMarketOrder";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   { className, setDrawedLineList, tChartRef },
   ref
 ) => {
   const asideRef = useRef<HTMLDivElement>(null);
   const { emittery } = useContext(EmitteryContext);
+  const { currentSymbol } = useSelector((state: RootState) => state.fetchData);
 
   useImperativeHandle(ref, () => ({
     container: asideRef.current,
@@ -29,19 +35,26 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     return tChartRef.current.childSeries[0] as ISeriesApi<"Candlestick", Time>;
   };
 
-  const marketOrderAction = (side: OrderSide) => {
+  const marketOrderAction = async (side: OrderSide) => {
     const mainSeries = extraMainSeries()!;
     const currentCandle = mainSeries.data()[
       mainSeries?.data().length - 1
     ] as CandlestickData;
 
-    const payload: OrderMarkerPayload = {
+    const payload: CreateOrderDto = {
       side,
-      price: currentCandle.close,
-      time: currentCandle.time,
+      opening_price: currentCandle.close,
+      time: currentCandle.time!,
+      order_type: OrderType.MARKET,
+      symbol_id: currentSymbol?.id!,
+      quantity: 1000, // 暂时写死
     };
 
-    emittery?.emit(OnOrderMarker.add, payload);
+    try {
+      const res = await postMarketOrder(payload);
+      console.log(res);
+      emittery?.emit(OnOrderMarker.add, payload);
+    } catch (error) {}
   };
 
   return (
@@ -51,7 +64,7 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
           variant={"default"}
           className="active:scale-100 flex-1 text-xl"
           style={{ backgroundColor: defaultCandleStickOptions.borderUpColor }}
-          onClick={() => marketOrderAction(OrderSide.buy)}
+          onClick={() => marketOrderAction(OrderSide.BUY)}
         >
           Buy
         </Button>
@@ -59,7 +72,7 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
           variant={"default"}
           className="active:scale-100 flex-1 text-xl"
           style={{ backgroundColor: defaultCandleStickOptions.borderDownColor }}
-          onClick={() => marketOrderAction(OrderSide.sell)}
+          onClick={() => marketOrderAction(OrderSide.SELL)}
         >
           Sell
         </Button>

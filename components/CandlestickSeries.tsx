@@ -2,7 +2,6 @@
 import { useSeries } from "@/hooks/useSeries";
 import {
   CandlestickSeriesProps,
-  OrderMarkerPayload,
   OrderSide,
 } from "./interfaces/CandlestickSeries";
 import { memo, useCallback, useContext, useEffect } from "react";
@@ -21,6 +20,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { setAvgAmplitude, symbolToSeriesOptions } from "@/store/fetchDataSlice";
+import { CreateOrderDto } from "@/app/playground/actions/createMarketOrder";
 
 const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   seriesData,
@@ -44,14 +44,14 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   };
 
   const addOrderMarker = useCallback(
-    ({ side, price, time }: OrderMarkerPayload) => {
+    ({ side, opening_price, time }: CreateOrderDto) => {
       const prevMarkers = series?.markers();
       const marker: SeriesMarker<Time> = {
-        time,
-        position: side === OrderSide.buy ? "belowBar" : "aboveBar",
+        time: time as Time,
+        position: side === OrderSide.BUY ? "belowBar" : "aboveBar",
         color: "#3b82f6",
-        shape: side === OrderSide.buy ? "arrowUp" : "arrowDown",
-        text: `${price}`,
+        shape: side === OrderSide.BUY ? "arrowUp" : "arrowDown",
+        text: `${opening_price}`,
         size: 2,
       };
       const markers = prevMarkers ? [...prevMarkers, marker] : [marker];

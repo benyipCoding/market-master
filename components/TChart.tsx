@@ -126,6 +126,7 @@ const TChart: React.ForwardRefRenderFunction<
     return () => {
       cleanUp1();
       cleanUp2();
+      chart?.remove();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
