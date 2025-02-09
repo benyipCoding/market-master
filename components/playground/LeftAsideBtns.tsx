@@ -118,10 +118,12 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
   useEffect(() => {
     hotkeys("l", toggleDrawingLineSegment);
     hotkeys("v", toggleAutoResize);
+    hotkeys("m", toggleBottomPanelOpen);
 
     return () => {
       hotkeys.unbind("l");
       hotkeys.unbind("v");
+      hotkeys.unbind("m");
     };
   }, [toggleDrawingLineSegment, toggleAutoResize]);
 
@@ -235,7 +237,7 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
           </TooltipTrigger>
           <TooltipContent side="right" className="flex">
             <p className="nav-item-divider">Bottom Panel</p>
-            <span className="short-cut">B</span>
+            <span className="short-cut">M</span>
           </TooltipContent>
         </Tooltip>
       </div>

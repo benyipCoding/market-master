@@ -361,7 +361,7 @@ const Playground = () => {
                   "bg-background rounded-md overflow-auto max-md:hidden p-2 flex-1 min-w-72"
                 )}
                 ref={asideRef}
-                setDrawedLineList={setDrawedLineList}
+                // setDrawedLineList={setDrawedLineList}
                 tChartRef={tChartRef}
               />
             )}

@@ -9,9 +9,9 @@ import { CustomLineSeriesType } from "@/hooks/interfaces";
 
 export interface AsideProps {
   className?: string;
-  setDrawedLineList: React.Dispatch<
-    React.SetStateAction<DeepPartial<LineStyleOptions & SeriesOptionsCommon>[]>
-  >;
+  // setDrawedLineList: React.Dispatch<
+  //   React.SetStateAction<DeepPartial<LineStyleOptions & SeriesOptionsCommon>[]>
+  // >;
   tChartRef: React.RefObject<TChartRef>;
 }
 

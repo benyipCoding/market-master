@@ -19,7 +19,11 @@ import {
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
-  { className, setDrawedLineList, tChartRef },
+  {
+    className,
+    // setDrawedLineList,
+    tChartRef,
+  },
   ref
 ) => {
   const asideRef = useRef<HTMLDivElement>(null);
@@ -51,8 +55,8 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     };
 
     try {
-      const res = await postMarketOrder(payload);
-      console.log(res);
+      // const res = await postMarketOrder(payload);
+      // console.log(res);
       emittery?.emit(OnOrderMarker.add, payload);
     } catch (error) {}
   };

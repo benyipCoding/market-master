@@ -641,13 +641,13 @@ const Navbar: React.FC<NavbarProps> = ({
 
         {/* order buttons */}
 
-        <Button
+        {/* <Button
           className={cn("nav-item px-2 gap-1 active:scale-100")}
           variant={"ghost"}
         >
           Trade
           <span className="sr-only">Trade</span>
-        </Button>
+        </Button> */}
 
         <div className="absolute right-14 h-full flex py-1 gap-4 items-center">
           {/* Upload data */}
