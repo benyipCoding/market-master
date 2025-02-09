@@ -29,6 +29,8 @@ export interface LeftAsideBtnsProps {
   setTechnicalIndicatorLines: React.Dispatch<
     React.SetStateAction<TechnicalIndicatorLine[]>
   >;
+  setBottomPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  bottomPanelOpen: boolean;
 }
 
 export interface NavbarProps {

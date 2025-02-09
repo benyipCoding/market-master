@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { LeftAsideBtnsProps } from "../interfaces/Playground";
 import { PiLineSegment } from "react-icons/pi";
 import { Button } from "../ui/button";
@@ -22,6 +22,7 @@ import {
 import hotkeys from "hotkeys-js";
 import { removeIndicator, removeSeries } from "@/utils/helpers";
 import { BsArrowsVertical } from "react-icons/bs";
+import { PanelRightClose, PanelRightOpen } from "lucide-react";
 
 const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
   className,
@@ -29,6 +30,8 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
   setDialogVisible,
   setDrawedLineList,
   setTechnicalIndicatorLines,
+  bottomPanelOpen,
+  setBottomPanelOpen,
 }) => {
   const { isDrawing, selectedSeries, selectedIndicator, graphType } =
     useSelector((state: RootState) => state.common);
@@ -107,6 +110,10 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
     }
   }, [isAutoResize]);
 
+  const toggleBottomPanelOpen = () => {
+    setBottomPanelOpen((prev) => !prev);
+  };
+
   // L key
   useEffect(() => {
     hotkeys("l", toggleDrawingLineSegment);
@@ -139,7 +146,7 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
     <TooltipProvider delayDuration={0}>
       <div
         className={cn(
-          "bg-background rounded-md flex-shrink-0 flex flex-col p-1 gap-3",
+          "bg-background rounded-md flex-shrink-0 flex flex-col p-1 gap-3 relative",
           className
         )}
       >
@@ -185,6 +192,7 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
             <span className="short-cut">L</span>
           </TooltipContent>
         </Tooltip>
+
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -203,6 +211,31 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
           <TooltipContent side="right" className="flex">
             <p className="nav-item-divider">Horizontal Line</p>
             <span className="short-cut">H</span>
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              type="button"
+              variant={bottomPanelOpen ? "default" : "ghost"}
+              className={cn(
+                "hover:bg-muted p-1 absolute bottom-4",
+                bottomPanelOpen && "hover:bg-primary bg-primary"
+              )}
+              onClick={toggleBottomPanelOpen}
+            >
+              {bottomPanelOpen ? (
+                <PanelRightClose className="w-full h-full rotate-90" />
+              ) : (
+                <PanelRightOpen className="w-full h-full rotate-90" />
+              )}
+              <span className="sr-only">Bottom Panel</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right" className="flex">
+            <p className="nav-item-divider">Bottom Panel</p>
+            <span className="short-cut">B</span>
           </TooltipContent>
         </Tooltip>
       </div>

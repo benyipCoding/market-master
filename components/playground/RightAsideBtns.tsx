@@ -36,8 +36,11 @@ const RightAsideBtns: React.FC<RightAsideBtnsProps> = ({
           <TooltipTrigger asChild>
             <Button
               type="button"
-              variant={"ghost"}
-              className={cn("hover:bg-muted p-1")}
+              variant={asideOpen ? "default" : "ghost"}
+              className={cn(
+                "hover:bg-muted p-1",
+                asideOpen && "bg-primary hover:bg-primary"
+              )}
             >
               {asideOpen ? (
                 <PanelRightClose

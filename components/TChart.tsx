@@ -23,6 +23,7 @@ import React, {
   forwardRef,
   useImperativeHandle,
   useMemo,
+  useCallback,
 } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { TChartRef, TChartProps, IChartContext } from "./interfaces/TChart";
@@ -60,6 +61,8 @@ const TChart: React.ForwardRefRenderFunction<
     setDialogVisible,
     dialogVisible,
     width,
+    asideOpen,
+    bottomPanelOpen,
   },
   ref
 ) => {
@@ -98,6 +101,9 @@ const TChart: React.ForwardRefRenderFunction<
     [isDrawing, isPreselect]
   );
   const contextMenuRef = useRef<TChartContextMenuRef>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const bottomPanelRef = useRef<HTMLDivElement>(null);
+  const dividerRef = useRef<HTMLDivElement>(null);
 
   // Activate the function of drawing straight lines
   const { drawStart, cleanUp: cleanUp1 } = useEnableDrawingLine({
@@ -244,56 +250,121 @@ const TChart: React.ForwardRefRenderFunction<
     } else contextMenuRef.current?.setSeriesSettingsDisable(true);
   }, [contextMenuVisible]);
 
+  const [isResizing, setIsResizing] = useState(false);
+  const [chartHeight, setChartHeight] = useState<number>(0);
+  const [maxChartHeight, setMaxChartHeight] = useState<number>(0);
+
+  const calculateMaxChartHeight = () => {
+    if (!wrapperRef?.current || !dividerRef?.current) return;
+    const wrapperHeight = wrapperRef.current.offsetHeight;
+    const maxHeight = wrapperHeight - 192 - dividerRef.current.offsetHeight;
+    setMaxChartHeight(maxHeight);
+    setChartHeight(maxHeight);
+  };
+
+  const dividerDragStart = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    setIsResizing(true);
+  };
+
   useImperativeHandle(ref, () => ({
     chart: chart!,
     childSeries: childSeries,
     chartContainer: container,
     dialogVisible,
-
     setLineId_equation,
     setChildSeries,
+    setIsResizing,
+    isResizing,
+    wrapper: wrapperRef.current,
+    bottomPanel: bottomPanelRef.current,
+    maxChartHeight,
+    setChartHeight,
   }));
 
+  useEffect(() => {
+    calculateMaxChartHeight();
+    window.addEventListener("resize", calculateMaxChartHeight);
+
+    return () => {
+      window.removeEventListener("resize", calculateMaxChartHeight);
+    };
+  }, []);
+
   return (
-    <ContextMenu onOpenChange={setContextMenuVisible} modal={true}>
-      <ContextMenuTrigger
-        disabled={contextMenuTriggerDisable}
-        className={cn(
-          "relative block",
-          className,
-          isCanGrab && "cursor-grab",
-          mousePressing && "cursor-grabbing",
-          isDrawing && !mousePressing && "cursor-crosshair"
-        )}
-        style={{ width }}
-        ref={container}
-        // Only unselected series can trigger the line drawing function
-        onMouseDown={(e) =>
-          hoveringPoint && !isDrawing
-            ? changeSelectedSeries(
-                e as MouseEvent | React.MouseEvent<HTMLDivElement, MouseEvent>
-              )
-            : drawStart(e as any, container.current)
-        }
+    <div
+      className={cn(
+        "relative bg-slate-100 dark:bg-black rounded-md z-10 flex flex-col",
+        !asideOpen && "flex-1"
+      )}
+      style={{ width }}
+      ref={wrapperRef}
+    >
+      {/* 图表 */}
+      <div
+        className={cn("bg-background", !bottomPanelOpen && "flex-1")}
+        style={{ height: chartHeight }}
       >
-        <ChartContext.Provider
-          value={{
-            chart,
-            setChildSeries,
-          }}
-        >
-          {children}
-        </ChartContext.Provider>
-      </ContextMenuTrigger>
+        <ContextMenu onOpenChange={setContextMenuVisible} modal={true}>
+          <ContextMenuTrigger
+            disabled={contextMenuTriggerDisable}
+            className={cn(
+              "block h-full",
+              className,
+              isCanGrab && "cursor-grab",
+              mousePressing && "cursor-grabbing",
+              isDrawing && !mousePressing && "cursor-crosshair"
+            )}
+            ref={container}
+            // Only unselected series can trigger the line drawing function
+            onMouseDown={(e) =>
+              hoveringPoint && !isDrawing
+                ? changeSelectedSeries(
+                    e as
+                      | MouseEvent
+                      | React.MouseEvent<HTMLDivElement, MouseEvent>
+                  )
+                : drawStart(e as any, container.current)
+            }
+          >
+            <ChartContext.Provider
+              value={{
+                chart,
+                setChildSeries,
+              }}
+            >
+              {children}
+            </ChartContext.Provider>
+          </ContextMenuTrigger>
 
-      <TChartContextMenu
-        ref={contextMenuRef}
-        setDialogVisible={setDialogVisible}
-        dialogVisible={dialogVisible}
-      />
+          <TChartContextMenu
+            ref={contextMenuRef}
+            setDialogVisible={setDialogVisible}
+            dialogVisible={dialogVisible}
+          />
 
-      {isBackTestMode && <ControlPanel dragConstraints={container} />}
-    </ContextMenu>
+          {isBackTestMode && <ControlPanel dragConstraints={container} />}
+        </ContextMenu>
+      </div>
+      {/* 滑块 */}
+      <div
+        className={cn(
+          "h-2 cursor-n-resize flex-shrink-0",
+          !bottomPanelOpen && "h-0"
+        )}
+        onMouseDown={dividerDragStart}
+        ref={dividerRef}
+      ></div>
+      {/* 底部操作台 */}
+      {bottomPanelOpen && (
+        <div
+          className="bg-background min-h-48 flex-1"
+          ref={bottomPanelRef}
+        ></div>
+      )}
+    </div>
   );
 };
 

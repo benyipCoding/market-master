@@ -64,6 +64,7 @@ const Playground = () => {
   const asideRef = useRef<AsideRef>(null);
   const dividerRef = useRef<HTMLDivElement>(null);
   const [asideOpen, setAsideOpen] = useState(true);
+  const [bottomPanelOpen, setBottomPanelOpen] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
   const { dialogContent } = useSelector((state: RootState) => state.dialog);
   const {
@@ -193,17 +194,23 @@ const Playground = () => {
 
   const resizingAside = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.preventDefault();
-    if (
-      !isResizing ||
-      !mainWrapper.current ||
-      !dividerRef.current ||
-      !asideOpen
-    )
-      return;
+    if (!mainWrapper.current || !dividerRef.current) return;
 
-    const chartWidth = e.clientX - mainWrapper.current?.offsetLeft!;
-    const realWidth = chartWidth > maxChartWidth! ? maxChartWidth! : chartWidth;
-    setTChartWidth(realWidth);
+    if (isResizing && asideOpen) {
+      const chartWidth = e.clientX - mainWrapper.current?.offsetLeft!;
+      const realWidth =
+        chartWidth > maxChartWidth! ? maxChartWidth! : chartWidth;
+      setTChartWidth(realWidth);
+    }
+
+    if (tChartRef.current?.isResizing && bottomPanelOpen) {
+      const chartHeight = e.clientY - tChartRef.current.wrapper?.offsetTop!;
+      const realHeight =
+        chartHeight > tChartRef.current.maxChartHeight
+          ? tChartRef.current.maxChartHeight
+          : chartHeight;
+      tChartRef.current.setChartHeight(realHeight);
+    }
   };
 
   const calculateMaxChartWidth = useCallback(() => {
@@ -213,6 +220,11 @@ const Playground = () => {
     setMaxChartWidth(maxWidth);
     setTChartWidth(maxWidth);
   }, []);
+
+  const cancelResizing = () => {
+    setIsResizing(false);
+    tChartRef.current?.setIsResizing(false);
+  };
 
   useEffect(() => {
     dispatch(fetchPeriods());
@@ -278,7 +290,7 @@ const Playground = () => {
     <>
       <div
         className="h-full flex bg-slate-100 dark:bg-black flex-col gap-2"
-        onMouseUp={() => setIsResizing(false)}
+        onMouseUp={cancelResizing}
         onMouseMove={resizingAside}
       >
         <Navbar
@@ -296,6 +308,8 @@ const Playground = () => {
             setDrawedLineList={setDrawedLineList}
             setDialogVisible={setDialogVisible}
             setTechnicalIndicatorLines={setTechnicalIndicatorLines}
+            setBottomPanelOpen={setBottomPanelOpen}
+            bottomPanelOpen={bottomPanelOpen}
           />
 
           <div
@@ -304,16 +318,14 @@ const Playground = () => {
           >
             {/* Chart */}
             <TChart
-              className={cn(
-                "bg-background rounded-md z-10",
-                !asideOpen && "flex-1"
-              )}
               setDrawedLineList={setDrawedLineList}
               drawedLineList={drawedLineList}
               ref={tChartRef}
               setDialogVisible={setDialogVisible}
               dialogVisible={dialogVisible}
               width={tChartWidth}
+              asideOpen={asideOpen}
+              bottomPanelOpen={bottomPanelOpen}
             >
               {currentSymbol && (
                 <CandlestickSeries seriesData={displayCandlestickData} />
@@ -338,7 +350,7 @@ const Playground = () => {
             </TChart>
             {/* 滑块 */}
             <div
-              className="w-2 bg-transparent cursor-col-resize flex-shrink-0"
+              className="w-2 bg-transparent cursor-e-resize flex-shrink-0"
               ref={dividerRef}
               onMouseDown={dividerDragStart}
             ></div>

@@ -11,7 +11,7 @@ import {
 } from "lightweight-charts";
 
 export interface TChartProps {
-  className: string;
+  className?: string;
   setDrawedLineList: React.Dispatch<
     React.SetStateAction<DeepPartial<LineStyleOptions & SeriesOptionsCommon>[]>
   >;
@@ -20,6 +20,8 @@ export interface TChartProps {
   setDialogVisible: React.Dispatch<React.SetStateAction<boolean>>;
   dialogVisible: boolean;
   width: number | string;
+  asideOpen: boolean;
+  bottomPanelOpen: boolean;
 }
 
 export interface IChartContext {
@@ -40,4 +42,10 @@ export interface TChartRef {
   setChildSeries: React.Dispatch<
     React.SetStateAction<ISeriesApi<SeriesType, Time>[]>
   >;
+  setIsResizing: React.Dispatch<React.SetStateAction<boolean>>;
+  isResizing: boolean;
+  wrapper: HTMLDivElement | null;
+  bottomPanel: HTMLDivElement | null;
+  maxChartHeight: number;
+  setChartHeight: React.Dispatch<React.SetStateAction<number>>;
 }

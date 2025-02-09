@@ -151,13 +151,13 @@ export const controlPanelSlideIn = () => {
   return {
     hidden: {
       x: "-50%",
-      y: "-210%",
-      opacity: 0,
+      y: "-100%",
+      // opacity: 1,
     },
     show: {
       x: "-50%",
       y: "10%",
-      opacity: 1,
+      // opacity: 1,
       transition: {
         duration: 0.3,
       },
