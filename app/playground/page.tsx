@@ -229,6 +229,11 @@ const Playground = () => {
   useEffect(() => {
     dispatch(fetchPeriods());
     dispatch(fetchSymbols());
+    window.addEventListener("mouseup", cancelResizing);
+
+    return () => {
+      window.removeEventListener("mouseup", cancelResizing);
+    };
   }, []);
 
   useEffect(() => {
@@ -290,7 +295,6 @@ const Playground = () => {
     <>
       <div
         className="h-full flex bg-slate-100 dark:bg-black flex-col gap-2"
-        onMouseUp={cancelResizing}
         onMouseMove={resizingAside}
       >
         <Navbar

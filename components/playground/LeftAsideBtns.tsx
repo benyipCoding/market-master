@@ -1,6 +1,9 @@
 import { cn } from "@/lib/utils";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { LeftAsideBtnsProps } from "../interfaces/Playground";
+import {
+  BottomPanelContent,
+  LeftAsideBtnsProps,
+} from "../interfaces/Playground";
 import { PiLineSegment } from "react-icons/pi";
 import { Button } from "../ui/button";
 import {
@@ -23,6 +26,9 @@ import hotkeys from "hotkeys-js";
 import { removeIndicator, removeSeries } from "@/utils/helpers";
 import { BsArrowsVertical } from "react-icons/bs";
 import { PanelRightClose, PanelRightOpen } from "lucide-react";
+import { RiListUnordered } from "react-icons/ri";
+import { MdBarChart } from "react-icons/md";
+import { setPanelContent } from "@/store/bottomPanelSlice";
 
 const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
   className,
@@ -35,6 +41,8 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
 }) => {
   const { isDrawing, selectedSeries, selectedIndicator, graphType } =
     useSelector((state: RootState) => state.common);
+
+  const { panelContent } = useSelector((state: RootState) => state.bottomPanel);
   const dispatch = useDispatch<AppDispatch>();
 
   const isAutoResize = useMemo<boolean>(
@@ -114,6 +122,14 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
     setBottomPanelOpen((prev) => !prev);
   };
 
+  const switchToOrders = () => {
+    dispatch(setPanelContent(BottomPanelContent.Orders));
+  };
+
+  const switchToOscillators = () => {
+    dispatch(setPanelContent(BottomPanelContent.Oscillators));
+  };
+
   // L key
   useEffect(() => {
     hotkeys("l", toggleDrawingLineSegment);
@@ -137,9 +153,13 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
 
   useEffect(() => {
     hotkeys("Esc", closeDialogByESC);
+    hotkeys("o", switchToOrders);
+    hotkeys("c", switchToOscillators);
     document.addEventListener("contextmenu", contextmenuHandler);
     return () => {
       hotkeys.unbind("Esc");
+      hotkeys.unbind("o");
+      hotkeys.unbind("c");
       document.removeEventListener("contextmenu", contextmenuHandler);
     };
   }, []);
@@ -216,30 +236,85 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
           </TooltipContent>
         </Tooltip>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              type="button"
-              variant={bottomPanelOpen ? "default" : "ghost"}
-              className={cn(
-                "hover:bg-muted p-1 absolute bottom-4",
-                bottomPanelOpen && "hover:bg-primary bg-primary"
-              )}
-              onClick={toggleBottomPanelOpen}
-            >
-              {bottomPanelOpen ? (
-                <PanelRightClose className="w-full h-full rotate-90" />
-              ) : (
-                <PanelRightOpen className="w-full h-full rotate-90" />
-              )}
-              <span className="sr-only">Bottom Panel</span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="right" className="flex">
-            <p className="nav-item-divider">Bottom Panel</p>
-            <span className="short-cut">M</span>
-          </TooltipContent>
-        </Tooltip>
+        <div className="absolute bottom-4 flex flex-col gap-4">
+          {/* Orders */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                variant={
+                  panelContent === BottomPanelContent.Orders
+                    ? "default"
+                    : "ghost"
+                }
+                className={cn(
+                  "hover:bg-muted p-1 active:scale-100 opacity-0 transition duration-150 translate-y-28",
+                  bottomPanelOpen && "opacity-100 translate-y-0",
+                  panelContent === BottomPanelContent.Orders &&
+                    "hover:bg-primary"
+                )}
+                onClick={switchToOrders}
+              >
+                <RiListUnordered className="w-full h-full" />
+                <span className="sr-only">Orders</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="flex">
+              <p className="nav-item-divider">Orders</p>
+              <span className="short-cut">O</span>
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                variant={
+                  panelContent === BottomPanelContent.Oscillators
+                    ? "default"
+                    : "ghost"
+                }
+                className={cn(
+                  "hover:bg-muted p-1 active:scale-100 opacity-0 transition duration-150 translate-y-10",
+                  bottomPanelOpen && "opacity-100 translate-y-0",
+                  panelContent === BottomPanelContent.Oscillators &&
+                    "hover:bg-primary"
+                )}
+                onClick={switchToOscillators}
+              >
+                <MdBarChart className="w-full h-full" />
+                <span className="sr-only">Oscillators</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="flex">
+              <p className="nav-item-divider">Oscillators</p>
+              <span className="short-cut">C</span>
+            </TooltipContent>
+          </Tooltip>
+
+          {/* 切换按钮 */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                variant={"ghost"}
+                className={cn("hover:bg-muted p-1 active:scale-100")}
+                onClick={toggleBottomPanelOpen}
+              >
+                {bottomPanelOpen ? (
+                  <PanelRightClose className="w-full h-full rotate-90" />
+                ) : (
+                  <PanelRightOpen className="w-full h-full rotate-90" />
+                )}
+                <span className="sr-only">Bottom Panel</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="flex">
+              <p className="nav-item-divider">Bottom Panel</p>
+              <span className="short-cut">M</span>
+            </TooltipContent>
+          </Tooltip>
+        </div>
       </div>
     </TooltipProvider>
   );

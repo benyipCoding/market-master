@@ -46,6 +46,7 @@ import { TChartContextMenuRef } from "./interfaces/TChartContextMenu";
 import { DialogContentType, setDialogContent } from "@/store/dialogSlice";
 import { cn } from "@/lib/utils";
 import ControlPanel from "./playground/ControlPanel";
+import BottomPanel from "./playground/BottomPanel";
 
 export const ChartContext = createContext<IChartContext>({});
 
@@ -102,7 +103,6 @@ const TChart: React.ForwardRefRenderFunction<
   );
   const contextMenuRef = useRef<TChartContextMenuRef>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const bottomPanelRef = useRef<HTMLDivElement>(null);
   const dividerRef = useRef<HTMLDivElement>(null);
 
   // Activate the function of drawing straight lines
@@ -257,7 +257,7 @@ const TChart: React.ForwardRefRenderFunction<
   const calculateMaxChartHeight = () => {
     if (!wrapperRef?.current || !dividerRef?.current) return;
     const wrapperHeight = wrapperRef.current.offsetHeight;
-    const maxHeight = wrapperHeight - 192 - dividerRef.current.offsetHeight;
+    const maxHeight = wrapperHeight - 208 - dividerRef.current.offsetHeight;
     setMaxChartHeight(maxHeight);
     setChartHeight(maxHeight);
   };
@@ -279,7 +279,6 @@ const TChart: React.ForwardRefRenderFunction<
     setIsResizing,
     isResizing,
     wrapper: wrapperRef.current,
-    bottomPanel: bottomPanelRef.current,
     maxChartHeight,
     setChartHeight,
   }));
@@ -358,12 +357,7 @@ const TChart: React.ForwardRefRenderFunction<
         ref={dividerRef}
       ></div>
       {/* 底部操作台 */}
-      {bottomPanelOpen && (
-        <div
-          className="bg-background min-h-48 flex-1"
-          ref={bottomPanelRef}
-        ></div>
-      )}
+      {bottomPanelOpen && !!chartHeight && <BottomPanel />}
     </div>
   );
 };

@@ -48,3 +48,8 @@ export interface RightAsideBtnsProps {
   asideOpen: boolean;
   toggleAsideOpen: () => void;
 }
+
+export enum BottomPanelContent {
+  Orders = "orders",
+  Oscillators = "oscillators",
+}

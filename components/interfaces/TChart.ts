@@ -45,7 +45,6 @@ export interface TChartRef {
   setIsResizing: React.Dispatch<React.SetStateAction<boolean>>;
   isResizing: boolean;
   wrapper: HTMLDivElement | null;
-  bottomPanel: HTMLDivElement | null;
   maxChartHeight: number;
   setChartHeight: React.Dispatch<React.SetStateAction<number>>;
 }

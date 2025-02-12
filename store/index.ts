@@ -2,7 +2,8 @@ import { configureStore } from "@reduxjs/toolkit";
 import commonReducer from "./commonSlice";
 import dialogReducer from "./dialogSlice";
 import fetchDataReducer from "./fetchDataSlice";
-import profileReducer from "./fetchDataSlice";
+import bottomPanelReducer from "./bottomPanelSlice";
+// import profileReducer from "./fetchDataSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     common: commonReducer,
     dialog: dialogReducer,
     fetchData: fetchDataReducer,
+    bottomPanel: bottomPanelReducer,
   },
   middleware: (defaultMiddleware) =>
     defaultMiddleware({ serializableCheck: false }),
