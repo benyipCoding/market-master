@@ -20,7 +20,7 @@ const OrdersPanel = () => {
           </Button>
         ))}
       </nav>
-      <div className="flex-1 bg-pink-300"></div>
+      <div className="flex-1"></div>
     </>
   );
 };
