@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Button } from "../ui/button";
+import { cn } from "@/lib/utils";
 const OrderTabs = ["Opening", "Total", "Limit", "Closed"];
 const OrdersPanel = () => {
   const [currentTab, setcurrentTab] = useState(0);
@@ -11,8 +12,11 @@ const OrdersPanel = () => {
         {OrderTabs.map((tab, index) => (
           <Button
             size={"sm"}
-            className="active:scale-100"
-            variant={currentTab === index ? "default" : "ghost"}
+            className={cn(
+              "active:scale-100",
+              currentTab === index && "bg-secondary"
+            )}
+            variant={"ghost"}
             key={tab}
             onClick={() => setcurrentTab(index)}
           >

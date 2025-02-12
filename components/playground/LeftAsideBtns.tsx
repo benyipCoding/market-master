@@ -179,7 +179,7 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
               variant={"ghost"}
               className={cn(
                 "hover:bg-muted p-1",
-                isAutoResize && "bg-primary hover:bg-primary"
+                isAutoResize && "bg-secondary"
               )}
               onClick={toggleAutoResize}
             >
@@ -200,8 +200,7 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
               variant={"ghost"}
               className={cn(
                 "hover:bg-muted p-1",
-                graphType === GraphType.LineSegment &&
-                  "bg-primary hover:bg-primary"
+                graphType === GraphType.LineSegment && "bg-secondary"
               )}
               onClick={toggleDrawingLineSegment}
             >
@@ -242,16 +241,11 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
             <TooltipTrigger asChild>
               <Button
                 type="button"
-                variant={
-                  panelContent === BottomPanelContent.Orders
-                    ? "default"
-                    : "ghost"
-                }
+                variant={"ghost"}
                 className={cn(
                   "hover:bg-muted p-1 active:scale-100 opacity-0 transition duration-150 translate-y-28",
                   bottomPanelOpen && "opacity-100 translate-y-0",
-                  panelContent === BottomPanelContent.Orders &&
-                    "hover:bg-primary"
+                  panelContent === BottomPanelContent.Orders && "bg-secondary"
                 )}
                 onClick={switchToOrders}
               >
@@ -269,16 +263,12 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
             <TooltipTrigger asChild>
               <Button
                 type="button"
-                variant={
-                  panelContent === BottomPanelContent.Oscillators
-                    ? "default"
-                    : "ghost"
-                }
+                variant={"ghost"}
                 className={cn(
                   "hover:bg-muted p-1 active:scale-100 opacity-0 transition duration-150 translate-y-10",
                   bottomPanelOpen && "opacity-100 translate-y-0",
                   panelContent === BottomPanelContent.Oscillators &&
-                    "hover:bg-primary"
+                    "bg-secondary"
                 )}
                 onClick={switchToOscillators}
               >
