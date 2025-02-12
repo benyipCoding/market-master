@@ -9,7 +9,7 @@ const BottomPanel = () => {
   const { panelContent } = useSelector((state: RootState) => state.bottomPanel);
 
   return (
-    <div className="bg-background min-h-52 flex-1 p-2 flex flex-col gap-2">
+    <div className="bg-background min-h-52 flex-1 p-2">
       {panelContent === BottomPanelContent.Orders && <OrdersPanel />}
       {panelContent === BottomPanelContent.Oscillators && <OscillatorsPanel />}
     </div>
