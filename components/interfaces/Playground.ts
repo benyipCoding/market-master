@@ -6,6 +6,7 @@ import {
 import { TChartRef } from "./TChart";
 import { TechnicalIndicatorLine } from "./TechnicalIndexForm";
 import { CustomLineSeriesType } from "@/hooks/interfaces";
+import { OrderSide, OrderType } from "./CandlestickSeries";
 
 export interface AsideProps {
   className?: string;
@@ -52,4 +53,47 @@ export interface RightAsideBtnsProps {
 export enum BottomPanelContent {
   Orders = "orders",
   Oscillators = "oscillators",
+}
+
+export enum OrderTabs {
+  Opening = "opening",
+  Limit = "limit",
+  Closed = "closed",
+}
+
+export enum OrderStatus {
+  PENDING = "pending",
+  EXECUTED = "executed",
+  CANCELLED = "cancelled",
+  CLOSED = "closed",
+}
+
+export enum OperationMode {
+  PRACTISE = "Practise",
+  BLINDBOX = "Blindbox",
+}
+
+export interface ListOrderDto {
+  orderStatus: OrderStatus;
+  operationMode: OperationMode;
+}
+
+export interface Order {
+  closing_price?: number;
+  comment?: string;
+  create_at?: Date;
+  executed_time?: Date;
+  expiry_time?: Date;
+  id: string;
+  limit_price?: number;
+  opening_price: number;
+  order_type: OrderType;
+  quantity: string;
+  side: OrderSide;
+  status: OrderStatus;
+  stop_price?: number;
+  symbol_id: number;
+  time: string;
+  update_at: Date;
+  user_id: string;
 }

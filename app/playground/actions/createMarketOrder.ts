@@ -4,6 +4,7 @@ import {
   OrderSide,
   OrderType,
 } from "@/components/interfaces/CandlestickSeries";
+import { OperationMode } from "@/components/interfaces/Playground";
 import request from "@/utils/apis/fetch";
 import { SuccessResponse, ErrorResponse } from "@/utils/apis/response";
 import { Time } from "lightweight-charts";
@@ -18,6 +19,8 @@ export interface CreateOrderDto {
   limit_price?: number;
   stop_price?: number;
   time: number | Time;
+  expiry_time?: Date;
+  operation_mode: OperationMode;
 }
 
 export async function postMarketOrder(data: CreateOrderDto) {

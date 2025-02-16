@@ -9,6 +9,12 @@ import {
 } from "@reduxjs/toolkit";
 import { RootState } from ".";
 import { getFavSymbols } from "@/app/playground/actions/getFavSymbols";
+import {
+  OperationMode,
+  Order,
+  OrderStatus,
+} from "@/components/interfaces/Playground";
+import { getOrders } from "@/app/playground/actions/getOrders";
 
 type BaseLabelType = { id: number; label: string };
 export interface SymbolCategory {
@@ -42,6 +48,7 @@ interface FetchDataState {
   isBackTestMode: boolean;
   isPreselect: boolean;
   hasVol: boolean;
+  openingOrders: Order[];
 }
 
 const initialState: FetchDataState = {
@@ -58,6 +65,7 @@ const initialState: FetchDataState = {
   isBackTestMode: false,
   isPreselect: false,
   hasVol: false,
+  openingOrders: [],
 };
 
 export const fetchPeriods = createAsyncThunk("fetch/periods", () => {
@@ -75,6 +83,16 @@ export const fetchCategories = createAsyncThunk("fetch/categories", () => {
 export const fetchFavSymbols = createAsyncThunk("fetch/favSymbols", () => {
   return getFavSymbols();
 });
+
+export const fetchOpeningOrders = createAsyncThunk(
+  "fetch/openingOrders",
+  (operationMode: OperationMode) => {
+    return getOrders({
+      orderStatus: OrderStatus.EXECUTED,
+      operationMode,
+    });
+  }
+);
 
 export const fetchDataSlice = createSlice({
   name: "fetchData",
@@ -129,6 +147,9 @@ export const fetchDataSlice = createSlice({
     });
     builder.addCase(fetchFavSymbols.fulfilled, (state, action) => {
       state.favSymIds = action.payload.data.fav_sym_ids;
+    });
+    builder.addCase(fetchOpeningOrders.fulfilled, (state, action) => {
+      state.openingOrders = action.payload.data;
     });
   },
 });

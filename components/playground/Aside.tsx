@@ -6,7 +6,12 @@ import React, {
   useImperativeHandle,
   useRef,
 } from "react";
-import { AsideRef, AsideProps } from "../interfaces/Playground";
+import {
+  AsideRef,
+  AsideProps,
+  OrderStatus,
+  OperationMode,
+} from "../interfaces/Playground";
 import { Button } from "../ui/button";
 import { defaultCandleStickOptions } from "@/constants/seriesOptions";
 import { CandlestickData, ISeriesApi, Time } from "lightweight-charts";
@@ -16,19 +21,19 @@ import {
   CreateOrderDto,
   postMarketOrder,
 } from "@/app/playground/actions/createMarketOrder";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
+import { toast } from "sonner";
+import { fetchOpeningOrders } from "@/store/fetchDataSlice";
+
 const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
-  {
-    className,
-    // setDrawedLineList,
-    tChartRef,
-  },
+  { className, tChartRef },
   ref
 ) => {
   const asideRef = useRef<HTMLDivElement>(null);
   const { emittery } = useContext(EmitteryContext);
   const { currentSymbol } = useSelector((state: RootState) => state.fetchData);
+  const dispatch = useDispatch<AppDispatch>();
 
   useImperativeHandle(ref, () => ({
     container: asideRef.current,
@@ -52,12 +57,18 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
       order_type: OrderType.MARKET,
       symbol_id: currentSymbol?.id!,
       quantity: 1000, // 暂时写死
+      operation_mode: OperationMode.PRACTISE,
     };
 
     try {
-      // const res = await postMarketOrder(payload);
-      // console.log(res);
+      const res = await postMarketOrder(payload);
+      if (res.status !== 200) return toast.error(res.msg);
+
+      // 增加marker
       emittery?.emit(OnOrderMarker.add, payload);
+
+      // 查询订单表
+      dispatch(fetchOpeningOrders(OperationMode.PRACTISE));
     } catch (error) {}
   };
 

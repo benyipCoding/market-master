@@ -491,7 +491,7 @@ const Navbar: React.FC<NavbarProps> = ({
             </Button>
           </TooltipTrigger>
           <TooltipContent className="flex">
-            <p>Scroll to date</p>
+            <p>Go to</p>
           </TooltipContent>
         </Tooltip>
 
@@ -638,16 +638,6 @@ const Navbar: React.FC<NavbarProps> = ({
             <span className="short-cut">T</span>
           </TooltipContent>
         </Tooltip>
-
-        {/* order buttons */}
-
-        {/* <Button
-          className={cn("nav-item px-2 gap-1 active:scale-100")}
-          variant={"ghost"}
-        >
-          Trade
-          <span className="sr-only">Trade</span>
-        </Button> */}
 
         <div className="absolute right-14 h-full flex py-1 gap-4 items-center">
           {/* Upload data */}
