@@ -63,6 +63,7 @@ import { EmitteryContext, OnContronPanel } from "@/providers/EmitteryProvider";
 import { logout } from "@/app/(root)/auth/login/logout";
 import { GrLogout } from "react-icons/gr";
 import { AuthContext } from "@/context/Auth";
+import { ColourfulText } from "../ui/colourful-text";
 
 const Navbar: React.FC<NavbarProps> = ({
   className,
@@ -628,7 +629,12 @@ const Navbar: React.FC<NavbarProps> = ({
               onClick={preselectBackTest}
             >
               {isBackTestMode ? <Loading /> : <IoPlayBackOutline size={24} />}
-              {isBackTestMode ? "Back testing..." : "Back test"}
+              {/* {isBackTestMode && <Loading />} */}
+              {isBackTestMode ? (
+                "Back testing..."
+              ) : (
+                <ColourfulText text="BACK TEST" isColorful={false} />
+              )}
               <span className="sr-only">Back test</span>
             </Button>
           </TooltipTrigger>
