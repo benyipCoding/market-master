@@ -5,9 +5,11 @@ import { motion } from "motion/react";
 export function ColourfulText({
   text,
   isColorful = true,
+  intervalTime = 5000,
 }: {
   text: string;
-  isColorful: boolean;
+  isColorful?: boolean;
+  intervalTime?: number;
 }) {
   const colors = [
     "rgb(131, 179, 32)",
@@ -30,7 +32,7 @@ export function ColourfulText({
       const shuffled = [...colors].sort(() => Math.random() - 0.5);
       isColorful && setCurrentColors(shuffled);
       setCount((prev) => prev + 1);
-    }, 5000);
+    }, intervalTime);
 
     return () => clearInterval(interval);
   }, []);

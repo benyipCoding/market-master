@@ -46,7 +46,9 @@ const OrdersPanel = () => {
     <div className="h-full flex flex-col gap-2">
       <ScrollArea className="flex-1">
         <Table>
-          <TableCaption>{displayOrders.length ? "" : "No data"}</TableCaption>
+          <TableCaption>
+            {displayOrders.length ? "" : "No order data"}
+          </TableCaption>
           <TableHeader>
             <TableRow>
               {/* <TableHead>ID</TableHead> */}

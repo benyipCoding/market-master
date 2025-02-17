@@ -25,6 +25,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { toast } from "sonner";
 import { fetchOpeningOrders } from "@/store/fetchDataSlice";
+import TradingAside from "./TradingAside";
 
 const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   { className, tChartRef },
@@ -74,7 +75,9 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
 
   return (
     <div className={cn(className)} ref={asideRef}>
-      <div className="flex gap-4">
+      <TradingAside />
+
+      {/* <div className="flex gap-4 bg-pink-300">
         <Button
           variant={"default"}
           className="active:scale-100 flex-1 text-xl"
@@ -91,7 +94,7 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
         >
           Sell
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 };

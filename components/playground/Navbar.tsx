@@ -633,7 +633,11 @@ const Navbar: React.FC<NavbarProps> = ({
               {isBackTestMode ? (
                 "Back testing..."
               ) : (
-                <ColourfulText text="BACK TEST" isColorful={false} />
+                <ColourfulText
+                  text="BACK TEST"
+                  isColorful={false}
+                  intervalTime={3000}
+                />
               )}
               <span className="sr-only">Back test</span>
             </Button>

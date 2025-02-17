@@ -97,3 +97,7 @@ export interface Order {
   update_at: Date;
   user_id: string;
 }
+
+export enum AsideContent {
+  Trade = "trade",
+}
