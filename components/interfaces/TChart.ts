@@ -8,6 +8,7 @@ import {
   ISeriesApi,
   SeriesType,
   Time,
+  WhitespaceData,
 } from "lightweight-charts";
 
 export interface TChartProps {

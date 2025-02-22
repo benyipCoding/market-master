@@ -1,12 +1,19 @@
 import { RootState } from "@/store";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { OrderType } from "../interfaces/CandlestickSeries";
+import { OrderSide, OrderType } from "../interfaces/CandlestickSeries";
 import { TitleCase } from "@/utils/helpers";
+import OrderSideBtn from "./OrderSideBtn";
+import { WhitespaceData, Time } from "lightweight-charts";
 
-const TradingAside = () => {
+interface TradingAsideProps {
+  currentPrice: number | undefined;
+}
+
+const TradingAside: React.FC<TradingAsideProps> = ({ currentPrice }) => {
   const { currentSymbol } = useSelector((state: RootState) => state.fetchData);
+  const [currentSide, setCurrentSide] = useState<OrderSide>(OrderSide.SELL);
 
   return (
     <div className="flex flex-col gap-4">
@@ -24,10 +31,18 @@ const TradingAside = () => {
         <div className="border"></div>
 
         <TabsContent value={OrderType.MARKET}>
-          Make changes to your account here.
+          <OrderSideBtn
+            currentSide={currentSide}
+            setCurrentSide={setCurrentSide}
+            currentPrice={currentPrice}
+          />
         </TabsContent>
         <TabsContent value={OrderType.LIMIT}>
-          Change your password here.
+          <OrderSideBtn
+            currentSide={currentSide}
+            setCurrentSide={setCurrentSide}
+            currentPrice={currentPrice}
+          />
         </TabsContent>
       </Tabs>
     </div>

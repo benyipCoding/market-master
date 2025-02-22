@@ -3,17 +3,11 @@ import { cn } from "@/lib/utils";
 import React, {
   forwardRef,
   useContext,
+  useEffect,
   useImperativeHandle,
   useRef,
 } from "react";
-import {
-  AsideRef,
-  AsideProps,
-  OrderStatus,
-  OperationMode,
-} from "../interfaces/Playground";
-import { Button } from "../ui/button";
-import { defaultCandleStickOptions } from "@/constants/seriesOptions";
+import { AsideRef, AsideProps, OperationMode } from "../interfaces/Playground";
 import { CandlestickData, ISeriesApi, Time } from "lightweight-charts";
 import { EmitteryContext, OnOrderMarker } from "@/providers/EmitteryProvider";
 import { OrderSide, OrderType } from "../interfaces/CandlestickSeries";
@@ -28,7 +22,7 @@ import { fetchOpeningOrders } from "@/store/fetchDataSlice";
 import TradingAside from "./TradingAside";
 
 const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
-  { className, tChartRef },
+  { className, tChartRef, currentCandle },
   ref
 ) => {
   const asideRef = useRef<HTMLDivElement>(null);
@@ -73,9 +67,13 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     } catch (error) {}
   };
 
+  useEffect(() => {
+    console.log("Aside", { currentCandle });
+  }, [currentCandle]);
+
   return (
     <div className={cn(className)} ref={asideRef}>
-      <TradingAside />
+      <TradingAside currentPrice={currentCandle?.close} />
 
       {/* <div className="flex gap-4 bg-pink-300">
         <Button

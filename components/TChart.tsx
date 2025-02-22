@@ -7,6 +7,7 @@ import {
 import { useEnableDrawingLine } from "@/hooks/useEnableDrawingLine";
 import { AppDispatch, RootState } from "@/store";
 import {
+  CandlestickData,
   createChart,
   IChartApi,
   ISeriesApi,

@@ -1,19 +1,18 @@
 import {
+  CandlestickData,
   DeepPartial,
   LineStyleOptions,
   SeriesOptionsCommon,
+  Time,
 } from "lightweight-charts";
 import { TChartRef } from "./TChart";
 import { TechnicalIndicatorLine } from "./TechnicalIndexForm";
-import { CustomLineSeriesType } from "@/hooks/interfaces";
 import { OrderSide, OrderType } from "./CandlestickSeries";
 
 export interface AsideProps {
   className?: string;
-  // setDrawedLineList: React.Dispatch<
-  //   React.SetStateAction<DeepPartial<LineStyleOptions & SeriesOptionsCommon>[]>
-  // >;
   tChartRef: React.RefObject<TChartRef>;
+  currentCandle: CandlestickData<Time> | undefined;
 }
 
 export interface AsideRef {

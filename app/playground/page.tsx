@@ -107,6 +107,11 @@ const Playground = () => {
     [candlestickData, isBackTestMode, sliceLeft, sliceRight]
   );
 
+  const currentCandle = useMemo(
+    () => displayCandlestickData[0],
+    [displayCandlestickData]
+  );
+
   // The list of drawed line series
   const [drawedLineList, setDrawedLineList] = useState<
     LineSeriesPartialOptions[]
@@ -367,6 +372,7 @@ const Playground = () => {
                 ref={asideRef}
                 // setDrawedLineList={setDrawedLineList}
                 tChartRef={tChartRef}
+                currentCandle={currentCandle}
               />
             )}
           </div>
