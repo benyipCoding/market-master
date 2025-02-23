@@ -67,32 +67,9 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     } catch (error) {}
   };
 
-  useEffect(() => {
-    console.log("Aside", { currentCandle });
-  }, [currentCandle]);
-
   return (
     <div className={cn(className)} ref={asideRef}>
       <TradingAside currentPrice={currentCandle?.close} />
-
-      {/* <div className="flex gap-4 bg-pink-300">
-        <Button
-          variant={"default"}
-          className="active:scale-100 flex-1 text-xl"
-          style={{ backgroundColor: defaultCandleStickOptions.borderUpColor }}
-          onClick={() => marketOrderAction(OrderSide.BUY)}
-        >
-          Buy
-        </Button>
-        <Button
-          variant={"default"}
-          className="active:scale-100 flex-1 text-xl"
-          style={{ backgroundColor: defaultCandleStickOptions.borderDownColor }}
-          onClick={() => marketOrderAction(OrderSide.SELL)}
-        >
-          Sell
-        </Button>
-      </div> */}
     </div>
   );
 };
