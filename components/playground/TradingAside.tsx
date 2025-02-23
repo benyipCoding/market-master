@@ -9,6 +9,9 @@ import { Input } from "../ui/input";
 import { Calculator } from "lucide-react";
 import { cn } from "@/lib/utils";
 import MiniCalculator from "./MiniCalculator";
+import { Checkbox } from "../ui/checkbox";
+import { Label } from "../ui/label";
+import LossAndProfit from "./LossAndProfit";
 
 interface TradingAsideProps {
   currentPrice: number | undefined;
@@ -22,10 +25,18 @@ const TradingAside: React.FC<TradingAsideProps> = ({ currentPrice }) => {
   );
   const [showCalculator, setShowCalculator] = useState(false);
   const unintInputRef = useRef<HTMLInputElement>(null);
+  const [unitValue, setUnitValue] = useState<string>("");
 
   const onClickCalculator = () => {
     unintInputRef.current?.focus();
     setShowCalculator((prev) => !prev);
+  };
+
+  const filterInput = (e: React.FormEvent<HTMLInputElement>) => {
+    const isNum = !isNaN(Number((e.nativeEvent as any).data));
+    if (!isNum) return;
+    const value = String(Number((e.target as HTMLInputElement).value));
+    setUnitValue(value);
   };
 
   return (
@@ -46,7 +57,7 @@ const TradingAside: React.FC<TradingAsideProps> = ({ currentPrice }) => {
           </TabsTrigger>
         </TabsList>
 
-        <div className="border"></div>
+        <div className="border-b-[1px]"></div>
       </Tabs>
 
       {/* Order side button */}
@@ -60,9 +71,10 @@ const TradingAside: React.FC<TradingAsideProps> = ({ currentPrice }) => {
       <div className="relative">
         <p className="text-secondary-foreground mb-2">Units</p>
         <Input
-          type={"number"}
           className="h-9 select-text"
           ref={unintInputRef}
+          value={unitValue}
+          onInput={filterInput}
         />
         <Calculator
           className="w-7 h-7 absolute bottom-1 right-1 z-20 cursor-pointer bg-background"
@@ -71,8 +83,15 @@ const TradingAside: React.FC<TradingAsideProps> = ({ currentPrice }) => {
         <MiniCalculator
           showCalculator={showCalculator}
           setShowCalculator={setShowCalculator}
+          element={unintInputRef.current}
+          setUnitValue={setUnitValue}
         />
       </div>
+
+      <div className="border-b-[1px] mt-2"></div>
+
+      {/* Stop Loss & Take Profit */}
+      <LossAndProfit />
     </div>
   );
 };
