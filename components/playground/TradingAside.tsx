@@ -69,6 +69,14 @@ const TradingAside: React.FC = () => {
         setCurrentSide={setCurrentSide}
       />
 
+      {/* Price when limit order */}
+      {currentOrderType === OrderType.LIMIT && (
+        <div className="relative">
+          <p className="text-secondary-foreground mb-2">Price</p>
+          <Input className="h-9 select-text" />
+        </div>
+      )}
+
       {/* Units */}
       <div className="relative">
         <p className="text-secondary-foreground mb-2">Units</p>
