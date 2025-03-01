@@ -372,7 +372,6 @@ const Playground = () => {
                 ref={asideRef}
                 // setDrawedLineList={setDrawedLineList}
                 tChartRef={tChartRef}
-                // currentCandle={currentCandle}
               />
             )}
           </div>

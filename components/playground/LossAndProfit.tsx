@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Label } from "../ui/label";
 import { Checkbox } from "../ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Input } from "../ui/input";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { OrderSide } from "../interfaces/CandlestickSeries";
 
 enum MiddleSection {
   Ticks = "ticks",
@@ -133,11 +134,30 @@ const Middle = () => {
 };
 
 interface LossAndProfitProps {
-  currentPrice?: number;
+  currentSide: OrderSide;
 }
 
-const LossAndProfit: React.FC<LossAndProfitProps> = ({ currentPrice }) => {
-  const { currentSymbol } = useSelector((state: RootState) => state.fetchData);
+const LossAndProfit: React.FC<LossAndProfitProps> = ({ currentSide }) => {
+  const { currentSymbol, currentCandle } = useSelector(
+    (state: RootState) => state.fetchData
+  );
+
+  useEffect(() => {
+    // console.log("市价：", currentCandle?.close);
+    // console.log(currentSymbol?.basic_point_place);
+    // console.log(currentSide);
+    // const pricePerTick = currentSymbol.
+
+    if (currentSide === OrderSide.BUY) {
+      // 做多时候
+      console.log("市价:", currentCandle?.close);
+      // console.log('止损价:',currentCandle?.close - );
+    }
+
+    if (currentSide === OrderSide.SELL) {
+      // 做空时候
+    }
+  }, [currentCandle?.close, currentSide, currentSymbol?.basic_point_place]);
 
   return (
     <div className="flex">

@@ -93,7 +93,7 @@ const TradingAside: React.FC = () => {
       <div className="border-b-[1px] mt-2"></div>
 
       {/* Stop Loss & Take Profit */}
-      <LossAndProfit />
+      <LossAndProfit currentSide={currentSide} />
     </div>
   );
 };

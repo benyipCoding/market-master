@@ -7,7 +7,6 @@ import { RootState } from "@/store";
 interface OrderSideBtnProps {
   currentSide: OrderSide;
   setCurrentSide: React.Dispatch<React.SetStateAction<OrderSide>>;
-
   className: string;
 }
 
@@ -30,8 +29,8 @@ const OrderSideBtn: React.FC<OrderSideBtnProps> = ({
           )}
           onClick={() => setCurrentSide(OrderSide.SELL)}
         >
-          <p className="text-base">Sell</p>
-          <p>{currentCandle?.close}</p>
+          <p className="text-base select-none">Sell</p>
+          <p className="select-none">{currentCandle?.close}</p>
         </div>
         <div
           className={cn(
@@ -41,8 +40,8 @@ const OrderSideBtn: React.FC<OrderSideBtnProps> = ({
           )}
           onClick={() => setCurrentSide(OrderSide.BUY)}
         >
-          <p className="text-base">Buy</p>
-          <p>{currentCandle?.close}</p>
+          <p className="text-base select-none">Buy</p>
+          <p className="select-none">{currentCandle?.close}</p>
         </div>
       </div>
     </div>

@@ -33,6 +33,7 @@ export interface Symbol {
   minMove: number;
   precision: number;
   isFav?: boolean;
+  price_per_tick?: number;
 }
 
 interface FetchDataState {
