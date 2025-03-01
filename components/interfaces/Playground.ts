@@ -12,7 +12,6 @@ import { OrderSide, OrderType } from "./CandlestickSeries";
 export interface AsideProps {
   className?: string;
   tChartRef: React.RefObject<TChartRef>;
-  currentCandle: CandlestickData<Time> | undefined;
 }
 
 export interface AsideRef {

@@ -22,7 +22,7 @@ import TradingAside from "./TradingAside";
 import { ScrollArea } from "../ui/scroll-area";
 
 const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
-  { className, tChartRef, currentCandle },
+  { className, tChartRef },
   ref
 ) => {
   const asideRef = useRef<HTMLDivElement>(null);
@@ -69,7 +69,7 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
 
   return (
     <ScrollArea className={cn(className)} ref={asideRef}>
-      <TradingAside currentPrice={currentCandle?.close} />
+      <TradingAside />
     </ScrollArea>
   );
 };

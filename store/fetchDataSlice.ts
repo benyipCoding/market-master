@@ -15,6 +15,7 @@ import {
   OrderStatus,
 } from "@/components/interfaces/Playground";
 import { getOrders } from "@/app/playground/actions/getOrders";
+import { CandlestickData, Time } from "lightweight-charts";
 
 type BaseLabelType = { id: number; label: string };
 export interface SymbolCategory {
@@ -49,6 +50,7 @@ interface FetchDataState {
   isPreselect: boolean;
   hasVol: boolean;
   openingOrders: Order[];
+  currentCandle: CandlestickData<Time> | undefined;
 }
 
 const initialState: FetchDataState = {
@@ -66,6 +68,7 @@ const initialState: FetchDataState = {
   isPreselect: false,
   hasVol: false,
   openingOrders: [],
+  currentCandle: undefined,
 };
 
 export const fetchPeriods = createAsyncThunk("fetch/periods", () => {
@@ -125,6 +128,9 @@ export const fetchDataSlice = createSlice({
     setHasVol(state, action: PayloadAction<boolean>) {
       state.hasVol = action.payload;
     },
+    setCurrentCandle(state, action: PayloadAction<CandlestickData<Time>>) {
+      state.currentCandle = action.payload;
+    },
   },
   extraReducers(builder) {
     builder.addCase(fetchPeriods.fulfilled, (state, action) => {
@@ -177,6 +183,7 @@ export const {
   setIsBackTestMode,
   setIsPreselect,
   setHasVol,
+  setCurrentCandle,
 } = fetchDataSlice.actions;
 
 export default fetchDataSlice.reducer;

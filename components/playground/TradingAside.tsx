@@ -13,11 +13,11 @@ import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
 import LossAndProfit from "./LossAndProfit";
 
-interface TradingAsideProps {
-  currentPrice: number | undefined;
-}
+// interface TradingAsideProps {
+//   currentPrice: number | undefined;
+// }
 
-const TradingAside: React.FC<TradingAsideProps> = ({ currentPrice }) => {
+const TradingAside: React.FC = () => {
   const { currentSymbol } = useSelector((state: RootState) => state.fetchData);
   const [currentSide, setCurrentSide] = useState<OrderSide>(OrderSide.SELL);
   const [currentOrderType, setCurrentOrderType] = useState<OrderType>(
@@ -67,7 +67,6 @@ const TradingAside: React.FC<TradingAsideProps> = ({ currentPrice }) => {
         }
         currentSide={currentSide}
         setCurrentSide={setCurrentSide}
-        currentPrice={currentPrice}
       />
 
       {/* Units */}

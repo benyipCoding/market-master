@@ -45,6 +45,7 @@ import {
   fetchPeriods,
   fetchSymbols,
   setCandleDataSlice,
+  setCurrentCandle,
   setHasVol,
   setIsBackTestMode,
 } from "@/store/fetchDataSlice";
@@ -107,10 +108,9 @@ const Playground = () => {
     [candlestickData, isBackTestMode, sliceLeft, sliceRight]
   );
 
-  const currentCandle = useMemo(
-    () => displayCandlestickData[0],
-    [displayCandlestickData]
-  );
+  useEffect(() => {
+    dispatch(setCurrentCandle(displayCandlestickData[0]));
+  }, [displayCandlestickData]);
 
   // The list of drawed line series
   const [drawedLineList, setDrawedLineList] = useState<
@@ -372,7 +372,7 @@ const Playground = () => {
                 ref={asideRef}
                 // setDrawedLineList={setDrawedLineList}
                 tChartRef={tChartRef}
-                currentCandle={currentCandle}
+                // currentCandle={currentCandle}
               />
             )}
           </div>

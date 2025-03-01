@@ -3,6 +3,8 @@ import { Label } from "../ui/label";
 import { Checkbox } from "../ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Input } from "../ui/input";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 enum MiddleSection {
   Ticks = "ticks",
@@ -130,7 +132,13 @@ const Middle = () => {
   );
 };
 
-const LossAndProfit = () => {
+interface LossAndProfitProps {
+  currentPrice?: number;
+}
+
+const LossAndProfit: React.FC<LossAndProfitProps> = ({ currentPrice }) => {
+  const { currentSymbol } = useSelector((state: RootState) => state.fetchData);
+
   return (
     <div className="flex">
       {/* Stop Loss */}
