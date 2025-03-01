@@ -4,24 +4,55 @@ import { Checkbox } from "../ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Input } from "../ui/input";
 
-const MiddleLabel = ["Ticks", "Price", "USD", "%"];
+enum MiddleSection {
+  Ticks = "ticks",
+  Price = "price",
+  USD = "usd",
+  Percentage = "%",
+}
 
-const ControlItem: React.FC<{ index: number; checked: boolean }> = ({
-  index,
-  checked,
-}) => {
+const MiddleLabel = [
+  {
+    label: "Ticks",
+    value: MiddleSection.Ticks,
+  },
+  {
+    label: "Price",
+    value: MiddleSection.Price,
+  },
+  {
+    label: "USD",
+    value: MiddleSection.USD,
+  },
+  {
+    label: "%",
+    value: MiddleSection.Percentage,
+  },
+];
+
+const ControlItem: React.FC<{
+  index: number;
+  checked: boolean;
+  onClickItem: () => void;
+  currentSection?: MiddleSection;
+  section: MiddleSection;
+}> = ({ index, checked, onClickItem, currentSection, section }) => {
   const isFirst = index === 0;
   const isLast = index === MiddleLabel.length - 1;
-
   const [inputValue, setInputValue] = useState("123");
 
   return (
     <div
       className={cn(
-        "h-8 border-l-[1px] border-r-[1px] border-t-[1px] flex items-center",
+        "h-8 border-l-2 border-r-2 border-t-2 flex items-center",
         isFirst && "rounded-tl-lg rounded-tr-lg",
-        isLast && "rounded-bl-lg rounded-br-lg border-b-[1px]"
+        isLast && "rounded-bl-lg rounded-br-lg border-b-2",
+        checked &&
+          currentSection === section &&
+          "dark:border-white border-black",
+        checked && currentSection === section && !isLast && "border-b-2"
       )}
+      onClick={onClickItem}
     >
       <Input
         className={cn(
@@ -37,6 +68,12 @@ const ControlItem: React.FC<{ index: number; checked: boolean }> = ({
 
 const BracketControl: React.FC<{ title: string }> = ({ title }) => {
   const [checked, setChecked] = useState(false);
+  const [currentSection, setCurrentSection] = useState<MiddleSection>();
+
+  const focusSection = (value: MiddleSection) => {
+    setCurrentSection(value);
+    setChecked(true);
+  };
 
   return (
     <div className="flex-1">
@@ -56,9 +93,20 @@ const BracketControl: React.FC<{ title: string }> = ({ title }) => {
       </Label>
 
       {/* Controller */}
-      <div className={cn("text-sm mt-3")}>
-        {MiddleLabel.map((label, index) => (
-          <ControlItem key={label} index={index} checked={checked} />
+      <div
+        className={cn(
+          "text-sm mt-3 border-pink-300 rounded-lg overflow-hidden"
+        )}
+      >
+        {MiddleLabel.map((item, index) => (
+          <ControlItem
+            key={item.value}
+            index={index}
+            checked={checked}
+            onClickItem={() => focusSection(item.value)}
+            currentSection={currentSection}
+            section={item.value}
+          />
         ))}
       </div>
     </div>
@@ -69,12 +117,12 @@ const Middle = () => {
   return (
     <div className="w-[20%] relative">
       <div className="absolute bottom-0 w-full flex flex-col">
-        {MiddleLabel.map((label) => (
+        {MiddleLabel.map((item) => (
           <div
-            key={label}
+            key={item.value}
             className="h-8 flex items-center justify-center text-xs text-gray-400"
           >
-            {label}
+            {item.label}
           </div>
         ))}
       </div>

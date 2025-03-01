@@ -3,7 +3,6 @@ import { cn } from "@/lib/utils";
 import React, {
   forwardRef,
   useContext,
-  useEffect,
   useImperativeHandle,
   useRef,
 } from "react";
@@ -20,6 +19,7 @@ import { AppDispatch, RootState } from "@/store";
 import { toast } from "sonner";
 import { fetchOpeningOrders } from "@/store/fetchDataSlice";
 import TradingAside from "./TradingAside";
+import { ScrollArea } from "../ui/scroll-area";
 
 const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   { className, tChartRef, currentCandle },
@@ -68,9 +68,9 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
   };
 
   return (
-    <div className={cn(className)} ref={asideRef}>
+    <ScrollArea className={cn(className)} ref={asideRef}>
       <TradingAside currentPrice={currentCandle?.close} />
-    </div>
+    </ScrollArea>
   );
 };
 
