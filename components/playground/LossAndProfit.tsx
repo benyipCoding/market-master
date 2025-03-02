@@ -52,7 +52,7 @@ const ControlItem: React.FC<{
 const BracketControl: React.FC<{
   title: string;
   sectionPrice: string;
-  orderPrice: string;
+  orderPrice: string | undefined;
   currentSide: OrderSide;
   unitValue: number;
 }> = ({ title, sectionPrice, orderPrice, currentSide, unitValue }) => {
@@ -222,7 +222,7 @@ const LossAndProfit: React.FC<LossAndProfitProps> = ({
       <BracketControl
         title="Stop Loss"
         sectionPrice={String(stopLossData[MiddleSection.Price])}
-        orderPrice={String(orderPrice)}
+        orderPrice={orderPrice ? String(orderPrice) : undefined}
         currentSide={currentSide}
         unitValue={unitValue}
       />
@@ -234,7 +234,7 @@ const LossAndProfit: React.FC<LossAndProfitProps> = ({
       <BracketControl
         title="Take Profit"
         sectionPrice={String(takeProfitData[MiddleSection.Price])}
-        orderPrice={String(orderPrice)}
+        orderPrice={orderPrice ? String(orderPrice) : undefined}
         currentSide={currentSide}
         unitValue={unitValue}
       />
