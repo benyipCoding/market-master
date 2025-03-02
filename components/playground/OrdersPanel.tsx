@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Table,
   TableBody,
@@ -32,6 +32,7 @@ const OrdersPanel = () => {
   const [slideBlock, setSlideBlock] = useState({
     width: 0,
     left: 0,
+    height: 0,
   });
 
   const displayOrders = useMemo(() => {
@@ -44,25 +45,40 @@ const OrdersPanel = () => {
     dispatch(setCurrentOrderTab(tab));
   };
 
-  const shapeSlideBlock = () => {
-    const el = document.getElementById(currentOrderTab);
-    if (!el) return;
-    setSlideBlock({
-      width: el.offsetWidth,
-      left: el.offsetLeft,
+  const obs = useRef<ResizeObserver | null>(null);
+  const initResizeObserver = (dom: HTMLElement | null) => {
+    if (!dom) return;
+    obs.current = new ResizeObserver((entries) => {
+      entries.forEach((e) => {
+        const dom = e.target as HTMLDivElement;
+        setSlideBlock({
+          width: dom.offsetWidth,
+          height: dom.offsetHeight,
+          left: dom.offsetLeft,
+        });
+      });
     });
+    obs.current.observe(dom);
   };
 
   useEffect(() => {
-    shapeSlideBlock();
+    if (!currentOrderTab) return;
+    const dom = document.getElementById(currentOrderTab);
+    initResizeObserver(dom);
+    return () => {
+      obs.current?.unobserve(dom!);
+    };
   }, [currentOrderTab]);
 
   useEffect(() => {
     dispatch(fetchOpeningOrders(OperationMode.PRACTISE));
 
-    setTimeout(() => {
-      shapeSlideBlock();
-    }, 150);
+    return () => {
+      if (obs.current) {
+        obs.current?.disconnect();
+        obs.current = null;
+      }
+    };
   }, []);
 
   return (
@@ -71,8 +87,8 @@ const OrdersPanel = () => {
         {OrderNavs.map((tab) => (
           <div
             className={cn(
-              "py-3 text-sm px-3 cursor-pointer text-[#a5a5a5] hover:text-white",
-              currentOrderTab === tab.value && "dark:text-white text-black"
+              "py-3 text-sm px-3 cursor-pointer text-[#a5a5a5] hover:text-white select-none z-10",
+              currentOrderTab === tab.value && "dark:text-white text-blacky"
             )}
             key={tab.value}
             id={tab.value}
@@ -83,8 +99,12 @@ const OrdersPanel = () => {
         ))}
         {/* slide block */}
         <div
-          className="absolute dark:bg-white bg-black bottom-0 left-0 h-[2px] transition-all duration-300"
-          style={{ width: slideBlock.width, left: slideBlock.left }}
+          className="absolute bottom-0 left-0 transition-all duration-200 bg-secondary/50 border-b-[2px] dark:border-white border-black"
+          style={{
+            width: slideBlock.width,
+            left: slideBlock.left,
+            height: slideBlock.height,
+          }}
         ></div>
       </div>
 
