@@ -1,37 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Label } from "../ui/label";
 import { Checkbox } from "../ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Input } from "../ui/input";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { OrderSide } from "../interfaces/CandlestickSeries";
-
-enum MiddleSection {
-  Ticks = "ticks",
-  Price = "price",
-  USD = "usd",
-  Percentage = "%",
-}
-
-const MiddleLabel = [
-  {
-    label: "Ticks",
-    value: MiddleSection.Ticks,
-  },
-  {
-    label: "Price",
-    value: MiddleSection.Price,
-  },
-  {
-    label: "USD",
-    value: MiddleSection.USD,
-  },
-  {
-    label: "%",
-    value: MiddleSection.Percentage,
-  },
-];
+import { OrderType } from "../interfaces/CandlestickSeries";
+import {
+  MiddleSection,
+  LossAndProfitDataType,
+  LossAndProfitProps,
+} from "../interfaces/TradingAside";
+import { MiddleLabel } from "@/constants/tradingAside";
 
 const ControlItem: React.FC<{
   index: number;
@@ -39,10 +19,11 @@ const ControlItem: React.FC<{
   onClickItem: () => void;
   currentSection?: MiddleSection;
   section: MiddleSection;
-}> = ({ index, checked, onClickItem, currentSection, section }) => {
+  data: string | number;
+}> = ({ index, checked, onClickItem, currentSection, section, data }) => {
   const isFirst = index === 0;
   const isLast = index === MiddleLabel.length - 1;
-  const [inputValue, setInputValue] = useState("123");
+  const [inputValue, setInputValue] = useState(data);
 
   return (
     <div
@@ -69,7 +50,10 @@ const ControlItem: React.FC<{
   );
 };
 
-const BracketControl: React.FC<{ title: string }> = ({ title }) => {
+const BracketControl: React.FC<{
+  title: string;
+  sectionData: LossAndProfitDataType;
+}> = ({ title, sectionData }) => {
   const [checked, setChecked] = useState(false);
   const [currentSection, setCurrentSection] = useState<MiddleSection>();
 
@@ -96,11 +80,7 @@ const BracketControl: React.FC<{ title: string }> = ({ title }) => {
       </Label>
 
       {/* Controller */}
-      <div
-        className={cn(
-          "text-sm mt-3 border-pink-300 rounded-lg overflow-hidden"
-        )}
-      >
+      <div className={cn("text-sm mt-3 rounded-lg overflow-hidden")}>
         {MiddleLabel.map((item, index) => (
           <ControlItem
             key={item.value}
@@ -109,6 +89,7 @@ const BracketControl: React.FC<{ title: string }> = ({ title }) => {
             onClickItem={() => focusSection(item.value)}
             currentSection={currentSection}
             section={item.value}
+            data={sectionData[item.value]}
           />
         ))}
       </div>
@@ -133,41 +114,49 @@ const Middle = () => {
   );
 };
 
-interface LossAndProfitProps {
-  currentSide: OrderSide;
-}
-
-const LossAndProfit: React.FC<LossAndProfitProps> = ({ currentSide }) => {
+const LossAndProfit: React.FC<LossAndProfitProps> = ({
+  currentSide,
+  currentOrderType,
+  preOrderPrice,
+}) => {
   const { currentSymbol, currentCandle } = useSelector(
     (state: RootState) => state.fetchData
   );
 
-  // useEffect(() => {
-  //   if (!currentCandle?.close || !currentSymbol) return;
-  //   if (currentSide === OrderSide.BUY) {
-  //     // 做多时候
-  //     console.log("市价:", currentCandle?.close);
-  //     console.log(
-  //       "止损价：",
-  //       currentCandle.close - 10 * currentSymbol.price_per_tick!
-  //     );
-  //   }
+  const orderPrice = useMemo(() => {
+    if (currentOrderType === OrderType.MARKET) return currentCandle?.close;
+    else return preOrderPrice;
+  }, [currentCandle?.close, currentOrderType, preOrderPrice]);
 
-  //   if (currentSide === OrderSide.SELL) {
-  //     // 做空时候
-  //   }
-  // }, [currentCandle?.close, currentSide, currentSymbol?.basic_point_place]);
+  const [stopLossData, setStopLossData] = useState<LossAndProfitDataType>({
+    [MiddleSection.Price]: "123",
+    [MiddleSection.Ticks]: "123",
+    [MiddleSection.USD]: "123",
+    [MiddleSection.Percentage]: "123",
+  });
+
+  const [takeProfitData, setTakeProfitData] = useState<LossAndProfitDataType>({
+    [MiddleSection.Price]: "321",
+    [MiddleSection.Ticks]: "321",
+    [MiddleSection.USD]: "321",
+    [MiddleSection.Percentage]: "321",
+  });
+
+  useEffect(() => {
+    if (!orderPrice) return;
+    console.log(orderPrice);
+  }, [orderPrice]);
 
   return (
     <div className="flex">
       {/* Stop Loss */}
-      <BracketControl title="Stop Loss" />
+      <BracketControl title="Stop Loss" sectionData={stopLossData} />
 
       {/* Middle */}
       <Middle />
 
       {/* Take Profit */}
-      <BracketControl title="Take Profit" />
+      <BracketControl title="Take Profit" sectionData={takeProfitData} />
     </div>
   );
 };
