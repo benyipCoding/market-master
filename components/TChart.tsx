@@ -258,7 +258,7 @@ const TChart: React.ForwardRefRenderFunction<
   const calculateMaxChartHeight = () => {
     if (!wrapperRef?.current || !dividerRef?.current) return;
     const wrapperHeight = wrapperRef.current.offsetHeight;
-    const maxHeight = wrapperHeight - 208 - dividerRef.current.offsetHeight;
+    const maxHeight = wrapperHeight - 288 - dividerRef.current.offsetHeight;
     setMaxChartHeight(maxHeight);
     setChartHeight(maxHeight);
   };

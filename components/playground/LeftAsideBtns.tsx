@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   BottomPanelContent,
   LeftAsideBtnsProps,
-  OrderTabs,
 } from "../interfaces/Playground";
 import { PiLineSegment } from "react-icons/pi";
 import { Button } from "../ui/button";
@@ -29,15 +28,7 @@ import { BsArrowsVertical } from "react-icons/bs";
 import { PanelRightClose, PanelRightOpen } from "lucide-react";
 import { RiListUnordered } from "react-icons/ri";
 import { MdBarChart } from "react-icons/md";
-import { setCurrentOrderTab, setPanelContent } from "@/store/bottomPanelSlice";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import { ScrollArea } from "../ui/scroll-area";
+import { setPanelContent } from "@/store/bottomPanelSlice";
 
 const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
   className,
@@ -133,12 +124,11 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
     setBottomPanelOpen((prev) => !prev);
   };
 
-  const switchToOrders = () => {
-    dispatch(setPanelContent(BottomPanelContent.Orders));
-  };
+  // const switchToOrders = () => {
+  //   dispatch(setPanelContent(BottomPanelContent.Orders));
+  // };
 
   const switchToOscillators = () => {
-    dispatch(setCurrentOrderTab(""));
     dispatch(setPanelContent(BottomPanelContent.Oscillators));
   };
 
@@ -249,68 +239,34 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
 
         <div className="absolute bottom-4 flex flex-col gap-4">
           {/* Orders */}
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                type="button"
-                variant={"ghost"}
-                className={cn(
-                  "hover:bg-muted p-1 active:scale-100 opacity-0 transition duration-150 translate-y-28",
-                  bottomPanelOpen && "opacity-100 translate-y-0",
-                  panelContent === BottomPanelContent.Orders && "bg-secondary"
-                )}
-              >
-                <RiListUnordered className="w-full h-full" />
-                <span className="sr-only">Orders</span>
-              </Button>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent className="w-fit" side="right">
-              <ScrollArea
-                className="rounded-md"
-                thumbClass="dark:bg-primary-foreground"
-              >
-                <DropdownMenuRadioGroup
-                  value={currentOrderTab}
-                  onValueChange={(value) => {
-                    switchToOrders();
-                    dispatch(setCurrentOrderTab(value as OrderTabs));
-                  }}
-                >
-                  <DropdownMenuRadioItem
-                    value={OrderTabs.Opening}
-                    className="cursor-pointer"
-                  >
-                    Opening Orders
-                  </DropdownMenuRadioItem>
-
-                  <DropdownMenuRadioItem
-                    value={OrderTabs.Limit}
-                    className="cursor-pointer"
-                  >
-                    Limit Orders
-                  </DropdownMenuRadioItem>
-
-                  <DropdownMenuRadioItem
-                    value={OrderTabs.Closed}
-                    className="cursor-pointer"
-                  >
-                    Closed Orders
-                  </DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
-              </ScrollArea>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 type="button"
                 variant={"ghost"}
                 className={cn(
-                  "hover:bg-muted p-1 active:scale-100 opacity-0 transition duration-150 translate-y-10",
-                  bottomPanelOpen && "opacity-100 translate-y-0",
+                  "hover:bg-muted p-1 active:scale-100",
+                  panelContent === BottomPanelContent.Orders && "bg-secondary"
+                )}
+              >
+                <RiListUnordered className="w-full h-full" />
+                <span className="sr-only">Orders</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="flex">
+              <p className="nav-item-divider">Orders</p>
+              <span className="short-cut">O</span>
+            </TooltipContent>
+          </Tooltip>
+
+          {/* Oscillators */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                variant={"ghost"}
+                className={cn(
+                  "hover:bg-muted p-1 active:scale-100",
                   panelContent === BottomPanelContent.Oscillators &&
                     "bg-secondary"
                 )}

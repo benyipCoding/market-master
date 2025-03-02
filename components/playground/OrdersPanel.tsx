@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Table,
   TableBody,
@@ -13,12 +13,14 @@ import { ScrollArea } from "../ui/scroll-area";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { fetchOpeningOrders } from "@/store/fetchDataSlice";
-import { OperationMode, OrderTabs } from "../interfaces/Playground";
+import { OperationMode, OrderNavs, OrderTabs } from "../interfaces/Playground";
 import {
   timestampToDateStr,
   TitleCase,
   transferNullToStr,
 } from "@/utils/helpers";
+import { cn } from "@/lib/utils";
+import { setCurrentOrderTab } from "@/store/bottomPanelSlice";
 
 const OrdersPanel = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -26,6 +28,11 @@ const OrdersPanel = () => {
   const { currentOrderTab } = useSelector(
     (state: RootState) => state.bottomPanel
   );
+  // slide block
+  const [slideBlock, setSlideBlock] = useState({
+    width: 0,
+    left: 0,
+  });
 
   const displayOrders = useMemo(() => {
     if (currentOrderTab === OrderTabs.Opening)
@@ -33,17 +40,54 @@ const OrdersPanel = () => {
     else return [];
   }, [currentOrderTab, openingOrders]);
 
-  useEffect(() => {
-    dispatch(fetchOpeningOrders(OperationMode.PRACTISE));
-  }, []);
+  const switchOrderTab = (tab: OrderTabs) => {
+    dispatch(setCurrentOrderTab(tab));
+  };
+
+  const shapeSlideBlock = () => {
+    const el = document.getElementById(currentOrderTab);
+    if (!el) return;
+    setSlideBlock({
+      width: el.offsetWidth,
+      left: el.offsetLeft,
+    });
+  };
 
   useEffect(() => {
-    if (!openingOrders.length) return;
-    console.log({ openingOrders });
-  }, [openingOrders]);
+    shapeSlideBlock();
+  }, [currentOrderTab]);
+
+  useEffect(() => {
+    dispatch(fetchOpeningOrders(OperationMode.PRACTISE));
+
+    setTimeout(() => {
+      shapeSlideBlock();
+    }, 150);
+  }, []);
 
   return (
     <div className="h-full flex flex-col gap-2">
+      <div className="flex gap-2 border-b-[1px] relative">
+        {OrderNavs.map((tab) => (
+          <div
+            className={cn(
+              "py-3 text-sm px-3 cursor-pointer text-[#a5a5a5] hover:text-white",
+              currentOrderTab === tab.value && "dark:text-white text-black"
+            )}
+            key={tab.value}
+            id={tab.value}
+            onClick={() => switchOrderTab(tab.value)}
+          >
+            {tab.label}
+          </div>
+        ))}
+        {/* slide block */}
+        <div
+          className="absolute dark:bg-white bg-black bottom-0 left-0 h-[2px] transition-all duration-300"
+          style={{ width: slideBlock.width, left: slideBlock.left }}
+        ></div>
+      </div>
+
       <ScrollArea className="flex-1">
         <Table>
           <TableCaption>

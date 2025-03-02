@@ -59,6 +59,21 @@ export enum OrderTabs {
   Closed = "closed",
 }
 
+export const OrderNavs = [
+  {
+    label: "Opening Orders",
+    value: OrderTabs.Opening,
+  },
+  {
+    label: "Limit Orders",
+    value: OrderTabs.Limit,
+  },
+  {
+    label: "Closed Orders",
+    value: OrderTabs.Closed,
+  },
+];
+
 export enum OrderStatus {
   PENDING = "pending",
   EXECUTED = "executed",
