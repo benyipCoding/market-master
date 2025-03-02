@@ -67,7 +67,7 @@ const OrdersPanel = () => {
 
   return (
     <div className="h-full flex flex-col gap-2">
-      <div className="flex gap-2 border-b-[1px] relative">
+      <div className="flex gap-2 relative">
         {OrderNavs.map((tab) => (
           <div
             className={cn(
