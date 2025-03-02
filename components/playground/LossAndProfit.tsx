@@ -5,13 +5,14 @@ import { cn } from "@/lib/utils";
 import { Input } from "../ui/input";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { OrderType } from "../interfaces/CandlestickSeries";
+import { OrderSide, OrderType } from "../interfaces/CandlestickSeries";
 import {
   MiddleSection,
   LossAndProfitDataType,
   LossAndProfitProps,
 } from "../interfaces/TradingAside";
 import { MiddleLabel } from "@/constants/tradingAside";
+import Big from "big.js";
 
 const ControlItem: React.FC<{
   index: number;
@@ -19,11 +20,10 @@ const ControlItem: React.FC<{
   onClickItem: () => void;
   currentSection?: MiddleSection;
   section: MiddleSection;
-  data: string | number;
+  data: string;
 }> = ({ index, checked, onClickItem, currentSection, section, data }) => {
   const isFirst = index === 0;
   const isLast = index === MiddleLabel.length - 1;
-  const [inputValue, setInputValue] = useState(data);
 
   return (
     <div
@@ -43,8 +43,7 @@ const ControlItem: React.FC<{
           "text-gray-400 border-none max-h-full w-full",
           checked && "text-white"
         )}
-        value={inputValue}
-        onInput={(e) => setInputValue((e.target as HTMLInputElement).value)}
+        value={data}
       />
     </div>
   );
@@ -52,10 +51,37 @@ const ControlItem: React.FC<{
 
 const BracketControl: React.FC<{
   title: string;
-  sectionData: LossAndProfitDataType;
-}> = ({ title, sectionData }) => {
+  sectionPrice: string;
+  orderPrice: string;
+  currentSide: OrderSide;
+  unitValue: number;
+}> = ({ title, sectionPrice, orderPrice, currentSide, unitValue }) => {
   const [checked, setChecked] = useState(false);
   const [currentSection, setCurrentSection] = useState<MiddleSection>();
+  const { currentSymbol } = useSelector((state: RootState) => state.fetchData);
+
+  const displaySectionData = useMemo<LossAndProfitDataType | null>(() => {
+    if (!currentSymbol || !sectionPrice || !orderPrice) return null;
+
+    const relativeProfitTicks = new Big(Number(sectionPrice))
+      .minus(orderPrice)
+      .div(currentSymbol.price_per_tick!)
+      .toFixed(2);
+
+    const ticks =
+      currentSide === OrderSide.BUY
+        ? relativeProfitTicks
+        : (Number(relativeProfitTicks) * -1).toFixed(2);
+
+    const usd = new Big(Number(ticks)).times(unitValue).div(100).toFixed(2);
+
+    return {
+      [MiddleSection.Price]: sectionPrice,
+      [MiddleSection.Ticks]: ticks,
+      [MiddleSection.USD]: usd,
+      [MiddleSection.Percentage]: "",
+    };
+  }, [currentSymbol, sectionPrice, orderPrice, currentSide, unitValue]);
 
   const focusSection = (value: MiddleSection) => {
     setCurrentSection(value);
@@ -81,17 +107,23 @@ const BracketControl: React.FC<{
 
       {/* Controller */}
       <div className={cn("text-sm mt-3 rounded-lg overflow-hidden")}>
-        {MiddleLabel.map((item, index) => (
-          <ControlItem
-            key={item.value}
-            index={index}
-            checked={checked}
-            onClickItem={() => focusSection(item.value)}
-            currentSection={currentSection}
-            section={item.value}
-            data={sectionData[item.value]}
-          />
-        ))}
+        {MiddleLabel.map((item, index) => {
+          const data = displaySectionData
+            ? String(displaySectionData[item.value])
+            : "";
+
+          return (
+            <ControlItem
+              key={item.value}
+              index={index}
+              checked={checked}
+              onClickItem={() => focusSection(item.value)}
+              currentSection={currentSection}
+              section={item.value}
+              data={data}
+            />
+          );
+        })}
       </div>
     </div>
   );
@@ -118,6 +150,7 @@ const LossAndProfit: React.FC<LossAndProfitProps> = ({
   currentSide,
   currentOrderType,
   preOrderPrice,
+  unitValue,
 }) => {
   const { currentSymbol, currentCandle } = useSelector(
     (state: RootState) => state.fetchData
@@ -128,35 +161,83 @@ const LossAndProfit: React.FC<LossAndProfitProps> = ({
     else return preOrderPrice;
   }, [currentCandle?.close, currentOrderType, preOrderPrice]);
 
-  const [stopLossData, setStopLossData] = useState<LossAndProfitDataType>({
-    [MiddleSection.Price]: "123",
-    [MiddleSection.Ticks]: "123",
-    [MiddleSection.USD]: "123",
-    [MiddleSection.Percentage]: "123",
+  const [stopLossData, setStopLossData] = useState<
+    Partial<LossAndProfitDataType>
+  >({
+    [MiddleSection.Price]: "",
+    isModify: false,
   });
 
-  const [takeProfitData, setTakeProfitData] = useState<LossAndProfitDataType>({
-    [MiddleSection.Price]: "321",
-    [MiddleSection.Ticks]: "321",
-    [MiddleSection.USD]: "321",
-    [MiddleSection.Percentage]: "321",
+  const [takeProfitData, setTakeProfitData] = useState<
+    Partial<LossAndProfitDataType>
+  >({
+    [MiddleSection.Price]: "",
+    isModify: false,
   });
 
   useEffect(() => {
-    if (!orderPrice) return;
-    console.log(orderPrice);
-  }, [orderPrice]);
+    if (!orderPrice || !currentSymbol) return;
+    const price = new Big(orderPrice);
+
+    if (currentSide === OrderSide.BUY) {
+      // 做多
+      // 设置止损信息
+      setStopLossData((prev) => ({
+        ...prev,
+        [MiddleSection.Price]: price
+          .minus(100 * currentSymbol.price_per_tick!)
+          .toFixed(currentSymbol.precision),
+      }));
+
+      // 设置止盈信息
+      setTakeProfitData((prev) => ({
+        ...prev,
+        [MiddleSection.Price]: price
+          .add(100 * currentSymbol.price_per_tick!)
+          .toFixed(currentSymbol.precision),
+      }));
+    } else {
+      // 做空
+      // 设置止损信息
+      setStopLossData((prev) => ({
+        ...prev,
+        [MiddleSection.Price]: price
+          .add(100 * currentSymbol.price_per_tick!)
+          .toFixed(currentSymbol.precision),
+      }));
+
+      // 设置止盈信息
+      setTakeProfitData((prev) => ({
+        ...prev,
+        [MiddleSection.Price]: price
+          .minus(100 * currentSymbol.price_per_tick!)
+          .toFixed(currentSymbol.precision),
+      }));
+    }
+  }, [orderPrice, currentSide, currentSymbol]);
 
   return (
     <div className="flex">
       {/* Stop Loss */}
-      <BracketControl title="Stop Loss" sectionData={stopLossData} />
+      <BracketControl
+        title="Stop Loss"
+        sectionPrice={String(stopLossData[MiddleSection.Price])}
+        orderPrice={String(orderPrice)}
+        currentSide={currentSide}
+        unitValue={unitValue}
+      />
 
       {/* Middle */}
       <Middle />
 
       {/* Take Profit */}
-      <BracketControl title="Take Profit" sectionData={takeProfitData} />
+      <BracketControl
+        title="Take Profit"
+        sectionPrice={String(takeProfitData[MiddleSection.Price])}
+        orderPrice={String(orderPrice)}
+        currentSide={currentSide}
+        unitValue={unitValue}
+      />
     </div>
   );
 };

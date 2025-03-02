@@ -9,6 +9,7 @@ import { Input } from "../ui/input";
 import { Calculator, ChevronDown, ChevronUp } from "lucide-react";
 import MiniCalculator from "./MiniCalculator";
 import LossAndProfit from "./LossAndProfit";
+import Big from "big.js";
 
 const TradingAside: React.FC = () => {
   const { currentSymbol } = useSelector((state: RootState) => state.fetchData);
@@ -18,7 +19,7 @@ const TradingAside: React.FC = () => {
   );
   const [showCalculator, setShowCalculator] = useState(false);
   const unintInputRef = useRef<HTMLInputElement>(null);
-  const [unitValue, setUnitValue] = useState<string>("");
+  const [unitValue, setUnitValue] = useState<string>("100");
   const [preOrderPrice, setPreOrderPrice] = useState<undefined | string>(); // 预选的开仓价
   const { currentCandle } = useSelector((state: RootState) => state.fetchData);
   const onClickCalculator = () => {
@@ -44,23 +45,23 @@ const TradingAside: React.FC = () => {
   };
 
   const changePreOrderPrice = (type: "increase" | "decrease") => {
-    const times = Math.pow(10, currentSymbol?.precision!);
-
-    let value = Number(preOrderPrice) * times;
-    const minMove = currentSymbol?.minMove! * times;
-
     switch (type) {
       case "increase":
-        value += minMove;
+        setPreOrderPrice((prev) =>
+          new Big(Number(prev!))
+            .add(currentSymbol?.minMove!)
+            .toFixed(currentSymbol?.precision)
+        );
         break;
 
       case "decrease":
-        value -= minMove;
+        setPreOrderPrice((prev) =>
+          new Big(Number(prev!))
+            .minus(currentSymbol?.minMove!)
+            .toFixed(currentSymbol?.precision)
+        );
         break;
     }
-
-    value = value / times;
-    setPreOrderPrice(String(value.toFixed(currentSymbol?.precision!)));
   };
 
   useEffect(() => {
@@ -150,6 +151,7 @@ const TradingAside: React.FC = () => {
         currentSide={currentSide}
         currentOrderType={currentOrderType}
         preOrderPrice={preOrderPrice}
+        unitValue={Number(unitValue)}
       />
     </div>
   );
