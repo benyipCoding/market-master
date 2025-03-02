@@ -142,21 +142,21 @@ const LossAndProfit: React.FC<LossAndProfitProps> = ({ currentSide }) => {
     (state: RootState) => state.fetchData
   );
 
-  useEffect(() => {
-    if (!currentCandle?.close || !currentSymbol) return;
-    if (currentSide === OrderSide.BUY) {
-      // 做多时候
-      console.log("市价:", currentCandle?.close);
-      console.log(
-        "止损价：",
-        currentCandle.close - 10 * currentSymbol.price_per_tick!
-      );
-    }
+  // useEffect(() => {
+  //   if (!currentCandle?.close || !currentSymbol) return;
+  //   if (currentSide === OrderSide.BUY) {
+  //     // 做多时候
+  //     console.log("市价:", currentCandle?.close);
+  //     console.log(
+  //       "止损价：",
+  //       currentCandle.close - 10 * currentSymbol.price_per_tick!
+  //     );
+  //   }
 
-    if (currentSide === OrderSide.SELL) {
-      // 做空时候
-    }
-  }, [currentCandle?.close, currentSide, currentSymbol?.basic_point_place]);
+  //   if (currentSide === OrderSide.SELL) {
+  //     // 做空时候
+  //   }
+  // }, [currentCandle?.close, currentSide, currentSymbol?.basic_point_place]);
 
   return (
     <div className="flex">
