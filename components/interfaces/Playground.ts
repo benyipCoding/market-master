@@ -51,6 +51,7 @@ export interface RightAsideBtnsProps {
 export enum BottomPanelContent {
   Orders = "orders",
   Oscillators = "oscillators",
+  Hide = "hide",
 }
 
 export enum OrderTabs {

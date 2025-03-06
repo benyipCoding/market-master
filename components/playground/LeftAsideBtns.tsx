@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   BottomPanelContent,
   LeftAsideBtnsProps,
+  OrderTabs,
 } from "../interfaces/Playground";
 import { PiLineSegment } from "react-icons/pi";
 import { Button } from "../ui/button";
@@ -43,7 +44,7 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
     useSelector((state: RootState) => state.common);
   const { panelContent } = useSelector((state: RootState) => state.bottomPanel);
   const dispatch = useDispatch<AppDispatch>();
-  const [orderTabsOpen, setOrderTabsOpen] = useState(false);
+  // const [orderTabsOpen, setOrderTabsOpen] = useState(false);
 
   const isAutoResize = useMemo<boolean>(
     () =>
@@ -122,13 +123,32 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
     setBottomPanelOpen((prev) => !prev);
   };
 
-  const switchToOrders = () => {
-    dispatch(setPanelContent(BottomPanelContent.Orders));
-  };
+  const switchPanel = useCallback(
+    (content: BottomPanelContent) => {
+      if (panelContent === content) {
+        setBottomPanelOpen(false);
+        dispatch(setPanelContent(BottomPanelContent.Hide));
+        return;
+      }
+      if (!bottomPanelOpen) setBottomPanelOpen(true);
+      dispatch(setPanelContent(content));
+    },
+    [bottomPanelOpen, dispatch, panelContent, setBottomPanelOpen]
+  );
 
-  const switchToOscillators = () => {
-    dispatch(setPanelContent(BottomPanelContent.Oscillators));
-  };
+  // const switchToOscillators = useCallback(() => {
+  //   if (panelContent === BottomPanelContent.Oscillators) {
+  //     setBottomPanelOpen(false);
+  //     dispatch(setPanelContent(BottomPanelContent.Hide));
+  //     return;
+  //   }
+
+  //   if (!bottomPanelOpen) {
+  //     setBottomPanelOpen(true);
+  //   }
+
+  //   dispatch(setPanelContent(BottomPanelContent.Oscillators));
+  // }, [bottomPanelOpen, dispatch, panelContent, setBottomPanelOpen]);
 
   // L key
   useEffect(() => {
@@ -152,14 +172,20 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
   }, [onDeleteSeries]);
 
   useEffect(() => {
+    hotkeys("o", () => switchPanel(BottomPanelContent.Orders));
+    hotkeys("c", () => switchPanel(BottomPanelContent.Oscillators));
+
+    return () => {
+      hotkeys.unbind("o");
+      hotkeys.unbind("c");
+    };
+  }, [switchPanel]);
+
+  useEffect(() => {
     hotkeys("Esc", closeDialogByESC);
-    hotkeys("o", switchToOrders);
-    hotkeys("c", switchToOscillators);
     document.addEventListener("contextmenu", contextmenuHandler);
     return () => {
       hotkeys.unbind("Esc");
-      hotkeys.unbind("o");
-      hotkeys.unbind("c");
       document.removeEventListener("contextmenu", contextmenuHandler);
     };
   }, []);
@@ -246,7 +272,7 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
                   "hover:bg-muted p-1 active:scale-100",
                   panelContent === BottomPanelContent.Orders && "bg-secondary"
                 )}
-                onClick={switchToOrders}
+                onClick={() => switchPanel(BottomPanelContent.Orders)}
               >
                 <RiListUnordered className="w-full h-full" />
                 <span className="sr-only">Orders</span>
@@ -269,7 +295,7 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
                   panelContent === BottomPanelContent.Oscillators &&
                     "bg-secondary"
                 )}
-                onClick={switchToOscillators}
+                onClick={() => switchPanel(BottomPanelContent.Oscillators)}
               >
                 <MdBarChart className="w-full h-full" />
                 <span className="sr-only">Oscillators</span>
@@ -282,7 +308,7 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
           </Tooltip>
 
           {/* 切换按钮 */}
-          <Tooltip>
+          {/* <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 type="button"
@@ -302,7 +328,7 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
               <p className="nav-item-divider">Bottom Panel</p>
               <span className="short-cut">M</span>
             </TooltipContent>
-          </Tooltip>
+          </Tooltip> */}
         </div>
       </div>
     </TooltipProvider>

@@ -21,7 +21,7 @@ export const bottomPanelSlice = createSlice({
     setPanelContent(state, action: PayloadAction<BottomPanelContent>) {
       state.panelContent = action.payload;
     },
-    setCurrentOrderTab(state, action: PayloadAction<OrderTabs | "">) {
+    setCurrentOrderTab(state, action: PayloadAction<OrderTabs>) {
       state.currentOrderTab = action.payload;
     },
   },

@@ -99,7 +99,7 @@ const OrdersPanel = () => {
         ))}
         {/* slide block */}
         <div
-          className="absolute bottom-0 left-0 transition-all duration-200 bg-secondary/50 border-b-[2px] dark:border-white border-black"
+          className="absolute bottom-0 left-0 transition-all duration-200 bg-secondary/50 border-b-[2px] dark:border-white border-black rounded-sm rounded-b-none"
           style={{
             width: slideBlock.width,
             left: slideBlock.left,
