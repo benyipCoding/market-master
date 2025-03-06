@@ -41,9 +41,7 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
 }) => {
   const { isDrawing, selectedSeries, selectedIndicator, graphType } =
     useSelector((state: RootState) => state.common);
-  const { panelContent, currentOrderTab } = useSelector(
-    (state: RootState) => state.bottomPanel
-  );
+  const { panelContent } = useSelector((state: RootState) => state.bottomPanel);
   const dispatch = useDispatch<AppDispatch>();
   const [orderTabsOpen, setOrderTabsOpen] = useState(false);
 
@@ -124,9 +122,9 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
     setBottomPanelOpen((prev) => !prev);
   };
 
-  // const switchToOrders = () => {
-  //   dispatch(setPanelContent(BottomPanelContent.Orders));
-  // };
+  const switchToOrders = () => {
+    dispatch(setPanelContent(BottomPanelContent.Orders));
+  };
 
   const switchToOscillators = () => {
     dispatch(setPanelContent(BottomPanelContent.Oscillators));
@@ -155,12 +153,12 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
 
   useEffect(() => {
     hotkeys("Esc", closeDialogByESC);
-    // hotkeys("o", switchToOrders);
+    hotkeys("o", switchToOrders);
     hotkeys("c", switchToOscillators);
     document.addEventListener("contextmenu", contextmenuHandler);
     return () => {
       hotkeys.unbind("Esc");
-      // hotkeys.unbind("o");
+      hotkeys.unbind("o");
       hotkeys.unbind("c");
       document.removeEventListener("contextmenu", contextmenuHandler);
     };
@@ -248,6 +246,7 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
                   "hover:bg-muted p-1 active:scale-100",
                   panelContent === BottomPanelContent.Orders && "bg-secondary"
                 )}
+                onClick={switchToOrders}
               >
                 <RiListUnordered className="w-full h-full" />
                 <span className="sr-only">Orders</span>

@@ -1,7 +1,11 @@
 import React from "react";
 
 const OscillatorsPanel = () => {
-  return <div>OscillatorsPanel</div>;
+  return (
+    <div>
+      <p>OscillatorsPanel</p>
+    </div>
+  );
 };
 
 export default OscillatorsPanel;
