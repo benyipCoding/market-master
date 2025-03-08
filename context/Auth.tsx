@@ -1,6 +1,5 @@
 "use client";
 import { getMe } from "@/app/(root)/auth/login/getMe";
-import { getProfile } from "@/app/playground/actions/getProfile";
 import { Status } from "@/utils/apis/response";
 import {
   createContext,
@@ -44,12 +43,14 @@ interface IAuthContext {
   setUserInfo: Dispatch<SetStateAction<User | null>>;
   userInfo: User | null;
   userProfile: Profile | null;
+  setUserProfile: Dispatch<SetStateAction<Profile | null>>;
 }
 
 export const AuthContext = createContext<IAuthContext>({
   setUserInfo: () => {},
   userInfo: null,
   userProfile: null,
+  setUserProfile: () => {},
 });
 
 const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
@@ -61,14 +62,12 @@ const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
       if (!res || res.status !== Status.OK) return;
       setUserInfo(res.data);
     });
-    getProfile().then((res) => {
-      if (!res || res.status !== Status.OK) return;
-      setUserProfile(res.data);
-    });
   }, []);
 
   return (
-    <AuthContext.Provider value={{ setUserInfo, userInfo, userProfile }}>
+    <AuthContext.Provider
+      value={{ setUserInfo, userInfo, userProfile, setUserProfile }}
+    >
       {children}
     </AuthContext.Provider>
   );

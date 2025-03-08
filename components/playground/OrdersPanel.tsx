@@ -23,6 +23,7 @@ import {
 import { cn } from "@/lib/utils";
 import { setCurrentOrderTab } from "@/store/bottomPanelSlice";
 import { AuthContext } from "@/context/Auth";
+import { getProfile } from "@/app/playground/actions/getProfile";
 
 const OrdersPanel = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -30,7 +31,7 @@ const OrdersPanel = () => {
   const { currentOrderTab } = useSelector(
     (state: RootState) => state.bottomPanel
   );
-  const { userInfo, userProfile } = useContext(AuthContext);
+  const { userInfo, userProfile, setUserProfile } = useContext(AuthContext);
   const displayBalance = useMemo(
     () =>
       userProfile?.balance ? formatNumberWithCommas(userProfile.balance) : 0,
@@ -81,6 +82,7 @@ const OrdersPanel = () => {
 
   useEffect(() => {
     dispatch(fetchOpeningOrders(OperationMode.PRACTISE));
+    getProfile().then((res) => setUserProfile(res.data));
 
     return () => {
       if (obs.current) {
