@@ -379,7 +379,7 @@ const Playground = () => {
           <RightAsideBtns
             className={cn("w-12 ml-2 max-md:ml-0", !asideOpen && "ml-0")}
             asideOpen={asideOpen}
-            toggleAsideOpen={toggleAsideOpen}
+            setAsideOpen={setAsideOpen}
           />
         </main>
       </div>

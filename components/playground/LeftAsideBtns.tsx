@@ -119,9 +119,9 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
     }
   }, [isAutoResize]);
 
-  const toggleBottomPanelOpen = () => {
-    setBottomPanelOpen((prev) => !prev);
-  };
+  // const toggleBottomPanelOpen = () => {
+  //   setBottomPanelOpen((prev) => !prev);
+  // };
 
   const switchPanel = useCallback(
     (content: BottomPanelContent) => {
@@ -154,12 +154,12 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
   useEffect(() => {
     hotkeys("l", toggleDrawingLineSegment);
     hotkeys("v", toggleAutoResize);
-    hotkeys("m", toggleBottomPanelOpen);
+    // hotkeys("m", toggleBottomPanelOpen);
 
     return () => {
       hotkeys.unbind("l");
       hotkeys.unbind("v");
-      hotkeys.unbind("m");
+      // hotkeys.unbind("m");
     };
   }, [toggleDrawingLineSegment, toggleAutoResize]);
 

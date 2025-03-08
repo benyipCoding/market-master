@@ -1,9 +1,7 @@
 import {
-  CandlestickData,
   DeepPartial,
   LineStyleOptions,
   SeriesOptionsCommon,
-  Time,
 } from "lightweight-charts";
 import { TChartRef } from "./TChart";
 import { TechnicalIndicatorLine } from "./TechnicalIndexForm";
@@ -45,7 +43,7 @@ export interface NavbarProps {
 export interface RightAsideBtnsProps {
   className?: string;
   asideOpen: boolean;
-  toggleAsideOpen: () => void;
+  setAsideOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export enum BottomPanelContent {
