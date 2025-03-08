@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
   Table,
   TableBody,
@@ -15,12 +15,14 @@ import { AppDispatch, RootState } from "@/store";
 import { fetchOpeningOrders } from "@/store/fetchDataSlice";
 import { OperationMode, OrderNavs, OrderTabs } from "../interfaces/Playground";
 import {
+  formatNumberWithCommas,
   timestampToDateStr,
   TitleCase,
   transferNullToStr,
 } from "@/utils/helpers";
 import { cn } from "@/lib/utils";
 import { setCurrentOrderTab } from "@/store/bottomPanelSlice";
+import { AuthContext } from "@/context/Auth";
 
 const OrdersPanel = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -28,6 +30,13 @@ const OrdersPanel = () => {
   const { currentOrderTab } = useSelector(
     (state: RootState) => state.bottomPanel
   );
+  const { userInfo, userProfile } = useContext(AuthContext);
+  const displayBalance = useMemo(
+    () =>
+      userProfile?.balance ? formatNumberWithCommas(userProfile.balance) : 0,
+    [userProfile?.balance]
+  );
+
   // slide block
   const [slideBlock, setSlideBlock] = useState({
     width: 0,
@@ -106,6 +115,21 @@ const OrdersPanel = () => {
             height: slideBlock.height,
           }}
         ></div>
+
+        <div className="absolute right-0 h-full flex">
+          <div className="w-32">
+            <p className="text-xs">Account</p>
+            <p>{userInfo?.display_name}</p>
+          </div>
+          <div className="w-32">
+            <p className="text-xs">Balance</p>
+            <p>{displayBalance} $</p>
+          </div>
+          <div className="w-32">
+            <p className="text-xs">Profit / Loss</p>
+            <p>0 $</p>
+          </div>
+        </div>
       </div>
 
       <ScrollArea className="flex-1">
