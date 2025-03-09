@@ -57,6 +57,8 @@ import {
   OnContronPanel,
   OnOrderMarker,
 } from "@/providers/EmitteryProvider";
+import { getProfile } from "./actions/getProfile";
+import { AuthContext } from "@/context/Auth";
 
 const Playground = () => {
   // TChart component instance
@@ -95,6 +97,7 @@ const Playground = () => {
     () => dialogContent === DialogContentType.UploadData,
     [dialogContent]
   );
+  const { setUserProfile } = useContext(AuthContext);
 
   const [candlestickData, setCandlestickData] = useState<
     CandlestickData<Time>[]
@@ -155,10 +158,6 @@ const Playground = () => {
 
   const chartDblClickHandler = (param: MouseEventParams<Time>) => {
     dispatch(setMouseDblClickEventParam(param));
-  };
-
-  const toggleAsideOpen = () => {
-    setAsideOpen((prev) => !prev);
   };
 
   const cleanLineSeries = () => {
@@ -235,6 +234,7 @@ const Playground = () => {
     dispatch(fetchPeriods());
     dispatch(fetchSymbols());
     window.addEventListener("mouseup", cancelResizing);
+    getProfile().then((res) => setUserProfile(res.data));
 
     return () => {
       window.removeEventListener("mouseup", cancelResizing);

@@ -16,13 +16,14 @@ const RightAsideBtns: React.FC<RightAsideBtnsProps> = ({
   asideOpen,
   setAsideOpen,
 }) => {
-  const [currentAside, setCurrentAside] = useState<AsideContent>(
+  const [currentAside, setCurrentAside] = useState<AsideContent | "">(
     AsideContent.Trade
   );
 
   const switchToTradePanel = useCallback(() => {
     if (currentAside === AsideContent.Trade && asideOpen) {
       setAsideOpen(false);
+      setCurrentAside("");
       return;
     }
     if (!asideOpen) setAsideOpen(true);

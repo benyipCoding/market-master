@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Label } from "../ui/label";
 import { Checkbox } from "../ui/checkbox";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,7 @@ import {
 } from "../interfaces/TradingAside";
 import { MiddleLabel } from "@/constants/tradingAside";
 import Big from "big.js";
+import { AuthContext } from "@/context/Auth";
 
 const ControlItem: React.FC<{
   index: number;
@@ -59,6 +60,7 @@ const BracketControl: React.FC<{
   const [checked, setChecked] = useState(false);
   const [currentSection, setCurrentSection] = useState<MiddleSection>();
   const { currentSymbol } = useSelector((state: RootState) => state.fetchData);
+  const { userProfile } = useContext(AuthContext);
 
   const displaySectionData = useMemo<LossAndProfitDataType | null>(() => {
     if (!currentSymbol || !sectionPrice || !orderPrice) return null;
@@ -74,14 +76,24 @@ const BracketControl: React.FC<{
         : (Number(relativeProfitTicks) * -1).toFixed(2);
 
     const usd = new Big(Number(ticks)).times(unitValue).div(100).toFixed(2);
+    const percentage = userProfile?.balance
+      ? new Big(usd).div(userProfile?.balance).times(100).toFixed(2)
+      : 0;
 
     return {
       [MiddleSection.Price]: sectionPrice,
       [MiddleSection.Ticks]: ticks,
       [MiddleSection.USD]: usd,
-      [MiddleSection.Percentage]: "",
+      [MiddleSection.Percentage]: percentage,
     };
-  }, [currentSymbol, sectionPrice, orderPrice, currentSide, unitValue]);
+  }, [
+    currentSymbol,
+    sectionPrice,
+    orderPrice,
+    currentSide,
+    unitValue,
+    userProfile?.balance,
+  ]);
 
   const focusSection = (value: MiddleSection) => {
     setCurrentSection(value);
@@ -128,6 +140,8 @@ const BracketControl: React.FC<{
     </div>
   );
 };
+
+const ticks = 100;
 
 const Middle = () => {
   return (
@@ -185,7 +199,7 @@ const LossAndProfit: React.FC<LossAndProfitProps> = ({
       setStopLossData((prev) => ({
         ...prev,
         [MiddleSection.Price]: price
-          .minus(100 * currentSymbol.price_per_tick!)
+          .minus(ticks * currentSymbol.price_per_tick!)
           .toFixed(currentSymbol.precision),
       }));
 
@@ -193,7 +207,7 @@ const LossAndProfit: React.FC<LossAndProfitProps> = ({
       setTakeProfitData((prev) => ({
         ...prev,
         [MiddleSection.Price]: price
-          .add(100 * currentSymbol.price_per_tick!)
+          .add(ticks * currentSymbol.price_per_tick!)
           .toFixed(currentSymbol.precision),
       }));
     } else {
@@ -202,7 +216,7 @@ const LossAndProfit: React.FC<LossAndProfitProps> = ({
       setStopLossData((prev) => ({
         ...prev,
         [MiddleSection.Price]: price
-          .add(100 * currentSymbol.price_per_tick!)
+          .add(ticks * currentSymbol.price_per_tick!)
           .toFixed(currentSymbol.precision),
       }));
 
@@ -210,7 +224,7 @@ const LossAndProfit: React.FC<LossAndProfitProps> = ({
       setTakeProfitData((prev) => ({
         ...prev,
         [MiddleSection.Price]: price
-          .minus(100 * currentSymbol.price_per_tick!)
+          .minus(ticks * currentSymbol.price_per_tick!)
           .toFixed(currentSymbol.precision),
       }));
     }

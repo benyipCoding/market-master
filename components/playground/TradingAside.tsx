@@ -109,7 +109,6 @@ const TradingAside: React.FC = () => {
             onInput={priceFilterInput}
             onBlur={formatPriceValue}
           />
-          {/* <Calculator className="w-7 h-7 absolute bottom-1 right-1 z-20 cursor-pointer bg-background" /> */}
           <div className="w-7 h-8 absolute bottom-[2px] right-1 z-20 flex flex-col gap-[2px]">
             <ChevronUp
               className="cursor-pointer flex-1 rounded-sm hover:bg-secondary transition-all duration-200 active:scale-90"
