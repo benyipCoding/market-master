@@ -10,6 +10,8 @@ import { Calculator, ChevronDown, ChevronUp } from "lucide-react";
 import MiniCalculator from "./MiniCalculator";
 import LossAndProfit from "./LossAndProfit";
 import Big from "big.js";
+import { Button } from "../ui/button";
+import { cn } from "@/lib/utils";
 
 const TradingAside: React.FC = () => {
   const { currentSymbol } = useSelector((state: RootState) => state.fetchData);
@@ -152,6 +154,23 @@ const TradingAside: React.FC = () => {
         preOrderPrice={preOrderPrice}
         unitValue={Number(unitValue)}
       />
+
+      <div className="border-b-[1px] mt-2"></div>
+
+      <Button
+        className={cn(
+          "flex flex-col h-fit py-1 active:scale-100",
+          currentSide === OrderSide.BUY && "bg-primary hover:bg-primary",
+          currentSide === OrderSide.SELL && "bg-red-600 hover:bg-red-600"
+        )}
+      >
+        <p className="text-lg">{TitleCase(currentSide)}</p>
+        <p className="text-xs">
+          {unitValue} {currentSymbol?.label} @
+          {currentOrderType === OrderType.LIMIT && preOrderPrice}{" "}
+          {currentOrderType === OrderType.MARKET ? "MKT" : "LMT"}
+        </p>
+      </Button>
     </div>
   );
 };
