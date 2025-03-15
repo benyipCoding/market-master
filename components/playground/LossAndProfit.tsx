@@ -220,6 +220,15 @@ const BracketControl: React.FC<{
     setChecked(true);
   };
 
+  useEffect(() => {
+    if (!checked) {
+      setSectionPrice((prev) => ({
+        ...prev,
+        isModify: false,
+      }));
+    }
+  }, [checked, setSectionPrice]);
+
   return (
     <div className="flex-1">
       {/* Title */}
@@ -265,7 +274,7 @@ const BracketControl: React.FC<{
   );
 };
 
-const ticks = 100;
+const ticks = 300;
 
 const Middle = () => {
   return (
@@ -320,39 +329,49 @@ const LossAndProfit: React.FC<LossAndProfitProps> = ({
     if (currentSide === OrderSide.BUY) {
       // 做多
       // 设置止损信息
-      setStopLossData((prev) => ({
-        ...prev,
-        [MiddleSection.Price]: price
-          .minus(ticks * currentSymbol.price_per_tick!)
-          .toFixed(currentSymbol.precision),
-      }));
+      !stopLossData.isModify &&
+        setStopLossData((prev) => ({
+          ...prev,
+          [MiddleSection.Price]: price
+            .minus(ticks * currentSymbol.price_per_tick!)
+            .toFixed(currentSymbol.precision),
+        }));
 
       // 设置止盈信息
-      setTakeProfitData((prev) => ({
-        ...prev,
-        [MiddleSection.Price]: price
-          .add(ticks * currentSymbol.price_per_tick!)
-          .toFixed(currentSymbol.precision),
-      }));
+      !takeProfitData.isModify &&
+        setTakeProfitData((prev) => ({
+          ...prev,
+          [MiddleSection.Price]: price
+            .add(ticks * currentSymbol.price_per_tick!)
+            .toFixed(currentSymbol.precision),
+        }));
     } else {
       // 做空
       // 设置止损信息
-      setStopLossData((prev) => ({
-        ...prev,
-        [MiddleSection.Price]: price
-          .add(ticks * currentSymbol.price_per_tick!)
-          .toFixed(currentSymbol.precision),
-      }));
+      !stopLossData.isModify &&
+        setStopLossData((prev) => ({
+          ...prev,
+          [MiddleSection.Price]: price
+            .add(ticks * currentSymbol.price_per_tick!)
+            .toFixed(currentSymbol.precision),
+        }));
 
       // 设置止盈信息
-      setTakeProfitData((prev) => ({
-        ...prev,
-        [MiddleSection.Price]: price
-          .minus(ticks * currentSymbol.price_per_tick!)
-          .toFixed(currentSymbol.precision),
-      }));
+      !takeProfitData.isModify &&
+        setTakeProfitData((prev) => ({
+          ...prev,
+          [MiddleSection.Price]: price
+            .minus(ticks * currentSymbol.price_per_tick!)
+            .toFixed(currentSymbol.precision),
+        }));
     }
-  }, [orderPrice, currentSide, currentSymbol]);
+  }, [
+    orderPrice,
+    currentSide,
+    currentSymbol,
+    stopLossData.isModify,
+    takeProfitData.isModify,
+  ]);
 
   return (
     <div className="flex">
