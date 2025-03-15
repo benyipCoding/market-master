@@ -22,9 +22,113 @@ const ControlItem: React.FC<{
   currentSection?: MiddleSection;
   section: MiddleSection;
   data: string;
-}> = ({ index, checked, onClickItem, currentSection, section, data }) => {
+  setData: React.Dispatch<React.SetStateAction<Partial<LossAndProfitDataType>>>;
+  orderPrice: string | undefined;
+  currentSide: OrderSide;
+  unitValue: number;
+}> = ({
+  index,
+  checked,
+  onClickItem,
+  currentSection,
+  section,
+  data,
+  setData,
+  orderPrice,
+  currentSide,
+  unitValue,
+}) => {
   const isFirst = index === 0;
   const isLast = index === MiddleLabel.length - 1;
+  const [modifying, setModifying] = useState(false);
+  const [modifyingValue, setModifyingValue] = useState<string>();
+  const { currentSymbol } = useSelector((state: RootState) => state.fetchData);
+  const { userProfile } = useContext(AuthContext);
+
+  const calDiffTicks = (diffUsd: any) => {
+    return new Big(diffUsd).times(100).div(unitValue);
+  };
+
+  const calDiffPrice = (diffTicks: any) => {
+    return new Big(diffTicks).times(currentSymbol?.price_per_tick!);
+  };
+
+  const calDiffUsd = (percentage: any) => {
+    if (!userProfile) return;
+    return new Big(percentage).div(100).times(userProfile?.balance);
+  };
+
+  const calModifiedPrice = (orderPrice: number | string, diffPrice: any) => {
+    const price =
+      currentSide === OrderSide.BUY
+        ? new Big(orderPrice).add(diffPrice).toString()
+        : new Big(orderPrice).minus(diffPrice).toString();
+
+    setData({
+      [MiddleSection.Price]: price,
+      isModify: true,
+    });
+  };
+
+  const handleChange = (e: React.FormEvent<HTMLInputElement>) => {
+    if (!orderPrice) throw new Error("OrderPrice is undefined");
+
+    const value = (e.target as HTMLInputElement).value;
+    setModifyingValue(value);
+    if (!value) return;
+    const numVal = Number(value);
+    let diffPrice: any = 0;
+    let differTicks: any = 0;
+    let differUsd: any = 0;
+
+    switch (section) {
+      case MiddleSection.Price:
+        setData({
+          [MiddleSection.Price]: numVal.toFixed(currentSymbol?.precision),
+          isModify: true,
+        });
+        break;
+
+      case MiddleSection.Ticks:
+        diffPrice = calDiffPrice(value);
+        calModifiedPrice(orderPrice, diffPrice);
+        break;
+
+      case MiddleSection.USD:
+        differTicks = calDiffTicks(value);
+        diffPrice = calDiffPrice(differTicks);
+        calModifiedPrice(orderPrice, diffPrice);
+        break;
+
+      case MiddleSection.Percentage:
+        differUsd = calDiffUsd(value);
+        differTicks = calDiffTicks(differUsd);
+        diffPrice = calDiffPrice(differTicks);
+        calModifiedPrice(orderPrice, diffPrice);
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  const handleFocus = () => {
+    setModifying(true);
+    setModifyingValue(data);
+  };
+
+  const handleBlur = () => {
+    switch (section) {
+      case MiddleSection.Price:
+        setModifyingValue((prev) =>
+          Number(prev).toFixed(currentSymbol?.precision)
+        );
+        break;
+      default:
+        break;
+    }
+    setModifying(false);
+  };
 
   return (
     <div
@@ -44,7 +148,11 @@ const ControlItem: React.FC<{
           "text-gray-400 border-none max-h-full w-full",
           checked && "text-white"
         )}
-        value={data}
+        type="number"
+        value={modifying ? modifyingValue : data}
+        onInput={handleChange}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
       />
     </div>
   );
@@ -56,7 +164,17 @@ const BracketControl: React.FC<{
   orderPrice: string | undefined;
   currentSide: OrderSide;
   unitValue: number;
-}> = ({ title, sectionPrice, orderPrice, currentSide, unitValue }) => {
+  setSectionPrice: React.Dispatch<
+    React.SetStateAction<Partial<LossAndProfitDataType>>
+  >;
+}> = ({
+  title,
+  sectionPrice,
+  orderPrice,
+  currentSide,
+  unitValue,
+  setSectionPrice,
+}) => {
   const [checked, setChecked] = useState(false);
   const [currentSection, setCurrentSection] = useState<MiddleSection>();
   const { currentSymbol } = useSelector((state: RootState) => state.fetchData);
@@ -81,7 +199,9 @@ const BracketControl: React.FC<{
       : 0;
 
     return {
-      [MiddleSection.Price]: sectionPrice,
+      [MiddleSection.Price]: Number(sectionPrice).toFixed(
+        currentSymbol.precision
+      ),
       [MiddleSection.Ticks]: ticks,
       [MiddleSection.USD]: usd,
       [MiddleSection.Percentage]: percentage,
@@ -133,6 +253,10 @@ const BracketControl: React.FC<{
               currentSection={currentSection}
               section={item.value}
               data={data}
+              setData={setSectionPrice}
+              orderPrice={orderPrice}
+              currentSide={currentSide}
+              unitValue={unitValue}
             />
           );
         })}
@@ -239,6 +363,7 @@ const LossAndProfit: React.FC<LossAndProfitProps> = ({
         orderPrice={orderPrice ? String(orderPrice) : undefined}
         currentSide={currentSide}
         unitValue={unitValue}
+        setSectionPrice={setStopLossData}
       />
 
       {/* Middle */}
@@ -251,6 +376,7 @@ const LossAndProfit: React.FC<LossAndProfitProps> = ({
         orderPrice={orderPrice ? String(orderPrice) : undefined}
         currentSide={currentSide}
         unitValue={unitValue}
+        setSectionPrice={setTakeProfitData}
       />
     </div>
   );
