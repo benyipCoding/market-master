@@ -32,7 +32,9 @@ const TradingAside: React.FC = () => {
   const unintInputRef = useRef<HTMLInputElement>(null);
   const [unitValue, setUnitValue] = useState<string>("100");
   const [preOrderPrice, setPreOrderPrice] = useState<undefined | string>(); // 预选的开仓价
-  const { currentCandle } = useSelector((state: RootState) => state.fetchData);
+  const { currentCandle, isBackTestMode } = useSelector(
+    (state: RootState) => state.fetchData
+  );
   const onClickCalculator = () => {
     unintInputRef.current?.focus();
     setShowCalculator((prev) => !prev);
@@ -209,6 +211,7 @@ const TradingAside: React.FC = () => {
           currentSide === OrderSide.SELL && "bg-red-600 hover:bg-red-600"
         )}
         onClick={createOrderAction}
+        disabled={!isBackTestMode}
       >
         <p className="text-lg">{TitleCase(currentSide)}</p>
         <p className="text-xs">
