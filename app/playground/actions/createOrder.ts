@@ -23,7 +23,7 @@ export interface CreateOrderDto {
   operation_mode: OperationMode;
 }
 
-export async function postMarketOrder(data: CreateOrderDto) {
+export async function createOrder(data: CreateOrderDto) {
   try {
     const res = await request.post("/orders", data);
     return SuccessResponse(res.data);

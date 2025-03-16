@@ -20,7 +20,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { setAvgAmplitude, symbolToSeriesOptions } from "@/store/fetchDataSlice";
-import { CreateOrderDto } from "@/app/playground/actions/createMarketOrder";
+import { CreateOrderDto } from "@/app/playground/actions/createOrder";
 
 const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   seriesData,

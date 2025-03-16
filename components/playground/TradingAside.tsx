@@ -8,10 +8,12 @@ import OrderSideBtn from "./OrderSideBtn";
 import { Input } from "../ui/input";
 import { Calculator, ChevronDown, ChevronUp } from "lucide-react";
 import MiniCalculator from "./MiniCalculator";
-import LossAndProfit from "./LossAndProfit";
+import LossAndProfit, { LossAndProfitRef } from "./LossAndProfit";
 import Big from "big.js";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
+import { CreateOrderDto } from "@/app/playground/actions/createOrder";
+import { OperationMode } from "../interfaces/Playground";
 
 const TradingAside: React.FC = () => {
   const { currentSymbol } = useSelector((state: RootState) => state.fetchData);
@@ -28,6 +30,7 @@ const TradingAside: React.FC = () => {
     unintInputRef.current?.focus();
     setShowCalculator((prev) => !prev);
   };
+  const lossAndProfitRef = useRef<LossAndProfitRef>(null);
 
   const unitFilterInput = (e: React.FormEvent<HTMLInputElement>) => {
     const isNum = !isNaN(Number((e.nativeEvent as any).data));
@@ -64,6 +67,31 @@ const TradingAside: React.FC = () => {
         );
         break;
     }
+  };
+
+  const createOrder = () => {
+    const orderPrice =
+      currentOrderType === OrderType.MARKET
+        ? currentCandle?.close
+        : preOrderPrice;
+
+    const payload: CreateOrderDto = {
+      symbol_id: currentSymbol?.id!,
+      order_type: currentOrderType,
+      side: currentSide,
+      quantity: Number(unitValue),
+      opening_price: Number(orderPrice),
+      operation_mode: OperationMode.PRACTISE,
+      time: currentCandle?.time!,
+      stop_price: lossAndProfitRef.current?.activeStop
+        ? lossAndProfitRef.current?.stopPrice
+        : undefined,
+      limit_price: lossAndProfitRef.current?.activeProfit
+        ? lossAndProfitRef.current?.limitPrice
+        : undefined,
+    };
+
+    console.log(payload);
   };
 
   useEffect(() => {
@@ -153,6 +181,7 @@ const TradingAside: React.FC = () => {
         currentOrderType={currentOrderType}
         preOrderPrice={preOrderPrice}
         unitValue={Number(unitValue)}
+        ref={lossAndProfitRef}
       />
 
       <div className="border-b-[1px] mt-2"></div>
@@ -163,6 +192,7 @@ const TradingAside: React.FC = () => {
           currentSide === OrderSide.BUY && "bg-primary hover:bg-primary",
           currentSide === OrderSide.SELL && "bg-red-600 hover:bg-red-600"
         )}
+        onClick={createOrder}
       >
         <p className="text-lg">{TitleCase(currentSide)}</p>
         <p className="text-xs">

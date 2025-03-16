@@ -1,4 +1,11 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, {
+  forwardRef,
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useState,
+} from "react";
 import { Label } from "../ui/label";
 import { Checkbox } from "../ui/checkbox";
 import { cn } from "@/lib/utils";
@@ -167,6 +174,8 @@ const BracketControl: React.FC<{
   setSectionPrice: React.Dispatch<
     React.SetStateAction<Partial<LossAndProfitDataType>>
   >;
+  checked: boolean;
+  setChecked: React.Dispatch<React.SetStateAction<boolean>>;
 }> = ({
   title,
   sectionPrice,
@@ -174,8 +183,10 @@ const BracketControl: React.FC<{
   currentSide,
   unitValue,
   setSectionPrice,
+  checked,
+  setChecked,
 }) => {
-  const [checked, setChecked] = useState(false);
+  // const [checked, setChecked] = useState(false);
   const [currentSection, setCurrentSection] = useState<MiddleSection>();
   const { currentSymbol } = useSelector((state: RootState) => state.fetchData);
   const { userProfile } = useContext(AuthContext);
@@ -293,12 +304,17 @@ const Middle = () => {
   );
 };
 
-const LossAndProfit: React.FC<LossAndProfitProps> = ({
-  currentSide,
-  currentOrderType,
-  preOrderPrice,
-  unitValue,
-}) => {
+export interface LossAndProfitRef {
+  stopPrice: number;
+  limitPrice: number;
+  activeStop: boolean;
+  activeProfit: boolean;
+}
+
+const LossAndProfit: React.ForwardRefRenderFunction<
+  LossAndProfitRef,
+  LossAndProfitProps
+> = ({ currentSide, currentOrderType, preOrderPrice, unitValue }, ref) => {
   const { currentSymbol, currentCandle } = useSelector(
     (state: RootState) => state.fetchData
   );
@@ -321,6 +337,9 @@ const LossAndProfit: React.FC<LossAndProfitProps> = ({
     [MiddleSection.Price]: "",
     isModify: false,
   });
+
+  const [activeStop, setActiveStop] = useState(false);
+  const [activeProfit, setactiveProfit] = useState(false);
 
   useEffect(() => {
     if (!orderPrice || !currentSymbol) return;
@@ -373,6 +392,13 @@ const LossAndProfit: React.FC<LossAndProfitProps> = ({
     takeProfitData.isModify,
   ]);
 
+  useImperativeHandle(ref, () => ({
+    stopPrice: Number(stopLossData[MiddleSection.Price]),
+    limitPrice: Number(takeProfitData[MiddleSection.Price]),
+    activeStop,
+    activeProfit,
+  }));
+
   return (
     <div className="flex">
       {/* Stop Loss */}
@@ -383,6 +409,8 @@ const LossAndProfit: React.FC<LossAndProfitProps> = ({
         currentSide={currentSide}
         unitValue={unitValue}
         setSectionPrice={setStopLossData}
+        checked={activeStop}
+        setChecked={setActiveStop}
       />
 
       {/* Middle */}
@@ -396,9 +424,11 @@ const LossAndProfit: React.FC<LossAndProfitProps> = ({
         currentSide={currentSide}
         unitValue={unitValue}
         setSectionPrice={setTakeProfitData}
+        checked={activeProfit}
+        setChecked={setactiveProfit}
       />
     </div>
   );
 };
 
-export default LossAndProfit;
+export default forwardRef(LossAndProfit);
