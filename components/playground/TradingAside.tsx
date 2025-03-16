@@ -1,6 +1,6 @@
-import { RootState } from "@/store";
-import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import { OrderSide, OrderType } from "../interfaces/CandlestickSeries";
 import { TitleCase } from "@/utils/helpers";
@@ -12,8 +12,15 @@ import LossAndProfit, { LossAndProfitRef } from "./LossAndProfit";
 import Big from "big.js";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
-import { CreateOrderDto } from "@/app/playground/actions/createOrder";
+import {
+  createOrder,
+  CreateOrderDto,
+} from "@/app/playground/actions/createOrder";
 import { OperationMode } from "../interfaces/Playground";
+import { Status } from "@/utils/apis/response";
+import { toast } from "sonner";
+import { EmitteryContext, OnOrderMarker } from "@/providers/EmitteryProvider";
+import { fetchOpeningOrders } from "@/store/fetchDataSlice";
 
 const TradingAside: React.FC = () => {
   const { currentSymbol } = useSelector((state: RootState) => state.fetchData);
@@ -31,6 +38,8 @@ const TradingAside: React.FC = () => {
     setShowCalculator((prev) => !prev);
   };
   const lossAndProfitRef = useRef<LossAndProfitRef>(null);
+  const dispatch = useDispatch<AppDispatch>();
+  const { emittery } = useContext(EmitteryContext);
 
   const unitFilterInput = (e: React.FormEvent<HTMLInputElement>) => {
     const isNum = !isNaN(Number((e.nativeEvent as any).data));
@@ -69,7 +78,7 @@ const TradingAside: React.FC = () => {
     }
   };
 
-  const createOrder = () => {
+  const createOrderAction = async () => {
     const orderPrice =
       currentOrderType === OrderType.MARKET
         ? currentCandle?.close
@@ -91,7 +100,14 @@ const TradingAside: React.FC = () => {
         : undefined,
     };
 
-    console.log(payload);
+    const res = await createOrder(payload);
+    console.log(res);
+    if (res.status !== Status.OK) return toast.error(res.msg);
+    // 增加marker
+    emittery?.emit(OnOrderMarker.add, payload);
+
+    // 查询订单表
+    dispatch(fetchOpeningOrders(OperationMode.PRACTISE));
   };
 
   useEffect(() => {
@@ -192,7 +208,7 @@ const TradingAside: React.FC = () => {
           currentSide === OrderSide.BUY && "bg-primary hover:bg-primary",
           currentSide === OrderSide.SELL && "bg-red-600 hover:bg-red-600"
         )}
-        onClick={createOrder}
+        onClick={createOrderAction}
       >
         <p className="text-lg">{TitleCase(currentSide)}</p>
         <p className="text-xs">
