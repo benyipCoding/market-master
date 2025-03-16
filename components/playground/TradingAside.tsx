@@ -81,6 +81,10 @@ const TradingAside: React.FC = () => {
   };
 
   const createOrderAction = async () => {
+    if (!isBackTestMode) {
+      return toast.warning("Orders can be created only in BACK TEST mode");
+    }
+
     const orderPrice =
       currentOrderType === OrderType.MARKET
         ? currentCandle?.close
@@ -206,12 +210,11 @@ const TradingAside: React.FC = () => {
 
       <Button
         className={cn(
-          "flex flex-col h-fit py-1 active:scale-100",
+          "flex flex-col h-fit py-1 active:scale-100 cursor-pointer",
           currentSide === OrderSide.BUY && "bg-primary hover:bg-primary",
           currentSide === OrderSide.SELL && "bg-red-600 hover:bg-red-600"
         )}
         onClick={createOrderAction}
-        disabled={!isBackTestMode}
       >
         <p className="text-lg">{TitleCase(currentSide)}</p>
         <p className="text-xs">
