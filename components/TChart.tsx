@@ -48,6 +48,8 @@ import { DialogContentType, setDialogContent } from "@/store/dialogSlice";
 import { cn } from "@/lib/utils";
 import ControlPanel from "./playground/ControlPanel";
 import BottomPanel from "./playground/BottomPanel";
+import { setPanelContent } from "@/store/bottomPanelSlice";
+import { BottomPanelContent } from "./interfaces/Playground";
 
 export const ChartContext = createContext<IChartContext>({});
 
@@ -287,7 +289,9 @@ const TChart: React.ForwardRefRenderFunction<
   useEffect(() => {
     calculateMaxChartHeight();
     window.addEventListener("resize", calculateMaxChartHeight);
-
+    Promise.resolve().then(() => {
+      dispatch(setPanelContent(BottomPanelContent.Orders));
+    });
     return () => {
       window.removeEventListener("resize", calculateMaxChartHeight);
     };

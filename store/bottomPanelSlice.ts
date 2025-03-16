@@ -5,12 +5,12 @@ import {
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface BottomPanelState {
-  panelContent: BottomPanelContent;
+  panelContent: BottomPanelContent | "";
   currentOrderTab: OrderTabs | "";
 }
 
 const initialState: BottomPanelState = {
-  panelContent: BottomPanelContent.Orders,
+  panelContent: "",
   currentOrderTab: OrderTabs.Opening,
 };
 
