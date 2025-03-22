@@ -27,18 +27,24 @@ import { getProfile } from "@/app/playground/actions/getProfile";
 
 const OrdersPanel = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { openingOrders } = useSelector((state: RootState) => state.fetchData);
+  const { openingOrders, operationMode } = useSelector(
+    (state: RootState) => state.fetchData
+  );
   const { currentOrderTab } = useSelector(
     (state: RootState) => state.bottomPanel
   );
   const { userInfo, userProfile } = useContext(AuthContext);
-  const displayBalance = useMemo(
-    () =>
-      userProfile?.balance_p
+  const displayBalance = useMemo(() => {
+    if (operationMode === OperationMode.PRACTISE) {
+      return userProfile?.balance_p
         ? formatNumberWithCommas(userProfile.balance_p)
-        : 0,
-    [userProfile?.balance_p]
-  );
+        : 0;
+    } else {
+      return userProfile?.balance_b
+        ? formatNumberWithCommas(userProfile.balance_b)
+        : 0;
+    }
+  }, [operationMode, userProfile?.balance_b, userProfile?.balance_p]);
 
   // slide block
   const [slideBlock, setSlideBlock] = useState({

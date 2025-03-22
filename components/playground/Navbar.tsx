@@ -1,6 +1,12 @@
 import { cn } from "@/lib/utils";
-import React, { useCallback, useContext, useEffect, useMemo } from "react";
-import { NavbarProps } from "../interfaces/Playground";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { NavbarProps, OperationMode } from "../interfaces/Playground";
 import { setSelectedIndicator, setSelectedSeries } from "@/store/commonSlice";
 import { setDialogContent, DialogContentType } from "@/store/dialogSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -38,6 +44,7 @@ import {
   setCurrentPeriod,
   setIsBackTestMode,
   setIsPreselect,
+  setOperationMode,
 } from "@/store/fetchDataSlice";
 import { ITimeScaleApi, Time } from "lightweight-charts";
 import { PiLineSegments } from "react-icons/pi";
@@ -64,6 +71,8 @@ import { logout } from "@/app/(root)/auth/login/logout";
 import { GrLogout } from "react-icons/gr";
 import { AuthContext } from "@/context/Auth";
 import { ColourfulText } from "../ui/colourful-text";
+import { Switch } from "../ui/switch";
+import { Label } from "../ui/label";
 
 const Navbar: React.FC<NavbarProps> = ({
   className,
@@ -290,6 +299,11 @@ const Navbar: React.FC<NavbarProps> = ({
     window.location.reload();
   };
 
+  const [isBlindbox, setIsBlindbox] = useState(false);
+  const operationModeChange = (checked: boolean) => {
+    setIsBlindbox(checked);
+  };
+
   useEffect(() => {
     if (isPreselect && tChartRef.current) {
       enterBackTestMode();
@@ -353,6 +367,11 @@ const Navbar: React.FC<NavbarProps> = ({
       emittery?.off(OnContronPanel.prevTick, onPrevTick);
     };
   }, [emittery, onNextTick]);
+
+  useEffect(() => {
+    if (isBlindbox) dispatch(setOperationMode(OperationMode.BLINDBOX));
+    else dispatch(setOperationMode(OperationMode.PRACTISE));
+  }, [isBlindbox]);
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -649,6 +668,41 @@ const Navbar: React.FC<NavbarProps> = ({
           </TooltipContent>
         </Tooltip>
 
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="gap-3 flex items-center px-2 active:scale-100 nav-item-divider h-full">
+              <Label
+                htmlFor="operation-mode"
+                className={cn(
+                  "cursor-pointer text-input",
+                  !isBlindbox && "text-white"
+                )}
+              >
+                {OperationMode.PRACTISE}
+              </Label>
+              <Switch
+                id="operation-mode"
+                className="data-[state=checked]:bg-input"
+                onCheckedChange={operationModeChange}
+              />
+              <Label
+                htmlFor="operation-mode"
+                className={cn(
+                  "cursor-pointer text-input",
+                  isBlindbox && "text-white"
+                )}
+              >
+                {OperationMode.BLINDBOX}
+              </Label>
+            </div>
+          </TooltipTrigger>
+
+          <TooltipContent className="flex">
+            <p className="">Operation Mode</p>
+            {/* <span className="short-cut">?</span> */}
+          </TooltipContent>
+        </Tooltip>
+
         <div className="absolute right-14 h-full flex py-1 gap-4 items-center">
           {/* Upload data */}
           {userInfo?.is_staff && (
@@ -684,7 +738,6 @@ const Navbar: React.FC<NavbarProps> = ({
             </TooltipTrigger>
             <TooltipContent className="flex">
               <p>Logout</p>
-              {/* <span className="short-cut">U</span> */}
             </TooltipContent>
           </Tooltip>
         </div>

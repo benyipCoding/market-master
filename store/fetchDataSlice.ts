@@ -52,6 +52,7 @@ interface FetchDataState {
   hasVol: boolean;
   openingOrders: Order[];
   currentCandle: CandlestickData<Time> | undefined;
+  operationMode: OperationMode;
 }
 
 const initialState: FetchDataState = {
@@ -70,6 +71,7 @@ const initialState: FetchDataState = {
   hasVol: false,
   openingOrders: [],
   currentCandle: undefined,
+  operationMode: OperationMode.PRACTISE,
 };
 
 export const fetchPeriods = createAsyncThunk("fetch/periods", () => {
@@ -132,6 +134,9 @@ export const fetchDataSlice = createSlice({
     setCurrentCandle(state, action: PayloadAction<CandlestickData<Time>>) {
       state.currentCandle = action.payload;
     },
+    setOperationMode(state, action: PayloadAction<OperationMode>) {
+      state.operationMode = action.payload;
+    },
   },
   extraReducers(builder) {
     builder.addCase(fetchPeriods.fulfilled, (state, action) => {
@@ -185,6 +190,7 @@ export const {
   setIsPreselect,
   setHasVol,
   setCurrentCandle,
+  setOperationMode,
 } = fetchDataSlice.actions;
 
 export default fetchDataSlice.reducer;
