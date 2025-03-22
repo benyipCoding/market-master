@@ -36,7 +36,8 @@ export interface Profile {
   id: number;
   user_id: string;
   fav_sym_ids: number;
-  balance: number;
+  balance_p: number;
+  balance_b: number;
 }
 
 interface IAuthContext {

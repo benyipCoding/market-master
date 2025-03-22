@@ -62,7 +62,7 @@ const ControlItem: React.FC<{
 
   const calDiffUsd = (percentage: any) => {
     if (!userProfile) return;
-    return new Big(percentage).div(100).times(userProfile?.balance);
+    return new Big(percentage).div(100).times(userProfile?.balance_p);
   };
 
   const calModifiedPrice = (orderPrice: number | string, diffPrice: any) => {
@@ -205,8 +205,8 @@ const BracketControl: React.FC<{
         : (Number(relativeProfitTicks) * -1).toFixed(2);
 
     const usd = new Big(Number(ticks)).times(unitValue).div(100).toFixed(2);
-    const percentage = userProfile?.balance
-      ? new Big(usd).div(userProfile?.balance).times(100).toFixed(2)
+    const percentage = userProfile?.balance_p
+      ? new Big(usd).div(userProfile?.balance_p).times(100).toFixed(2)
       : 0;
 
     return {
@@ -223,7 +223,7 @@ const BracketControl: React.FC<{
     orderPrice,
     currentSide,
     unitValue,
-    userProfile?.balance,
+    userProfile?.balance_p,
   ]);
 
   const focusSection = (value: MiddleSection) => {

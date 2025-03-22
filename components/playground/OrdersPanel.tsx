@@ -34,8 +34,10 @@ const OrdersPanel = () => {
   const { userInfo, userProfile } = useContext(AuthContext);
   const displayBalance = useMemo(
     () =>
-      userProfile?.balance ? formatNumberWithCommas(userProfile.balance) : 0,
-    [userProfile?.balance]
+      userProfile?.balance_p
+        ? formatNumberWithCommas(userProfile.balance_p)
+        : 0,
+    [userProfile?.balance_p]
   );
 
   // slide block
