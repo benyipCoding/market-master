@@ -684,6 +684,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 id="operation-mode"
                 className="data-[state=checked]:bg-input"
                 onCheckedChange={operationModeChange}
+                disabled={isBackTestMode}
               />
               <Label
                 htmlFor="operation-mode"
@@ -698,8 +699,8 @@ const Navbar: React.FC<NavbarProps> = ({
           </TooltipTrigger>
 
           <TooltipContent className="flex">
-            <p className="">Operation Mode</p>
-            {/* <span className="short-cut">?</span> */}
+            <p className="">BackTest Mode</p>
+            <span className="sr-only">BackTest Mode</span>
           </TooltipContent>
         </Tooltip>
 
