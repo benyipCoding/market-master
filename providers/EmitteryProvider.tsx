@@ -47,6 +47,10 @@ export enum OnContronPanel {
 }
 
 export enum OnOrderMarker {
-  add = "add",
-  removeAll = "removeAll",
+  add = "order_marker_add",
+  removeAll = "order_marker_removeAll",
+}
+
+export enum OnPriceLine {
+  add = "price_line_add",
 }

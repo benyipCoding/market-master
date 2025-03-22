@@ -12,7 +12,12 @@ import { cn } from "@/lib/utils";
 import { Input } from "../ui/input";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { OrderSide, OrderType } from "../interfaces/CandlestickSeries";
+import {
+  AddPriceLinePayload,
+  OrderSide,
+  OrderType,
+  PriceLineType,
+} from "../interfaces/CandlestickSeries";
 import {
   MiddleSection,
   LossAndProfitDataType,
@@ -21,6 +26,7 @@ import {
 import { MiddleLabel } from "@/constants/tradingAside";
 import Big from "big.js";
 import { AuthContext } from "@/context/Auth";
+import { EmitteryContext, OnPriceLine } from "@/providers/EmitteryProvider";
 
 const ControlItem: React.FC<{
   index: number;
@@ -186,7 +192,6 @@ const BracketControl: React.FC<{
   checked,
   setChecked,
 }) => {
-  // const [checked, setChecked] = useState(false);
   const [currentSection, setCurrentSection] = useState<MiddleSection>();
   const { currentSymbol } = useSelector((state: RootState) => state.fetchData);
   const { userProfile } = useContext(AuthContext);
@@ -318,6 +323,7 @@ const LossAndProfit: React.ForwardRefRenderFunction<
   const { currentSymbol, currentCandle } = useSelector(
     (state: RootState) => state.fetchData
   );
+  const { emittery } = useContext(EmitteryContext);
 
   const orderPrice = useMemo(() => {
     if (currentOrderType === OrderType.MARKET) return currentCandle?.close;
@@ -391,6 +397,18 @@ const LossAndProfit: React.ForwardRefRenderFunction<
     stopLossData.isModify,
     takeProfitData.isModify,
   ]);
+
+  useEffect(() => {
+    if (activeStop) {
+      const payload: AddPriceLinePayload = {
+        type: PriceLineType.StopLoss,
+        price: Number(stopLossData[MiddleSection.Price]),
+        action: "add",
+      };
+
+      emittery?.emit(OnPriceLine.add, payload);
+    }
+  }, [activeStop, activeProfit]);
 
   useImperativeHandle(ref, () => ({
     stopPrice: Number(stopLossData[MiddleSection.Price]),
