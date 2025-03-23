@@ -290,7 +290,7 @@ const BracketControl: React.FC<{
   );
 };
 
-const ticks = 300;
+const ticks = 1000;
 
 const Middle = () => {
   return (
@@ -347,6 +347,10 @@ const LossAndProfit: React.ForwardRefRenderFunction<
   const [activeStop, setActiveStop] = useState(false);
   const [activeProfit, setactiveProfit] = useState(false);
 
+  const generatePriceLineId = (price: number, type: PriceLineType) => {
+    return `${type}_${price}_${Date.now()}`;
+  };
+
   useEffect(() => {
     if (!orderPrice || !currentSymbol) return;
     const price = new Big(orderPrice);
@@ -398,17 +402,37 @@ const LossAndProfit: React.ForwardRefRenderFunction<
     takeProfitData.isModify,
   ]);
 
+  // 监听止损的激活情况设置priceLine
   useEffect(() => {
-    if (activeStop) {
-      const payload: AddPriceLinePayload = {
-        type: PriceLineType.StopLoss,
-        price: Number(stopLossData[MiddleSection.Price]),
-        action: "add",
-      };
+    const price = Number(stopLossData[MiddleSection.Price]);
+    const id = generatePriceLineId(price, PriceLineType.StopLoss);
 
-      emittery?.emit(OnPriceLine.add, payload);
-    }
-  }, [activeStop, activeProfit]);
+    if (activeStop)
+      emittery?.emit(OnPriceLine.add, {
+        id,
+        price,
+        type: PriceLineType.StopLoss,
+      } as AddPriceLinePayload);
+
+    return () => {
+      if (activeStop) emittery?.emit(OnPriceLine.remove, id);
+    };
+  }, [activeStop]);
+
+  useEffect(() => {
+    const price = Number(takeProfitData[MiddleSection.Price]);
+    const id = generatePriceLineId(price, PriceLineType.TakeProfit);
+    if (activeProfit)
+      emittery?.emit(OnPriceLine.add, {
+        id,
+        price,
+        type: PriceLineType.TakeProfit,
+      } as AddPriceLinePayload);
+
+    return () => {
+      if (activeProfit) emittery?.emit(OnPriceLine.remove, id);
+    };
+  }, [activeProfit]);
 
   useImperativeHandle(ref, () => ({
     stopPrice: Number(stopLossData[MiddleSection.Price]),

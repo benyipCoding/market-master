@@ -17,10 +17,11 @@ export enum OrderType {
 export enum PriceLineType {
   StopLoss = "priceLine_stopLoss",
   TakeProfit = "priceLine_takeProfit",
+  OpeningPrice = "priceLine_openingPrice",
 }
 
 export interface AddPriceLinePayload {
-  type: PriceLineType;
   price: number;
-  action: "add" | "remove";
+  id: string;
+  type: PriceLineType;
 }

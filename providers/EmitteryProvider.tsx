@@ -53,4 +53,5 @@ export enum OnOrderMarker {
 
 export enum OnPriceLine {
   add = "price_line_add",
+  remove = "price_line_remove",
 }

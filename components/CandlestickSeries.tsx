@@ -4,8 +4,9 @@ import {
   AddPriceLinePayload,
   CandlestickSeriesProps,
   OrderSide,
+  PriceLineType,
 } from "./interfaces/CandlestickSeries";
-import { memo, useCallback, useContext, useEffect } from "react";
+import { memo, useCallback, useContext, useEffect, useRef } from "react";
 import {
   EmitteryContext,
   OnApply,
@@ -19,13 +20,16 @@ import {
   Time,
   SeriesMarker,
   PriceLineOptions,
-  LineWidth,
-  LineStyle,
+  IPriceLine,
 } from "lightweight-charts";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { setAvgAmplitude, symbolToSeriesOptions } from "@/store/fetchDataSlice";
 import { CreateOrderDto } from "@/app/playground/actions/createOrder";
+import {
+  stopLossPriceLineOptions,
+  takeProfitPriceLineOptions,
+} from "@/constants/seriesOptions";
 
 const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   seriesData,
@@ -36,6 +40,10 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   const { series } = useSeries("Candlestick", seriesData, customOptions);
   const { emittery } = useContext(EmitteryContext);
   const dispatch = useDispatch<AppDispatch>();
+  const priceLines = useRef<IPriceLine[]>([]);
+  const { mouseMovingEventParam } = useSelector(
+    (state: RootState) => state.common
+  );
 
   const resetDataHandler = ({
     customOptions,
@@ -69,31 +77,42 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     series?.setMarkers([]);
   }, [series]);
 
-  const addPriceLineAction = useCallback(
-    (price: number) => {
+  const createPriceLine = useCallback(
+    ({ price, id, type }: AddPriceLinePayload) => {
       if (!series) return;
       // @ts-ignore
-      const priceLine: PriceLineOptions = {
+      let priceLine: PriceLineOptions = {
         price,
-        lineStyle: LineStyle.Dotted,
-        color: "#3179F5",
-        lineWidth: 1 as LineWidth,
-        axisLabelVisible: true,
-        title: "test",
-        lineVisible: true,
+        id,
       };
+
+      switch (type) {
+        case PriceLineType.StopLoss:
+          priceLine = Object.assign({}, priceLine, stopLossPriceLineOptions);
+          break;
+
+        case PriceLineType.TakeProfit:
+          priceLine = Object.assign({}, priceLine, takeProfitPriceLineOptions);
+          break;
+
+        default:
+          break;
+      }
 
       return series.createPriceLine(priceLine);
     },
     [series]
   );
 
-  const addPriceLine = ({ type, action, price }: AddPriceLinePayload) => {
-    const priceLine = addPriceLineAction(price);
-    console.log(priceLine?.options());
-    setTimeout(() => {
-      series?.removePriceLine(priceLine!);
-    }, 2000);
+  const addPriceLine = (payload: AddPriceLinePayload) => {
+    const priceLine = createPriceLine(payload);
+    priceLines.current.push(priceLine!);
+  };
+
+  const removePriceLine = (id: string) => {
+    const target = priceLines.current.find((p) => p.options().id === id);
+    if (!target) return;
+    series?.removePriceLine(target);
   };
 
   useEffect(() => {
@@ -101,12 +120,14 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     emittery?.on(OnOrderMarker.add, addOrderMarker);
     emittery?.on(OnOrderMarker.removeAll, removeOrderMarkers);
     emittery?.on(OnPriceLine.add, addPriceLine);
+    emittery?.on(OnPriceLine.remove, removePriceLine);
 
     return () => {
       emittery?.off(OnApply.ResetMainSeriesData, resetDataHandler);
       emittery?.off(OnOrderMarker.add, addOrderMarker);
       emittery?.off(OnOrderMarker.removeAll, removeOrderMarkers);
       emittery?.off(OnPriceLine.add, addPriceLine);
+      emittery?.off(OnPriceLine.remove, removePriceLine);
     };
   }, [series, emittery]);
 
@@ -128,6 +149,12 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     const avgAmplitude = totalAmplitude / seriesData.length;
     dispatch(setAvgAmplitude(avgAmplitude));
   }, [seriesData]);
+
+  useEffect(() => {
+    if (!mouseMovingEventParam?.hoveredSeries || !series) return;
+    const price = series.coordinateToPrice(mouseMovingEventParam?.point?.y!);
+    console.log(price);
+  }, [mouseMovingEventParam, series]);
 
   return null;
 };

@@ -2,6 +2,8 @@ import {
   CandlestickSeriesPartialOptions,
   LineSeriesPartialOptions,
   LineStyle,
+  LineWidth,
+  PriceLineOptions,
 } from "lightweight-charts";
 
 // default candle stick series options
@@ -84,3 +86,25 @@ export type SeriesColorType = SeriesColorItem["value"];
 export const LineWidthOptions = [1, 2, 3, 4] as const;
 
 export const LineStyleOptions = ["solid", "dashed", "dotted"];
+
+export const stopLossPriceLineOptions: Partial<PriceLineOptions> = {
+  lineStyle: LineStyle.Dotted,
+  color: "#ff6c37",
+  lineWidth: 1 as LineWidth,
+  axisLabelVisible: true,
+  title: "Stop Loss",
+  lineVisible: true,
+  axisLabelTextColor: "white",
+  axisLabelColor: "#ff6c37",
+};
+
+export const takeProfitPriceLineOptions: Partial<PriceLineOptions> = {
+  lineStyle: LineStyle.Dotted,
+  color: "#0ccf67",
+  lineWidth: 1 as LineWidth,
+  axisLabelVisible: true,
+  title: "Take Profit",
+  lineVisible: true,
+  axisLabelTextColor: "white",
+  axisLabelColor: "#0ccf67",
+};
