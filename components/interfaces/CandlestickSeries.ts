@@ -1,4 +1,4 @@
-import { CandlestickData, Time } from "lightweight-charts";
+import { CandlestickData, PriceLineOptions, Time } from "lightweight-charts";
 
 export interface CandlestickSeriesProps {
   seriesData: CandlestickData<Time>[];
@@ -24,4 +24,9 @@ export interface AddPriceLinePayload {
   price: number;
   id: string;
   type: PriceLineType;
+}
+
+export interface UpdatePriceLinePayload {
+  id: string;
+  options: Partial<PriceLineOptions>;
 }

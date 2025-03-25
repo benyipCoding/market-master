@@ -5,6 +5,7 @@ import {
   CandlestickSeriesProps,
   OrderSide,
   PriceLineType,
+  UpdatePriceLinePayload,
 } from "./interfaces/CandlestickSeries";
 import { memo, useCallback, useContext, useEffect, useRef } from "react";
 import {
@@ -115,12 +116,19 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     series?.removePriceLine(target);
   };
 
+  const updatePriceLine = ({ id, options }: UpdatePriceLinePayload) => {
+    const target = priceLines.current.find((p) => p.options().id === id);
+    if (!target) return;
+    target.applyOptions(options);
+  };
+
   useEffect(() => {
     emittery?.on(OnApply.ResetMainSeriesData, resetDataHandler);
     emittery?.on(OnOrderMarker.add, addOrderMarker);
     emittery?.on(OnOrderMarker.removeAll, removeOrderMarkers);
     emittery?.on(OnPriceLine.add, addPriceLine);
     emittery?.on(OnPriceLine.remove, removePriceLine);
+    emittery?.on(OnPriceLine.update, updatePriceLine);
 
     return () => {
       emittery?.off(OnApply.ResetMainSeriesData, resetDataHandler);
@@ -128,6 +136,7 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
       emittery?.off(OnOrderMarker.removeAll, removeOrderMarkers);
       emittery?.off(OnPriceLine.add, addPriceLine);
       emittery?.off(OnPriceLine.remove, removePriceLine);
+      emittery?.off(OnPriceLine.update, updatePriceLine);
     };
   }, [series, emittery]);
 

@@ -27,6 +27,9 @@ import { MiddleLabel } from "@/constants/tradingAside";
 import Big from "big.js";
 import { AuthContext } from "@/context/Auth";
 import { EmitteryContext, OnPriceLine } from "@/providers/EmitteryProvider";
+import { PriceLineOptions } from "lightweight-charts";
+
+const ticks = 1000;
 
 const ControlItem: React.FC<{
   index: number;
@@ -77,10 +80,11 @@ const ControlItem: React.FC<{
         ? new Big(orderPrice).add(diffPrice).toString()
         : new Big(orderPrice).minus(diffPrice).toString();
 
-    setData({
+    setData((prev) => ({
+      ...prev,
       [MiddleSection.Price]: price,
       isModify: true,
-    });
+    }));
   };
 
   const handleChange = (e: React.FormEvent<HTMLInputElement>) => {
@@ -96,10 +100,11 @@ const ControlItem: React.FC<{
 
     switch (section) {
       case MiddleSection.Price:
-        setData({
+        setData((prev) => ({
+          ...prev,
           [MiddleSection.Price]: numVal.toFixed(currentSymbol?.precision),
           isModify: true,
-        });
+        }));
         break;
 
       case MiddleSection.Ticks:
@@ -290,8 +295,6 @@ const BracketControl: React.FC<{
   );
 };
 
-const ticks = 1000;
-
 const Middle = () => {
   return (
     <div className="w-[20%] relative">
@@ -335,6 +338,7 @@ const LossAndProfit: React.ForwardRefRenderFunction<
   >({
     [MiddleSection.Price]: "",
     isModify: false,
+    id: undefined,
   });
 
   const [takeProfitData, setTakeProfitData] = useState<
@@ -342,6 +346,7 @@ const LossAndProfit: React.ForwardRefRenderFunction<
   >({
     [MiddleSection.Price]: "",
     isModify: false,
+    id: undefined,
   });
 
   const [activeStop, setActiveStop] = useState(false);
@@ -406,33 +411,71 @@ const LossAndProfit: React.ForwardRefRenderFunction<
   useEffect(() => {
     const price = Number(stopLossData[MiddleSection.Price]);
     const id = generatePriceLineId(price, PriceLineType.StopLoss);
-
-    if (activeStop)
+    if (activeStop) {
+      setStopLossData((prev) => ({ ...prev, id }));
       emittery?.emit(OnPriceLine.add, {
         id,
         price,
         type: PriceLineType.StopLoss,
       } as AddPriceLinePayload);
+    }
 
     return () => {
-      if (activeStop) emittery?.emit(OnPriceLine.remove, id);
+      if (activeStop) {
+        emittery?.emit(OnPriceLine.remove, id);
+        setStopLossData((prev) => ({ ...prev, id: undefined }));
+      }
     };
   }, [activeStop]);
 
+  // 监听止损的激活情况设置priceLine
   useEffect(() => {
     const price = Number(takeProfitData[MiddleSection.Price]);
     const id = generatePriceLineId(price, PriceLineType.TakeProfit);
-    if (activeProfit)
+    if (activeProfit) {
+      setTakeProfitData((prev) => ({ ...prev, id }));
       emittery?.emit(OnPriceLine.add, {
         id,
         price,
         type: PriceLineType.TakeProfit,
       } as AddPriceLinePayload);
+    }
 
     return () => {
-      if (activeProfit) emittery?.emit(OnPriceLine.remove, id);
+      if (activeProfit) {
+        emittery?.emit(OnPriceLine.remove, id);
+        setTakeProfitData((prev) => ({ ...prev, id: undefined }));
+      }
     };
   }, [activeProfit]);
+
+  // 监听止损价格update priceLine
+  useEffect(() => {
+    if (!activeStop) return;
+
+    const options: Partial<PriceLineOptions> = {
+      price: stopLossData[MiddleSection.Price] as number,
+    };
+
+    emittery?.emit(OnPriceLine.update, {
+      id: stopLossData.id,
+      options,
+    });
+  }, [stopLossData[MiddleSection.Price]]);
+
+  // 监听止盈价格update priceLine
+  useEffect(() => {
+    if (!activeProfit) return;
+
+    const options: Partial<PriceLineOptions> = {
+      price: takeProfitData[MiddleSection.Price] as number,
+    };
+
+    emittery?.emit(OnPriceLine.update, {
+      id: takeProfitData.id,
+      options,
+    });
+  }, [takeProfitData[MiddleSection.Price]]);
 
   useImperativeHandle(ref, () => ({
     stopPrice: Number(stopLossData[MiddleSection.Price]),
