@@ -159,11 +159,10 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     dispatch(setAvgAmplitude(avgAmplitude));
   }, [seriesData]);
 
-  useEffect(() => {
-    if (!mouseMovingEventParam?.hoveredSeries || !series) return;
-    const price = series.coordinateToPrice(mouseMovingEventParam?.point?.y!);
-    console.log(price);
-  }, [mouseMovingEventParam, series]);
+  // useEffect(() => {
+  //   if (!mouseMovingEventParam?.hoveredSeries || !series) return;
+  //   const price = series.coordinateToPrice(mouseMovingEventParam?.point?.y!);
+  // }, [mouseMovingEventParam, series]);
 
   return null;
 };

@@ -1,10 +1,11 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
 import {
   ISeriesApi,
   MouseEventParams,
   SeriesType,
   Time,
 } from "lightweight-charts";
+import { RootState } from ".";
 
 export enum GraphType {
   LineSegment = "line_segment",
@@ -91,6 +92,15 @@ export const commonSlice = createSlice({
     },
   },
 });
+
+const selectMouseMovingEventParam = (state: RootState) =>
+  state.common.mouseMovingEventParam;
+
+export const selectIsHoveringPriceLine = createSelector(
+  [selectMouseMovingEventParam],
+  (mouseMovingEventParam) =>
+    (mouseMovingEventParam?.hoveredObjectId as string)?.includes("priceLine")
+);
 
 export const {
   toggleDrawing,

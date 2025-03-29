@@ -34,6 +34,7 @@ import {
   findHoveringSeries,
 } from "@/utils/helpers";
 import {
+  selectIsHoveringPriceLine,
   setHoveringIndicator,
   setHoveringSeries,
   setSelectedIndicator,
@@ -97,6 +98,10 @@ const TChart: React.ForwardRefRenderFunction<
     null
   );
   const isCanGrab = useMemo<boolean>(() => !!hoveringPoint, [hoveringPoint]);
+  const isHoveringPriceLine = useSelector((state: RootState) =>
+    selectIsHoveringPriceLine(state)
+  );
+
   const dispatch = useDispatch<AppDispatch>();
   const { theme } = useTheme();
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
@@ -317,7 +322,7 @@ const TChart: React.ForwardRefRenderFunction<
             className={cn(
               "block h-full",
               className,
-              isCanGrab && "cursor-grab",
+              (isCanGrab || isHoveringPriceLine) && "cursor-grab",
               mousePressing && "cursor-grabbing",
               isDrawing && !mousePressing && "cursor-crosshair"
             )}
