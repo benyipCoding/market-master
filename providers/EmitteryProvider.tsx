@@ -55,4 +55,5 @@ export enum OnPriceLine {
   add = "price_line_add",
   remove = "price_line_remove",
   update = "price_line_update",
+  updatePanel = "price_line_update_panel",
 }

@@ -1,5 +1,6 @@
 import React, {
   forwardRef,
+  useCallback,
   useContext,
   useEffect,
   useImperativeHandle,
@@ -17,6 +18,7 @@ import {
   OrderSide,
   OrderType,
   PriceLineType,
+  UpdatePriceLinePayload,
 } from "../interfaces/CandlestickSeries";
 import {
   MiddleSection,
@@ -356,6 +358,22 @@ const LossAndProfit: React.ForwardRefRenderFunction<
     return `${type}_${price}_${Date.now()}`;
   };
 
+  const updatePanel = (payload: UpdatePriceLinePayload) => {
+    if (payload.id.includes("stopLoss")) {
+      setStopLossData((prev) => ({
+        ...prev,
+        [MiddleSection.Price]: payload.options.price,
+        isModify: true,
+      }));
+    } else if (payload.id.includes("takeProfit")) {
+      setTakeProfitData((prev) => ({
+        ...prev,
+        [MiddleSection.Price]: payload.options.price,
+        isModify: true,
+      }));
+    }
+  };
+
   useEffect(() => {
     if (!orderPrice || !currentSymbol) return;
     const price = new Big(orderPrice);
@@ -476,6 +494,14 @@ const LossAndProfit: React.ForwardRefRenderFunction<
       options,
     });
   }, [takeProfitData[MiddleSection.Price]]);
+
+  useEffect(() => {
+    emittery?.on(OnPriceLine.updatePanel, updatePanel);
+
+    return () => {
+      emittery?.off(OnPriceLine.updatePanel, updatePanel);
+    };
+  }, [emittery]);
 
   useImperativeHandle(ref, () => ({
     stopPrice: Number(stopLossData[MiddleSection.Price]),

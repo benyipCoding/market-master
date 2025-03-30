@@ -102,6 +102,11 @@ export const selectIsHoveringPriceLine = createSelector(
     (mouseMovingEventParam?.hoveredObjectId as string)?.includes("priceLine")
 );
 
+export const selectHoveredObjectId = createSelector(
+  [selectMouseMovingEventParam],
+  (mouseMovingEventParam) => mouseMovingEventParam?.hoveredObjectId
+);
+
 export const {
   toggleDrawing,
   toggleMousePressing,

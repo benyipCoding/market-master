@@ -132,6 +132,18 @@ const TChart: React.ForwardRefRenderFunction<
 
   const { avgAmplitude } = useSelector((state: RootState) => state.fetchData);
 
+  const dispatchMouseDownEvent = (
+    e: React.MouseEvent<HTMLSpanElement, MouseEvent>
+  ) => {
+    if ((hoveringPoint && !isDrawing) || isHoveringPriceLine) {
+      return changeSelectedSeries(
+        e as MouseEvent | React.MouseEvent<HTMLDivElement, MouseEvent>
+      );
+    } else {
+      return drawStart(e as any, container.current);
+    }
+  };
+
   // Mounted
   useEffect(() => {
     if (!container.current) return;
@@ -328,15 +340,7 @@ const TChart: React.ForwardRefRenderFunction<
             )}
             ref={container}
             // Only unselected series can trigger the line drawing function
-            onMouseDown={(e) =>
-              hoveringPoint && !isDrawing
-                ? changeSelectedSeries(
-                    e as
-                      | MouseEvent
-                      | React.MouseEvent<HTMLDivElement, MouseEvent>
-                  )
-                : drawStart(e as any, container.current)
-            }
+            onMouseDown={dispatchMouseDownEvent}
           >
             <ChartContext.Provider
               value={{

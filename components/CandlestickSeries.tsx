@@ -42,9 +42,6 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   const { emittery } = useContext(EmitteryContext);
   const dispatch = useDispatch<AppDispatch>();
   const priceLines = useRef<IPriceLine[]>([]);
-  const { mouseMovingEventParam } = useSelector(
-    (state: RootState) => state.common
-  );
 
   const resetDataHandler = ({
     customOptions,

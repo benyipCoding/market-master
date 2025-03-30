@@ -1,6 +1,9 @@
 import { AppDispatch, RootState } from "@/store";
 import {
+  selectHoveredObjectId,
+  selectIsHoveringPriceLine,
   setGraphType,
+  setSelectedSeries,
   toggleDrawing,
   toggleMousePressing,
 } from "@/store/commonSlice";
@@ -12,13 +15,16 @@ import {
 } from "@/utils/helpers";
 import {
   CandlestickData,
+  ISeriesApi,
   LineData,
   Time,
   UTCTimestamp,
 } from "lightweight-charts";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IDragLineSeries } from "./interfaces";
+import { EmitteryContext, OnPriceLine } from "@/providers/EmitteryProvider";
+import { UpdatePriceLinePayload } from "@/components/interfaces/CandlestickSeries";
 
 export const useDragLineSeries = ({
   dom,
@@ -35,44 +41,67 @@ export const useDragLineSeries = ({
   const [fixed, setFixed] = useState<LineData<Time> | null>(null);
   const lineId = useMemo(() => selectedSeries?.options().id, [selectedSeries]);
   const { avgAmplitude } = useSelector((state: RootState) => state.fetchData);
+  const isHoveringPriceLine = useSelector((state: RootState) =>
+    selectIsHoveringPriceLine(state)
+  );
+  const hoveredObjectId = useSelector((state: RootState) =>
+    selectHoveredObjectId(state)
+  );
+  const { emittery } = useContext(EmitteryContext);
 
   const changeSelectedSeries = useCallback(
     (e: MouseEvent | React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-      if (!selectedSeries) return;
+      // if (!selectedSeries) return;
       dispatch(toggleDrawing(true));
       dispatch(toggleMousePressing(true));
-      // Find invariant point
-      const fixedPoint = selectedSeries
-        .data()
-        .find(
-          (point) =>
-            (point.customValues as Record<string, unknown>).isStartPoint !==
-            (hoveringPoint?.customValues as Record<string, unknown>)
-              .isStartPoint
-        ) as LineData<Time>;
 
-      setFixed(fixedPoint);
+      if (selectedSeries && !isHoveringPriceLine) {
+        // Find invariant point
+        const fixedPoint = selectedSeries
+          .data()
+          .find(
+            (point) =>
+              (point.customValues as Record<string, unknown>).isStartPoint !==
+              (hoveringPoint?.customValues as Record<string, unknown>)
+                .isStartPoint
+          ) as LineData<Time>;
+
+        setFixed(fixedPoint);
+      }
 
       // // Bind events when the mouse move and mouse up
       document.onmousemove = dragMove;
       document.onmouseup = dragEnd;
     },
-    [baseSeries, hoveringPoint?.customValues, selectedSeries]
+    [selectedSeries, isHoveringPriceLine, hoveringPoint?.customValues]
   );
 
   const dragMove = useCallback(
     (e: MouseEvent) => {
       const [time, value, x, y, logic] = calcValue(e, dom, baseSeries, chart);
 
-      const dynamicPoint: LineData<Time> = {
-        value: value as number,
-        time: time as UTCTimestamp,
-        customValues: { x, y, logic, price: value },
-      };
+      if (isHoveringPriceLine) {
+        // 如果是拖动priceLine
+        dispatch(setSelectedSeries(null));
+        const payload: UpdatePriceLinePayload = {
+          id: hoveredObjectId as string,
+          options: {
+            price: value as number,
+          },
+        };
+        emittery?.emit(OnPriceLine.updatePanel, payload);
+      } else if (selectedSeries) {
+        // 如果是自定义画线
+        const dynamicPoint: LineData<Time> = {
+          value: value as number,
+          time: time as UTCTimestamp,
+          customValues: { x, y, logic, price: value },
+        };
 
-      setDynamic(dynamicPoint);
+        setDynamic(dynamicPoint);
+      }
     },
-    [baseSeries]
+    [baseSeries, isHoveringPriceLine, selectedSeries, hoveredObjectId]
   );
 
   const cleanUp = () => {
