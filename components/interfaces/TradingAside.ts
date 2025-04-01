@@ -16,7 +16,6 @@ export type LossAndProfitDataType = {
 
 export interface LossAndProfitProps {
   currentSide: OrderSide;
-  currentOrderType: OrderType;
-  preOrderPrice: string | undefined;
+  orderPrice: string | number | undefined;
   unitValue: number;
 }

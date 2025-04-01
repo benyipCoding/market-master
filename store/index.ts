@@ -3,6 +3,7 @@ import commonReducer from "./commonSlice";
 import dialogReducer from "./dialogSlice";
 import fetchDataReducer from "./fetchDataSlice";
 import bottomPanelReducer from "./bottomPanelSlice";
+import asideReducer from "./asideSlice";
 // import profileReducer from "./fetchDataSlice";
 
 export const store = configureStore({
@@ -12,6 +13,7 @@ export const store = configureStore({
     dialog: dialogReducer,
     fetchData: fetchDataReducer,
     bottomPanel: bottomPanelReducer,
+    aside: asideReducer,
   },
   middleware: (defaultMiddleware) =>
     defaultMiddleware({ serializableCheck: false }),

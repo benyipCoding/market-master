@@ -56,4 +56,6 @@ export enum OnPriceLine {
   remove = "price_line_remove",
   update = "price_line_update",
   updatePanel = "price_line_update_panel",
+  // openingPrice = "price_line_opening_price",
+  // addOrderPrice = "price_line_add_order_price",
 }

@@ -1,9 +1,15 @@
 import { AppDispatch, RootState } from "@/store";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
-import { OrderSide, OrderType } from "../interfaces/CandlestickSeries";
-import { TitleCase } from "@/utils/helpers";
+import {
+  AddPriceLinePayload,
+  OrderSide,
+  OrderType,
+  PriceLineType,
+  UpdatePriceLinePayload,
+} from "../interfaces/CandlestickSeries";
+import { generatePriceLineId, TitleCase } from "@/utils/helpers";
 import OrderSideBtn from "./OrderSideBtn";
 import { Input } from "../ui/input";
 import { Calculator, ChevronDown, ChevronUp } from "lucide-react";
@@ -16,10 +22,14 @@ import {
   createOrder,
   CreateOrderDto,
 } from "@/app/playground/actions/createOrder";
-import { OperationMode } from "../interfaces/Playground";
+import { AsideContent, OperationMode } from "../interfaces/Playground";
 import { Status } from "@/utils/apis/response";
 import { toast } from "sonner";
-import { EmitteryContext, OnOrderMarker } from "@/providers/EmitteryProvider";
+import {
+  EmitteryContext,
+  OnOrderMarker,
+  OnPriceLine,
+} from "@/providers/EmitteryProvider";
 import { fetchOpeningOrders } from "@/store/fetchDataSlice";
 
 const TradingAside: React.FC = () => {
@@ -35,6 +45,7 @@ const TradingAside: React.FC = () => {
   const { currentCandle, isBackTestMode } = useSelector(
     (state: RootState) => state.fetchData
   );
+
   const onClickCalculator = () => {
     unintInputRef.current?.focus();
     setShowCalculator((prev) => !prev);
@@ -42,6 +53,15 @@ const TradingAside: React.FC = () => {
   const lossAndProfitRef = useRef<LossAndProfitRef>(null);
   const dispatch = useDispatch<AppDispatch>();
   const { emittery } = useContext(EmitteryContext);
+
+  const orderPrice = useMemo(() => {
+    if (currentOrderType === OrderType.MARKET) return currentCandle?.close;
+    else return preOrderPrice;
+  }, [currentCandle?.close, currentOrderType, preOrderPrice]);
+
+  const [orderPriceId, setorderPriceId] = useState<string | undefined>(
+    undefined
+  );
 
   const unitFilterInput = (e: React.FormEvent<HTMLInputElement>) => {
     const isNum = !isNaN(Number((e.nativeEvent as any).data));
@@ -65,7 +85,7 @@ const TradingAside: React.FC = () => {
       case "increase":
         setPreOrderPrice((prev) =>
           new Big(Number(prev!))
-            .add(currentSymbol?.minMove!)
+            .add(new Big(currentSymbol?.minMove!).times(10))
             .toFixed(currentSymbol?.precision)
         );
         break;
@@ -73,9 +93,28 @@ const TradingAside: React.FC = () => {
       case "decrease":
         setPreOrderPrice((prev) =>
           new Big(Number(prev!))
-            .minus(currentSymbol?.minMove!)
+            .minus(new Big(currentSymbol?.minMove!).times(10))
             .toFixed(currentSymbol?.precision)
         );
+        break;
+    }
+  };
+
+  const changePreOrderPriceByKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    switch (e.key) {
+      case "ArrowUp":
+        e.preventDefault();
+        changePreOrderPrice("increase");
+        break;
+
+      case "ArrowDown":
+        e.preventDefault();
+        changePreOrderPrice("decrease");
+        break;
+
+      default:
         break;
     }
   };
@@ -121,6 +160,31 @@ const TradingAside: React.FC = () => {
       setPreOrderPrice(String(currentCandle?.close));
   }, [currentOrderType]);
 
+  useEffect(() => {
+    if (!orderPrice) return;
+    if (!orderPriceId) {
+      const id = generatePriceLineId(
+        Number(orderPrice),
+        PriceLineType.OrderPrice
+      );
+      setorderPriceId(id);
+      const payload: AddPriceLinePayload = {
+        id,
+        type: PriceLineType.OrderPrice,
+        price: Number(orderPrice),
+      };
+      emittery?.emit(OnPriceLine.add, payload);
+    } else {
+      const payload: UpdatePriceLinePayload = {
+        id: orderPriceId,
+        options: {
+          price: Number(orderPrice),
+        },
+      };
+      emittery?.emit(OnPriceLine.update, payload);
+    }
+  }, [orderPrice, orderPriceId]);
+
   return (
     <div className="flex flex-col gap-4">
       <h2 className="select-none">{currentSymbol?.label}, trading panel</h2>
@@ -160,6 +224,7 @@ const TradingAside: React.FC = () => {
             value={preOrderPrice}
             onInput={priceFilterInput}
             onBlur={formatPriceValue}
+            onKeyDown={changePreOrderPriceByKeyDown}
           />
           <div className="w-7 h-8 absolute bottom-[2px] right-1 z-20 flex flex-col gap-[2px]">
             <ChevronUp
@@ -200,8 +265,7 @@ const TradingAside: React.FC = () => {
       {/* Stop Loss & Take Profit */}
       <LossAndProfit
         currentSide={currentSide}
-        currentOrderType={currentOrderType}
-        preOrderPrice={preOrderPrice}
+        orderPrice={orderPrice}
         unitValue={Number(unitValue)}
         ref={lossAndProfitRef}
       />

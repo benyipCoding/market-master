@@ -13,6 +13,7 @@ import {
   LineStyleOptions,
   SeriesOptionsCommon,
 } from "lightweight-charts";
+import { PriceLineType } from "@/components/interfaces/CandlestickSeries";
 
 export const calcMouseCoordinate = (
   mouseEvent: React.MouseEvent<HTMLDivElement, MouseEvent> | MouseEvent,
@@ -562,3 +563,7 @@ export function TitleCase(str: string): string {
 export function formatNumberWithCommas(num: number): string {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+
+export const generatePriceLineId = (price: number, type: PriceLineType) => {
+  return `${type}_${price}_${Date.now()}`;
+};

@@ -18,6 +18,7 @@ export enum PriceLineType {
   StopLoss = "priceLine_stopLoss",
   TakeProfit = "priceLine_takeProfit",
   OpeningPrice = "priceLine_openingPrice",
+  OrderPrice = "price_line_orderPrice",
 }
 
 export interface AddPriceLinePayload {

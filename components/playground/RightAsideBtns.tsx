@@ -10,25 +10,27 @@ import {
   TooltipContent,
 } from "../ui/tooltip";
 import hotkeys from "hotkeys-js";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
+import { setCurrentAside } from "@/store/asideSlice";
 
 const RightAsideBtns: React.FC<RightAsideBtnsProps> = ({
   className,
   asideOpen,
   setAsideOpen,
 }) => {
-  const [currentAside, setCurrentAside] = useState<AsideContent | "">(
-    AsideContent.Trade
-  );
+  const { currentAside } = useSelector((state: RootState) => state.aside);
+  const dispatch = useDispatch<AppDispatch>();
 
   const switchToTradePanel = useCallback(() => {
     if (currentAside === AsideContent.Trade && asideOpen) {
       setAsideOpen(false);
-      setCurrentAside("");
+      dispatch(setCurrentAside(""));
       return;
     }
     if (!asideOpen) setAsideOpen(true);
 
-    setCurrentAside(AsideContent.Trade);
+    dispatch(setCurrentAside(AsideContent.Trade));
   }, [asideOpen, currentAside, setAsideOpen]);
 
   useEffect(() => {

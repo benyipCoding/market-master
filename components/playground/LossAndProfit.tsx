@@ -30,6 +30,7 @@ import Big from "big.js";
 import { AuthContext } from "@/context/Auth";
 import { EmitteryContext, OnPriceLine } from "@/providers/EmitteryProvider";
 import { PriceLineOptions } from "lightweight-charts";
+import { generatePriceLineId } from "@/utils/helpers";
 
 const ticks = 1000;
 
@@ -324,16 +325,9 @@ export interface LossAndProfitRef {
 const LossAndProfit: React.ForwardRefRenderFunction<
   LossAndProfitRef,
   LossAndProfitProps
-> = ({ currentSide, currentOrderType, preOrderPrice, unitValue }, ref) => {
-  const { currentSymbol, currentCandle } = useSelector(
-    (state: RootState) => state.fetchData
-  );
+> = ({ currentSide, orderPrice, unitValue }, ref) => {
+  const { currentSymbol } = useSelector((state: RootState) => state.fetchData);
   const { emittery } = useContext(EmitteryContext);
-
-  const orderPrice = useMemo(() => {
-    if (currentOrderType === OrderType.MARKET) return currentCandle?.close;
-    else return preOrderPrice;
-  }, [currentCandle?.close, currentOrderType, preOrderPrice]);
 
   const [stopLossData, setStopLossData] = useState<
     Partial<LossAndProfitDataType>
@@ -353,10 +347,6 @@ const LossAndProfit: React.ForwardRefRenderFunction<
 
   const [activeStop, setActiveStop] = useState(false);
   const [activeProfit, setactiveProfit] = useState(false);
-
-  const generatePriceLineId = (price: number, type: PriceLineType) => {
-    return `${type}_${price}_${Date.now()}`;
-  };
 
   const updatePanel = (payload: UpdatePriceLinePayload) => {
     if (payload.id.includes("stopLoss")) {
@@ -446,7 +436,7 @@ const LossAndProfit: React.ForwardRefRenderFunction<
     };
   }, [activeStop]);
 
-  // 监听止损的激活情况设置priceLine
+  // 监听止盈的激活情况设置priceLine
   useEffect(() => {
     const price = Number(takeProfitData[MiddleSection.Price]);
     const id = generatePriceLineId(price, PriceLineType.TakeProfit);

@@ -28,9 +28,11 @@ import { AppDispatch, RootState } from "@/store";
 import { setAvgAmplitude, symbolToSeriesOptions } from "@/store/fetchDataSlice";
 import { CreateOrderDto } from "@/app/playground/actions/createOrder";
 import {
+  orderPriceLineOptions,
   stopLossPriceLineOptions,
   takeProfitPriceLineOptions,
 } from "@/constants/seriesOptions";
+import { AsideContent } from "./interfaces/Playground";
 
 const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   seriesData,
@@ -42,6 +44,7 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   const { emittery } = useContext(EmitteryContext);
   const dispatch = useDispatch<AppDispatch>();
   const priceLines = useRef<IPriceLine[]>([]);
+  const { currentAside } = useSelector((state: RootState) => state.aside);
 
   const resetDataHandler = ({
     customOptions,
@@ -93,6 +96,9 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
           priceLine = Object.assign({}, priceLine, takeProfitPriceLineOptions);
           break;
 
+        case PriceLineType.OrderPrice:
+          priceLine = Object.assign({}, priceLine, orderPriceLineOptions);
+          break;
         default:
           break;
       }
@@ -105,9 +111,11 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   const addPriceLine = (payload: AddPriceLinePayload) => {
     const priceLine = createPriceLine(payload);
     priceLines.current.push(priceLine!);
+    console.log(priceLine?.options().id);
   };
 
-  const removePriceLine = (id: string) => {
+  const removePriceLine = (id: string | undefined) => {
+    if (!id) return;
     const target = priceLines.current.find((p) => p.options().id === id);
     if (!target) return;
     series?.removePriceLine(target);
@@ -119,6 +127,17 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     target.applyOptions(options);
   };
 
+  const removePreOrderPriceLine = useCallback(() => {
+    const target = priceLines.current.find((p) =>
+      p.options().id?.includes("orderPrice")
+    );
+    if (!target) return;
+    series?.removePriceLine(target);
+    priceLines.current = priceLines.current.filter(
+      (p) => p.options().id !== target.options().id
+    );
+  }, [series]);
+
   useEffect(() => {
     emittery?.on(OnApply.ResetMainSeriesData, resetDataHandler);
     emittery?.on(OnOrderMarker.add, addOrderMarker);
@@ -126,6 +145,7 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     emittery?.on(OnPriceLine.add, addPriceLine);
     emittery?.on(OnPriceLine.remove, removePriceLine);
     emittery?.on(OnPriceLine.update, updatePriceLine);
+    // emittery?.on(OnPriceLine.addOrderPrice, orderPriceOps);
 
     return () => {
       emittery?.off(OnApply.ResetMainSeriesData, resetDataHandler);
@@ -134,6 +154,7 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
       emittery?.off(OnPriceLine.add, addPriceLine);
       emittery?.off(OnPriceLine.remove, removePriceLine);
       emittery?.off(OnPriceLine.update, updatePriceLine);
+      // emittery?.off(OnPriceLine.addOrderPrice, orderPriceOps);
     };
   }, [series, emittery]);
 
@@ -156,10 +177,13 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     dispatch(setAvgAmplitude(avgAmplitude));
   }, [seriesData]);
 
-  // useEffect(() => {
-  //   if (!mouseMovingEventParam?.hoveredSeries || !series) return;
-  //   const price = series.coordinateToPrice(mouseMovingEventParam?.point?.y!);
-  // }, [mouseMovingEventParam, series]);
+  useEffect(() => {
+    return () => {
+      if (currentAside === AsideContent.Trade) {
+        removePreOrderPriceLine();
+      }
+    };
+  }, [currentAside, removePreOrderPriceLine]);
 
   return null;
 };
