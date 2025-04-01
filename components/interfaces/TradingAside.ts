@@ -1,4 +1,4 @@
-import { OrderSide, OrderType } from "./CandlestickSeries";
+import { OrderSide } from "./CandlestickSeries";
 
 export enum MiddleSection {
   Ticks = "ticks",

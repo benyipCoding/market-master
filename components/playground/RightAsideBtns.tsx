@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 import { AsideContent, RightAsideBtnsProps } from "../interfaces/Playground";
 import { Button } from "@/components/ui/button";
 import { CircleDollarSign } from "lucide-react";

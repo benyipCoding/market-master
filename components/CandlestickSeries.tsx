@@ -145,7 +145,6 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     emittery?.on(OnPriceLine.add, addPriceLine);
     emittery?.on(OnPriceLine.remove, removePriceLine);
     emittery?.on(OnPriceLine.update, updatePriceLine);
-    // emittery?.on(OnPriceLine.addOrderPrice, orderPriceOps);
 
     return () => {
       emittery?.off(OnApply.ResetMainSeriesData, resetDataHandler);
@@ -154,7 +153,6 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
       emittery?.off(OnPriceLine.add, addPriceLine);
       emittery?.off(OnPriceLine.remove, removePriceLine);
       emittery?.off(OnPriceLine.update, updatePriceLine);
-      // emittery?.off(OnPriceLine.addOrderPrice, orderPriceOps);
     };
   }, [series, emittery]);
 
