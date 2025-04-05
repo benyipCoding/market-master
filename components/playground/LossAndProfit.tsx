@@ -349,13 +349,13 @@ const LossAndProfit: React.ForwardRefRenderFunction<
   const [activeProfit, setactiveProfit] = useState(false);
 
   const updatePanel = (payload: UpdatePriceLinePayload) => {
-    if (payload.id.includes("stopLoss")) {
+    if (payload.id.includes(PriceLineType.StopLoss)) {
       setStopLossData((prev) => ({
         ...prev,
         [MiddleSection.Price]: payload.options.price,
         isModify: true,
       }));
-    } else if (payload.id.includes("takeProfit")) {
+    } else if (payload.id.includes(PriceLineType.TakeProfit)) {
       setTakeProfitData((prev) => ({
         ...prev,
         [MiddleSection.Price]: payload.options.price,

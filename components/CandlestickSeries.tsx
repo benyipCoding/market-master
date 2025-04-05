@@ -129,7 +129,7 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
 
   const removePreOrderPriceLine = useCallback(() => {
     const target = priceLines.current.find((p) =>
-      p.options().id?.includes("orderPrice")
+      p.options().id?.includes(PriceLineType.OrderPrice)
     );
     if (!target) return;
     series?.removePriceLine(target);

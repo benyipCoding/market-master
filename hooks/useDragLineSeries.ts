@@ -1,7 +1,8 @@
 import { AppDispatch, RootState } from "@/store";
 import {
+  selectCanMoveOrderPriceLine,
   selectHoveredObjectId,
-  selectIsHoveringPriceLine,
+  selectIsHoveringLossOrProfit,
   setGraphType,
   setSelectedSeries,
   toggleDrawing,
@@ -41,9 +42,13 @@ export const useDragLineSeries = ({
   const [fixed, setFixed] = useState<LineData<Time> | null>(null);
   const lineId = useMemo(() => selectedSeries?.options().id, [selectedSeries]);
   const { avgAmplitude } = useSelector((state: RootState) => state.fetchData);
-  const isHoveringPriceLine = useSelector((state: RootState) =>
-    selectIsHoveringPriceLine(state)
+  const isHoveringLossOrProfit = useSelector((state: RootState) =>
+    selectIsHoveringLossOrProfit(state)
   );
+  const canMoveOrderPriceLine = useSelector((state: RootState) =>
+    selectCanMoveOrderPriceLine(state)
+  );
+
   const hoveredObjectId = useSelector((state: RootState) =>
     selectHoveredObjectId(state)
   );
@@ -51,11 +56,10 @@ export const useDragLineSeries = ({
 
   const changeSelectedSeries = useCallback(
     (e: MouseEvent | React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-      // if (!selectedSeries) return;
       dispatch(toggleDrawing(true));
       dispatch(toggleMousePressing(true));
 
-      if (selectedSeries && !isHoveringPriceLine) {
+      if (selectedSeries && !isHoveringLossOrProfit && !canMoveOrderPriceLine) {
         // Find invariant point
         const fixedPoint = selectedSeries
           .data()
@@ -73,14 +77,18 @@ export const useDragLineSeries = ({
       document.onmousemove = dragMove;
       document.onmouseup = dragEnd;
     },
-    [selectedSeries, isHoveringPriceLine, hoveringPoint?.customValues]
+    [
+      selectedSeries,
+      isHoveringLossOrProfit,
+      canMoveOrderPriceLine,
+      hoveringPoint?.customValues,
+    ]
   );
 
   const dragMove = useCallback(
     (e: MouseEvent) => {
       const [time, value, x, y, logic] = calcValue(e, dom, baseSeries, chart);
-
-      if (isHoveringPriceLine) {
+      if (isHoveringLossOrProfit || canMoveOrderPriceLine) {
         // 如果是拖动priceLine
         dispatch(setSelectedSeries(null));
         const payload: UpdatePriceLinePayload = {
@@ -101,7 +109,13 @@ export const useDragLineSeries = ({
         setDynamic(dynamicPoint);
       }
     },
-    [baseSeries, isHoveringPriceLine, selectedSeries, hoveredObjectId]
+    [
+      baseSeries,
+      isHoveringLossOrProfit,
+      selectedSeries,
+      hoveredObjectId,
+      canMoveOrderPriceLine,
+    ]
   );
 
   const cleanUp = () => {

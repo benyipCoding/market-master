@@ -110,12 +110,12 @@ export const takeProfitPriceLineOptions: Partial<PriceLineOptions> = {
 };
 
 export const orderPriceLineOptions: Partial<PriceLineOptions> = {
-  lineStyle: LineStyle.LargeDashed,
-  color: "#515151",
+  lineStyle: LineStyle.Dashed,
+  color: "#48a2de",
   lineWidth: 1 as LineWidth,
   axisLabelVisible: true,
   title: "Order Price",
   lineVisible: true,
   axisLabelTextColor: "white",
-  axisLabelColor: "#515151",
+  axisLabelColor: "#48a2de",
 };

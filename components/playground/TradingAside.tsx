@@ -22,7 +22,7 @@ import {
   createOrder,
   CreateOrderDto,
 } from "@/app/playground/actions/createOrder";
-import { AsideContent, OperationMode } from "../interfaces/Playground";
+import { OperationMode } from "../interfaces/Playground";
 import { Status } from "@/utils/apis/response";
 import { toast } from "sonner";
 import {
@@ -31,13 +31,12 @@ import {
   OnPriceLine,
 } from "@/providers/EmitteryProvider";
 import { fetchOpeningOrders } from "@/store/fetchDataSlice";
+import { setCurrentOrderType } from "@/store/asideSlice";
 
 const TradingAside: React.FC = () => {
   const { currentSymbol } = useSelector((state: RootState) => state.fetchData);
   const [currentSide, setCurrentSide] = useState<OrderSide>(OrderSide.SELL);
-  const [currentOrderType, setCurrentOrderType] = useState<OrderType>(
-    OrderType.MARKET
-  );
+  const { currentOrderType } = useSelector((state: RootState) => state.aside);
   const [showCalculator, setShowCalculator] = useState(false);
   const unintInputRef = useRef<HTMLInputElement>(null);
   const [unitValue, setUnitValue] = useState<string>("100");
@@ -155,6 +154,12 @@ const TradingAside: React.FC = () => {
     dispatch(fetchOpeningOrders(OperationMode.PRACTISE));
   };
 
+  const updatePreOrderPriceByDrag = (payload: UpdatePriceLinePayload) => {
+    if (payload.id.includes(PriceLineType.OrderPrice)) {
+      setPreOrderPrice(String(payload.options.price));
+    }
+  };
+
   useEffect(() => {
     if (currentOrderType === OrderType.LIMIT && !preOrderPrice)
       setPreOrderPrice(String(currentCandle?.close));
@@ -185,6 +190,14 @@ const TradingAside: React.FC = () => {
     }
   }, [orderPrice, orderPriceId]);
 
+  useEffect(() => {
+    emittery?.on(OnPriceLine.updatePanel, updatePreOrderPriceByDrag);
+
+    return () => {
+      emittery?.off(OnPriceLine.updatePanel, updatePreOrderPriceByDrag);
+    };
+  }, [emittery]);
+
   return (
     <div className="flex flex-col gap-4">
       <h2 className="select-none">{currentSymbol?.label}, trading panel</h2>
@@ -192,7 +205,9 @@ const TradingAside: React.FC = () => {
       <Tabs
         defaultValue={OrderType.MARKET}
         className="flex flex-col gap-4"
-        onValueChange={(value) => setCurrentOrderType(value as OrderType)}
+        onValueChange={(value) =>
+          dispatch(setCurrentOrderType(value as OrderType))
+        }
       >
         <TabsList className="w-full flex">
           <TabsTrigger value={OrderType.MARKET} className="flex-1 select-none">

@@ -6,6 +6,10 @@ import {
   Time,
 } from "lightweight-charts";
 import { RootState } from ".";
+import {
+  OrderType,
+  PriceLineType,
+} from "@/components/interfaces/CandlestickSeries";
 
 export enum GraphType {
   LineSegment = "line_segment",
@@ -96,15 +100,31 @@ export const commonSlice = createSlice({
 const selectMouseMovingEventParam = (state: RootState) =>
   state.common.mouseMovingEventParam;
 
-export const selectIsHoveringPriceLine = createSelector(
+const selectCurrentOrderType = (state: RootState) =>
+  state.aside.currentOrderType;
+
+export const selectIsHoveringLossOrProfit = createSelector(
   [selectMouseMovingEventParam],
   (mouseMovingEventParam) =>
-    (mouseMovingEventParam?.hoveredObjectId as string)?.includes("priceLine")
+    (mouseMovingEventParam?.hoveredObjectId as string)?.includes(
+      PriceLineType.StopLoss
+    ) ||
+    (mouseMovingEventParam?.hoveredObjectId as string)?.includes(
+      PriceLineType.TakeProfit
+    )
 );
 
 export const selectHoveredObjectId = createSelector(
   [selectMouseMovingEventParam],
   (mouseMovingEventParam) => mouseMovingEventParam?.hoveredObjectId
+);
+
+export const selectCanMoveOrderPriceLine = createSelector(
+  [selectMouseMovingEventParam, selectCurrentOrderType],
+  (mouseMovingEventParam, currentOrderType) =>
+    (mouseMovingEventParam?.hoveredObjectId as string)?.includes(
+      "priceLine_orderPrice"
+    ) && currentOrderType === OrderType.LIMIT
 );
 
 export const {

@@ -34,7 +34,8 @@ import {
   findHoveringSeries,
 } from "@/utils/helpers";
 import {
-  selectIsHoveringPriceLine,
+  selectCanMoveOrderPriceLine,
+  selectIsHoveringLossOrProfit,
   setHoveringIndicator,
   setHoveringSeries,
   setSelectedIndicator,
@@ -98,8 +99,11 @@ const TChart: React.ForwardRefRenderFunction<
     null
   );
   const isCanGrab = useMemo<boolean>(() => !!hoveringPoint, [hoveringPoint]);
-  const isHoveringPriceLine = useSelector((state: RootState) =>
-    selectIsHoveringPriceLine(state)
+  const isHoveringLossOrProfit = useSelector((state: RootState) =>
+    selectIsHoveringLossOrProfit(state)
+  );
+  const canMoveOrderPriceLine = useSelector((state: RootState) =>
+    selectCanMoveOrderPriceLine(state)
   );
 
   const dispatch = useDispatch<AppDispatch>();
@@ -135,7 +139,11 @@ const TChart: React.ForwardRefRenderFunction<
   const dispatchMouseDownEvent = (
     e: React.MouseEvent<HTMLSpanElement, MouseEvent>
   ) => {
-    if ((hoveringPoint && !isDrawing) || isHoveringPriceLine) {
+    if (
+      (hoveringPoint && !isDrawing) ||
+      isHoveringLossOrProfit ||
+      canMoveOrderPriceLine
+    ) {
       return changeSelectedSeries(
         e as MouseEvent | React.MouseEvent<HTMLDivElement, MouseEvent>
       );
@@ -334,7 +342,8 @@ const TChart: React.ForwardRefRenderFunction<
             className={cn(
               "block h-full",
               className,
-              (isCanGrab || isHoveringPriceLine) && "cursor-grab",
+              (isCanGrab || isHoveringLossOrProfit || canMoveOrderPriceLine) &&
+                "cursor-grab",
               mousePressing && "cursor-grabbing",
               isDrawing && !mousePressing && "cursor-crosshair"
             )}
