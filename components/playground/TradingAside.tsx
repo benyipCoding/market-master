@@ -203,7 +203,7 @@ const TradingAside: React.FC = () => {
       <h2 className="select-none">{currentSymbol?.label}, trading panel</h2>
       {/* Market or Limit */}
       <Tabs
-        defaultValue={OrderType.MARKET}
+        defaultValue={currentOrderType}
         className="flex flex-col gap-4"
         onValueChange={(value) =>
           dispatch(setCurrentOrderType(value as OrderType))
