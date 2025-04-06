@@ -1,6 +1,5 @@
 import React, {
   forwardRef,
-  useCallback,
   useContext,
   useEffect,
   useImperativeHandle,
@@ -16,7 +15,6 @@ import { RootState } from "@/store";
 import {
   AddPriceLinePayload,
   OrderSide,
-  OrderType,
   PriceLineType,
   UpdatePriceLinePayload,
 } from "../interfaces/CandlestickSeries";
@@ -28,11 +26,15 @@ import {
 import { MiddleLabel } from "@/constants/tradingAside";
 import Big from "big.js";
 import { AuthContext } from "@/context/Auth";
-import { EmitteryContext, OnPriceLine } from "@/providers/EmitteryProvider";
+import {
+  EmitteryContext,
+  OnPriceLine,
+  OnStopLossAndTakeProfit,
+} from "@/providers/EmitteryProvider";
 import { PriceLineOptions } from "lightweight-charts";
 import { generatePriceLineId } from "@/utils/helpers";
 
-const ticks = 1000;
+// const TICKS = 1000;
 
 const ControlItem: React.FC<{
   index: number;
@@ -326,7 +328,9 @@ const LossAndProfit: React.ForwardRefRenderFunction<
   LossAndProfitRef,
   LossAndProfitProps
 > = ({ currentSide, orderPrice, unitValue }, ref) => {
-  const { currentSymbol } = useSelector((state: RootState) => state.fetchData);
+  const { currentSymbol, avgAmplitude } = useSelector(
+    (state: RootState) => state.fetchData
+  );
   const { emittery } = useContext(EmitteryContext);
 
   const [stopLossData, setStopLossData] = useState<
@@ -370,8 +374,9 @@ const LossAndProfit: React.ForwardRefRenderFunction<
   };
 
   useEffect(() => {
-    if (!orderPrice || !currentSymbol) return;
+    if (!orderPrice || !currentSymbol || !avgAmplitude) return;
     const price = new Big(orderPrice);
+    const TICKS = new Big(avgAmplitude!).div(currentSymbol.price_per_tick!);
 
     if (currentSide === OrderSide.BUY) {
       // 做多
@@ -380,7 +385,7 @@ const LossAndProfit: React.ForwardRefRenderFunction<
         setStopLossData((prev) => ({
           ...prev,
           [MiddleSection.Price]: price
-            .minus(ticks * currentSymbol.price_per_tick!)
+            .minus(new Big(TICKS).times(currentSymbol.price_per_tick!))
             .toFixed(currentSymbol.precision),
         }));
 
@@ -389,7 +394,7 @@ const LossAndProfit: React.ForwardRefRenderFunction<
         setTakeProfitData((prev) => ({
           ...prev,
           [MiddleSection.Price]: price
-            .add(ticks * currentSymbol.price_per_tick!)
+            .add(new Big(TICKS).times(currentSymbol.price_per_tick!))
             .toFixed(currentSymbol.precision),
         }));
     } else {
@@ -399,7 +404,7 @@ const LossAndProfit: React.ForwardRefRenderFunction<
         setStopLossData((prev) => ({
           ...prev,
           [MiddleSection.Price]: price
-            .add(ticks * currentSymbol.price_per_tick!)
+            .add(new Big(TICKS).times(currentSymbol.price_per_tick!))
             .toFixed(currentSymbol.precision),
         }));
 
@@ -408,7 +413,7 @@ const LossAndProfit: React.ForwardRefRenderFunction<
         setTakeProfitData((prev) => ({
           ...prev,
           [MiddleSection.Price]: price
-            .minus(ticks * currentSymbol.price_per_tick!)
+            .minus(new Big(TICKS).times(currentSymbol.price_per_tick!))
             .toFixed(currentSymbol.precision),
         }));
     }
@@ -418,6 +423,7 @@ const LossAndProfit: React.ForwardRefRenderFunction<
     currentSymbol,
     stopLossData.isModify,
     takeProfitData.isModify,
+    avgAmplitude,
   ]);
 
   // 监听止损的激活情况设置priceLine
@@ -492,11 +498,11 @@ const LossAndProfit: React.ForwardRefRenderFunction<
 
   useEffect(() => {
     emittery?.on(OnPriceLine.updatePanel, updatePanel);
-    emittery?.on(OnPriceLine.clear, resetActive);
+    emittery?.on(OnStopLossAndTakeProfit.reset, resetActive);
 
     return () => {
       emittery?.off(OnPriceLine.updatePanel, updatePanel);
-      emittery?.off(OnPriceLine.clear, resetActive);
+      emittery?.off(OnStopLossAndTakeProfit.reset, resetActive);
     };
   }, [emittery]);
 

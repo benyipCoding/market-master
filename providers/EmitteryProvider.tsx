@@ -58,3 +58,7 @@ export enum OnPriceLine {
   updatePanel = "price_line_update_panel",
   clear = "price_line_clear",
 }
+
+export enum OnStopLossAndTakeProfit {
+  reset = "stopLoss_takeProfit_reset_active",
+}

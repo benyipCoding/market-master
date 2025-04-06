@@ -57,6 +57,7 @@ import {
   OnContronPanel,
   OnOrderMarker,
   OnPriceLine,
+  OnStopLossAndTakeProfit,
 } from "@/providers/EmitteryProvider";
 import { getProfile } from "./actions/getProfile";
 import { AuthContext } from "@/context/Auth";
@@ -280,8 +281,8 @@ const Playground = () => {
     cleanLineSeries();
     // 清除标记
     emittery?.emit(OnOrderMarker.removeAll);
-    // 清除所有priceLine
-    emittery?.emit(OnPriceLine.clear);
+    // 止损止盈的激活状态设置为false
+    emittery?.emit(OnStopLossAndTakeProfit.reset);
 
     getCandlestickData().then((data: any[]) => {
       dispatch(setCandleDataSlice([0, data.length]));
