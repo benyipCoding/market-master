@@ -57,10 +57,19 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     series?.setData(seriesData);
   };
 
+  const generateMarkerId = (
+    side: OrderSide,
+    opening_price: number,
+    time: number | Time
+  ): string => {
+    return `${side}_${opening_price}_${time}_${Date.now()}`;
+  };
+
   const addOrderMarker = useCallback(
     ({ side, opening_price, time }: CreateOrderDto) => {
       const prevMarkers = series?.markers();
       const marker: SeriesMarker<Time> = {
+        id: generateMarkerId(side, opening_price, time),
         time: time as Time,
         position: side === OrderSide.BUY ? "belowBar" : "aboveBar",
         color: "#3b82f6",

@@ -178,6 +178,7 @@ const TChart: React.ForwardRefRenderFunction<
   // Mouse movement event (exclusive to light weight chart)
   useEffect(() => {
     if (!chart) return;
+
     // Logic of selectedSeries existed
     if (selectedSeries) {
       const point = mouseMovingEventParam?.seriesData.get(

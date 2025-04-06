@@ -34,8 +34,6 @@ import {
 import { PriceLineOptions } from "lightweight-charts";
 import { generatePriceLineId } from "@/utils/helpers";
 
-// const TICKS = 1000;
-
 const ControlItem: React.FC<{
   index: number;
   checked: boolean;
