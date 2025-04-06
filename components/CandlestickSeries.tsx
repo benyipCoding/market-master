@@ -138,6 +138,12 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     );
   }, [series]);
 
+  // const clearPriceLine = useCallback(() => {
+  //   priceLines.current.forEach((p) => {
+  //     series?.removePriceLine(p);
+  //   });
+  // }, [series]);
+
   useEffect(() => {
     emittery?.on(OnApply.ResetMainSeriesData, resetDataHandler);
     emittery?.on(OnOrderMarker.add, addOrderMarker);
@@ -145,6 +151,7 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     emittery?.on(OnPriceLine.add, addPriceLine);
     emittery?.on(OnPriceLine.remove, removePriceLine);
     emittery?.on(OnPriceLine.update, updatePriceLine);
+    // emittery?.on(OnPriceLine.clear, clearPriceLine);
 
     return () => {
       emittery?.off(OnApply.ResetMainSeriesData, resetDataHandler);
@@ -153,6 +160,7 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
       emittery?.off(OnPriceLine.add, addPriceLine);
       emittery?.off(OnPriceLine.remove, removePriceLine);
       emittery?.off(OnPriceLine.update, updatePriceLine);
+      // emittery?.off(OnPriceLine.clear, clearPriceLine);
     };
   }, [series, emittery]);
 

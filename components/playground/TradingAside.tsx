@@ -163,6 +163,11 @@ const TradingAside: React.FC = () => {
   useEffect(() => {
     if (currentOrderType === OrderType.LIMIT && !preOrderPrice)
       setPreOrderPrice(String(currentCandle?.close));
+
+    return () => {
+      if (currentOrderType === OrderType.LIMIT)
+        setPreOrderPrice(String(currentCandle?.close));
+    };
   }, [currentOrderType]);
 
   useEffect(() => {

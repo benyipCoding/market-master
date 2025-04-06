@@ -56,6 +56,7 @@ import {
   EmitteryContext,
   OnContronPanel,
   OnOrderMarker,
+  OnPriceLine,
 } from "@/providers/EmitteryProvider";
 import { getProfile } from "./actions/getProfile";
 import { AuthContext } from "@/context/Auth";
@@ -279,6 +280,8 @@ const Playground = () => {
     cleanLineSeries();
     // 清除标记
     emittery?.emit(OnOrderMarker.removeAll);
+    // 清除所有priceLine
+    emittery?.emit(OnPriceLine.clear);
 
     getCandlestickData().then((data: any[]) => {
       dispatch(setCandleDataSlice([0, data.length]));

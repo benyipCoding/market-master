@@ -346,7 +346,7 @@ const LossAndProfit: React.ForwardRefRenderFunction<
   });
 
   const [activeStop, setActiveStop] = useState(false);
-  const [activeProfit, setactiveProfit] = useState(false);
+  const [activeProfit, setActiveProfit] = useState(false);
 
   const updatePanel = (payload: UpdatePriceLinePayload) => {
     if (payload.id.includes(PriceLineType.StopLoss)) {
@@ -362,6 +362,11 @@ const LossAndProfit: React.ForwardRefRenderFunction<
         isModify: true,
       }));
     }
+  };
+
+  const resetActive = () => {
+    setActiveStop(false);
+    setActiveProfit(false);
   };
 
   useEffect(() => {
@@ -487,9 +492,11 @@ const LossAndProfit: React.ForwardRefRenderFunction<
 
   useEffect(() => {
     emittery?.on(OnPriceLine.updatePanel, updatePanel);
+    emittery?.on(OnPriceLine.clear, resetActive);
 
     return () => {
       emittery?.off(OnPriceLine.updatePanel, updatePanel);
+      emittery?.off(OnPriceLine.clear, resetActive);
     };
   }, [emittery]);
 
@@ -526,7 +533,7 @@ const LossAndProfit: React.ForwardRefRenderFunction<
         unitValue={unitValue}
         setSectionPrice={setTakeProfitData}
         checked={activeProfit}
-        setChecked={setactiveProfit}
+        setChecked={setActiveProfit}
       />
     </div>
   );
