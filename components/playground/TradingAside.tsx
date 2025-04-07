@@ -118,11 +118,7 @@ const TradingAside: React.FC = () => {
     }
   };
 
-  const createOrderAction = async () => {
-    if (!isBackTestMode) {
-      return toast.warning("Orders can be created only in BACK TEST mode");
-    }
-
+  const createMarketOrder = async () => {
     const orderPrice =
       currentOrderType === OrderType.MARKET
         ? currentCandle?.close
@@ -145,13 +141,23 @@ const TradingAside: React.FC = () => {
     };
 
     const res = await createOrder(payload);
-    console.log(res);
+
     if (res.status !== Status.OK) return toast.error(res.msg);
     // 增加marker
     emittery?.emit(OnOrderMarker.add, payload);
 
     // 查询订单表
     dispatch(fetchOpeningOrders(OperationMode.PRACTISE));
+  };
+
+  const createLimitOrder = () => {};
+
+  const createOrderAction = async () => {
+    if (!isBackTestMode) {
+      return toast.warning("Orders can be created only in BACK TEST mode");
+    }
+    if (currentOrderType === OrderType.MARKET) createMarketOrder();
+    else createLimitOrder();
   };
 
   const updatePreOrderPriceByDrag = (payload: UpdatePriceLinePayload) => {
