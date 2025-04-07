@@ -12,7 +12,7 @@ import {
 import { ScrollArea } from "../ui/scroll-area";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
-import { fetchOpeningOrders } from "@/store/fetchDataSlice";
+import { fetchLimitOrders, fetchOpeningOrders } from "@/store/fetchDataSlice";
 import { OperationMode, OrderNavs, OrderTabs } from "../interfaces/Playground";
 import {
   formatNumberWithCommas,
@@ -27,7 +27,7 @@ import { getProfile } from "@/app/playground/actions/getProfile";
 
 const OrdersPanel = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { openingOrders, operationMode } = useSelector(
+  const { openingOrders, operationMode, limitOrders } = useSelector(
     (state: RootState) => state.fetchData
   );
   const { currentOrderTab } = useSelector(
@@ -56,8 +56,10 @@ const OrdersPanel = () => {
   const displayOrders = useMemo(() => {
     if (currentOrderTab === OrderTabs.Opening)
       return openingOrders.map((order) => transferNullToStr(order));
+    else if (currentOrderTab === OrderTabs.Limit)
+      return limitOrders.map((order) => transferNullToStr(order));
     else return [];
-  }, [currentOrderTab, openingOrders]);
+  }, [currentOrderTab, openingOrders, limitOrders]);
 
   const switchOrderTab = (tab: OrderTabs) => {
     dispatch(setCurrentOrderTab(tab));
@@ -90,6 +92,7 @@ const OrdersPanel = () => {
 
   useEffect(() => {
     dispatch(fetchOpeningOrders(OperationMode.PRACTISE));
+    dispatch(fetchLimitOrders(OperationMode.PRACTISE));
     return () => {
       if (obs.current) {
         obs.current?.disconnect();

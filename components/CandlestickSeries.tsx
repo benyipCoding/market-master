@@ -65,9 +65,29 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     return `${side}_${opening_price}_${time}_${Date.now()}`;
   };
 
+  const parseMarkerId = (id: string) => {
+    const [side, opening_price, time, timestamp] = id.split("_");
+    return {
+      side,
+      opening_price: Number(opening_price),
+      time: Number(time),
+      timestamp: Number(timestamp),
+    };
+  };
+
   const addOrderMarker = useCallback(
     ({ side, opening_price, time }: CreateOrderDto) => {
       const prevMarkers = series?.markers();
+
+      const samePosition = prevMarkers?.find((m) => {
+        const payload = parseMarkerId(m.id!);
+        return payload.side === side && payload.time === time;
+      });
+
+      if (samePosition) {
+        return;
+      }
+
       const marker: SeriesMarker<Time> = {
         id: generateMarkerId(side, opening_price, time),
         time: time as Time,

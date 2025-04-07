@@ -51,6 +51,7 @@ interface FetchDataState {
   isPreselect: boolean;
   hasVol: boolean;
   openingOrders: Order[];
+  limitOrders: Order[];
   currentCandle: CandlestickData<Time> | undefined;
   operationMode: OperationMode;
 }
@@ -70,6 +71,7 @@ const initialState: FetchDataState = {
   isPreselect: false,
   hasVol: false,
   openingOrders: [],
+  limitOrders: [],
   currentCandle: undefined,
   operationMode: OperationMode.PRACTISE,
 };
@@ -95,6 +97,16 @@ export const fetchOpeningOrders = createAsyncThunk(
   (operationMode: OperationMode) => {
     return getOrders({
       orderStatus: OrderStatus.EXECUTED,
+      operationMode,
+    });
+  }
+);
+
+export const fetchLimitOrders = createAsyncThunk(
+  "fetch/limitOrders",
+  (operationMode: OperationMode) => {
+    return getOrders({
+      orderStatus: OrderStatus.PENDING,
       operationMode,
     });
   }
@@ -162,6 +174,9 @@ export const fetchDataSlice = createSlice({
     });
     builder.addCase(fetchOpeningOrders.fulfilled, (state, action) => {
       state.openingOrders = action.payload.data;
+    });
+    builder.addCase(fetchLimitOrders.fulfilled, (state, action) => {
+      state.limitOrders = action.payload.data;
     });
   },
 });
