@@ -45,6 +45,7 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const priceLines = useRef<IPriceLine[]>([]);
   const { currentAside } = useSelector((state: RootState) => state.aside);
+  const { isBackTestMode } = useSelector((state: RootState) => state.fetchData);
 
   const resetDataHandler = ({
     customOptions,
@@ -211,6 +212,12 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     const avgAmplitude = totalAmplitude / seriesData.length;
     dispatch(setAvgAmplitude(avgAmplitude));
   }, [seriesData]);
+
+  useEffect(() => {
+    return () => {
+      isBackTestMode && removePreOrderPriceLine();
+    };
+  }, [isBackTestMode, removePreOrderPriceLine]);
 
   useEffect(() => {
     return () => {

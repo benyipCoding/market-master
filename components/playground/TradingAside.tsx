@@ -177,7 +177,7 @@ const TradingAside: React.FC = () => {
   }, [currentOrderType]);
 
   useEffect(() => {
-    if (!orderPrice) return;
+    if (!orderPrice || !isBackTestMode) return;
     if (!orderPriceId) {
       const id = generatePriceLineId(
         Number(orderPrice),
@@ -199,7 +199,7 @@ const TradingAside: React.FC = () => {
       };
       emittery?.emit(OnPriceLine.update, payload);
     }
-  }, [orderPrice, orderPriceId]);
+  }, [orderPrice, orderPriceId, isBackTestMode]);
 
   useEffect(() => {
     emittery?.on(OnPriceLine.updatePanel, updatePreOrderPriceByDrag);
