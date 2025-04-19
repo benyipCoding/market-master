@@ -1,5 +1,12 @@
 import { AppDispatch, RootState } from "@/store";
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import {
@@ -58,9 +65,9 @@ const TradingAside: React.FC = () => {
     else return preOrderPrice;
   }, [currentCandle?.close, currentOrderType, preOrderPrice]);
 
-  const [orderPriceId, setorderPriceId] = useState<string | undefined>(
-    undefined
-  );
+  const [limitOrderPriceLineId, setLimitOrderPriceLineId] = useState<
+    string | undefined
+  >(undefined);
 
   const unitFilterInput = (e: React.FormEvent<HTMLInputElement>) => {
     const isNum = !isNaN(Number((e.nativeEvent as any).data));
@@ -161,7 +168,7 @@ const TradingAside: React.FC = () => {
   };
 
   const updatePreOrderPriceByDrag = (payload: UpdatePriceLinePayload) => {
-    if (payload.id.includes(PriceLineType.OrderPrice)) {
+    if (payload.id.includes(PriceLineType.LimitOrderPrice)) {
       setPreOrderPrice(String(payload.options.price));
     }
   };
@@ -177,29 +184,63 @@ const TradingAside: React.FC = () => {
   }, [currentOrderType]);
 
   useEffect(() => {
-    if (!orderPrice || !isBackTestMode) return;
-    if (!orderPriceId) {
+    if (
+      currentOrderType === OrderType.LIMIT &&
+      isBackTestMode &&
+      !limitOrderPriceLineId &&
+      orderPrice
+    ) {
+      // 创建limitOrderPriceLine
       const id = generatePriceLineId(
         Number(orderPrice),
-        PriceLineType.OrderPrice
+        PriceLineType.LimitOrderPrice
       );
-      setorderPriceId(id);
+      setLimitOrderPriceLineId(id);
       const payload: AddPriceLinePayload = {
         id,
-        type: PriceLineType.OrderPrice,
+        type: PriceLineType.LimitOrderPrice,
         price: Number(orderPrice),
       };
       emittery?.emit(OnPriceLine.add, payload);
-    } else {
-      const payload: UpdatePriceLinePayload = {
-        id: orderPriceId,
-        options: {
-          price: Number(orderPrice),
-        },
-      };
-      emittery?.emit(OnPriceLine.update, payload);
+    } else if (currentOrderType === OrderType.MARKET || !isBackTestMode) {
+      if (limitOrderPriceLineId) {
+        // 移除limitOrderPriceLine
+        emittery?.emit(OnPriceLine.remove, limitOrderPriceLineId);
+        setLimitOrderPriceLineId(undefined);
+      }
     }
-  }, [orderPrice, orderPriceId, isBackTestMode]);
+  }, [
+    currentOrderType,
+    emittery,
+    isBackTestMode,
+    limitOrderPriceLineId,
+    orderPrice,
+  ]);
+
+  // useEffect(() => {
+  //   if (!orderPrice || !isBackTestMode) return;
+  //   if (!orderPriceId) {
+  //     const id = generatePriceLineId(
+  //       Number(orderPrice),
+  //       PriceLineType.OrderPrice
+  //     );
+  //     setorderPriceId(id);
+  //     const payload: AddPriceLinePayload = {
+  //       id,
+  //       type: PriceLineType.OrderPrice,
+  //       price: Number(orderPrice),
+  //     };
+  //     emittery?.emit(OnPriceLine.add, payload);
+  //   } else {
+  //     const payload: UpdatePriceLinePayload = {
+  //       id: orderPriceId,
+  //       options: {
+  //         price: Number(orderPrice),
+  //       },
+  //     };
+  //     emittery?.emit(OnPriceLine.update, payload);
+  //   }
+  // }, [orderPrice, orderPriceId, isBackTestMode]);
 
   useEffect(() => {
     emittery?.on(OnPriceLine.updatePanel, updatePreOrderPriceByDrag);

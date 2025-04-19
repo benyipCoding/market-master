@@ -28,7 +28,7 @@ import { AppDispatch, RootState } from "@/store";
 import { setAvgAmplitude, symbolToSeriesOptions } from "@/store/fetchDataSlice";
 import { CreateOrderDto } from "@/app/playground/actions/createOrder";
 import {
-  orderPriceLineOptions,
+  limitOrderPriceLineOptions,
   stopLossPriceLineOptions,
   takeProfitPriceLineOptions,
 } from "@/constants/seriesOptions";
@@ -126,8 +126,8 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
           priceLine = Object.assign({}, priceLine, takeProfitPriceLineOptions);
           break;
 
-        case PriceLineType.OrderPrice:
-          priceLine = Object.assign({}, priceLine, orderPriceLineOptions);
+        case PriceLineType.LimitOrderPrice:
+          priceLine = Object.assign({}, priceLine, limitOrderPriceLineOptions);
           break;
         default:
           break;
@@ -159,7 +159,7 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
 
   const removePreOrderPriceLine = useCallback(() => {
     const target = priceLines.current.find((p) =>
-      p.options().id?.includes(PriceLineType.OrderPrice)
+      p.options().id?.includes(PriceLineType.LimitOrderPrice)
     );
     if (!target) return;
     series?.removePriceLine(target);
