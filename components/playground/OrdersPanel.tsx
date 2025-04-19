@@ -186,7 +186,7 @@ const OrdersPanel = () => {
                   <TableHead className="text-right">Stop</TableHead>
                   <TableHead className="text-right">Limit</TableHead>
                   <TableHead className="text-right">Profit / Loss</TableHead>
-                  <TableHead className="w-7"></TableHead>
+                  <TableHead className="text-right"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -210,12 +210,14 @@ const OrdersPanel = () => {
                       {order.limit_price}
                     </TableCell>
                     <TableCell className="text-right">$250.00</TableCell>
-                    <TableCell className="">
+                    <TableCell className="text-right">
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant={"ghost"} className="p-2">
-                            <Ellipsis size={24} />
-                          </Button>
+                        <DropdownMenuTrigger asChild className="w-full">
+                          <Ellipsis
+                            className={cn(
+                              "cursor-pointer text-gray-400 hover:text-white"
+                            )}
+                          />
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent className="w-fit">
