@@ -34,6 +34,6 @@ export interface UpdatePriceLinePayload {
 }
 
 export enum MarkerColor {
-  profit = "#1cd66c",
-  loss = "#e53e30",
+  profit = "#19964e",
+  loss = "#ae1919",
 }

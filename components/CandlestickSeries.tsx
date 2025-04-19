@@ -30,6 +30,7 @@ import { setAvgAmplitude, symbolToSeriesOptions } from "@/store/fetchDataSlice";
 import { CreateOrderDto } from "@/app/playground/actions/createOrder";
 import {
   limitOrderPriceLineOptions,
+  openingOrderPriceLineOptions,
   stopLossPriceLineOptions,
   takeProfitPriceLineOptions,
 } from "@/constants/seriesOptions";
@@ -141,6 +142,15 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
         case PriceLineType.LimitOrderPrice:
           priceLine = Object.assign({}, priceLine, limitOrderPriceLineOptions);
           break;
+
+        case PriceLineType.OpeningPrice:
+          priceLine = Object.assign(
+            {},
+            priceLine,
+            openingOrderPriceLineOptions
+          );
+          break;
+
         default:
           break;
       }

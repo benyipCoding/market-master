@@ -119,3 +119,14 @@ export const limitOrderPriceLineOptions: Partial<PriceLineOptions> = {
   axisLabelTextColor: "white",
   axisLabelColor: "#48a2de",
 };
+
+export const openingOrderPriceLineOptions: Partial<PriceLineOptions> = {
+  lineStyle: LineStyle.Dashed,
+  color: "gray",
+  lineWidth: 1 as LineWidth,
+  axisLabelVisible: true,
+  title: "",
+  lineVisible: true,
+  axisLabelTextColor: "white",
+  axisLabelColor: "#09090b",
+};

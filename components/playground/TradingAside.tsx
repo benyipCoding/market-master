@@ -153,6 +153,17 @@ const TradingAside: React.FC = () => {
     // 增加marker
     emittery?.emit(OnOrderMarker.add, payload);
 
+    // 增加priceLine
+    const payload2: AddPriceLinePayload = {
+      id: generatePriceLineId(
+        payload.opening_price,
+        PriceLineType.OpeningPrice
+      ),
+      price: payload.opening_price,
+      type: PriceLineType.OpeningPrice,
+    };
+    emittery?.emit(OnPriceLine.add, payload2);
+
     // 查询订单表
     dispatch(fetchOpeningOrders(OperationMode.PRACTISE));
   };
