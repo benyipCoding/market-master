@@ -32,3 +32,8 @@ export interface UpdatePriceLinePayload {
   id: string;
   options: Partial<PriceLineOptions>;
 }
+
+export enum MarkerColor {
+  profit = "#1cd66c",
+  loss = "#e53e30",
+}

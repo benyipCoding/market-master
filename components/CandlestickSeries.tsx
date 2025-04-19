@@ -3,6 +3,7 @@ import { useSeries } from "@/hooks/useSeries";
 import {
   AddPriceLinePayload,
   CandlestickSeriesProps,
+  MarkerColor,
   OrderSide,
   PriceLineType,
   UpdatePriceLinePayload,
@@ -45,7 +46,9 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const priceLines = useRef<IPriceLine[]>([]);
   const { currentAside } = useSelector((state: RootState) => state.aside);
-  const { isBackTestMode } = useSelector((state: RootState) => state.fetchData);
+  const { isBackTestMode, currentCandle } = useSelector(
+    (state: RootState) => state.fetchData
+  );
 
   const resetDataHandler = ({
     customOptions,
@@ -93,7 +96,7 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
         id: generateMarkerId(side, opening_price, time),
         time: time as Time,
         position: side === OrderSide.BUY ? "belowBar" : "aboveBar",
-        color: "#3b82f6",
+        color: MarkerColor.profit,
         shape: side === OrderSide.BUY ? "arrowUp" : "arrowDown",
         text: `${opening_price}`,
         size: 2,
@@ -103,6 +106,15 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     },
     [series]
   );
+
+  // const updateOrderMarker = useCallback(
+  //   (id: string, options: SeriesMarker<Time>) => {
+  //     const targetMarker = series?.markers().find((m) => m.id === id);
+  //     if (!targetMarker) return;
+  //     console.log({ targetMarker });
+  //   },
+  //   [series]
+  // );
 
   const removeOrderMarkers = useCallback(() => {
     series?.setMarkers([]);
@@ -226,6 +238,27 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
       }
     };
   }, [currentAside, removePreOrderPriceLine]);
+
+  useEffect(() => {
+    if (!series) return;
+    const markers = series.markers();
+    if (!markers.length) return;
+
+    markers.forEach((m) => {
+      const side = m.id!.split("_")[0];
+      if (side === OrderSide.BUY) {
+        currentCandle!.close >= Number(m.text) &&
+          (m.color = MarkerColor.profit);
+        currentCandle!.close < Number(m.text) && (m.color = MarkerColor.loss);
+      } else if (side === OrderSide.SELL) {
+        currentCandle!.close <= Number(m.text) &&
+          (m.color = MarkerColor.profit);
+        currentCandle!.close > Number(m.text) && (m.color = MarkerColor.loss);
+      }
+    });
+
+    series.setMarkers(markers);
+  }, [currentCandle, series]);
 
   return null;
 };

@@ -217,31 +217,6 @@ const TradingAside: React.FC = () => {
     orderPrice,
   ]);
 
-  // useEffect(() => {
-  //   if (!orderPrice || !isBackTestMode) return;
-  //   if (!orderPriceId) {
-  //     const id = generatePriceLineId(
-  //       Number(orderPrice),
-  //       PriceLineType.OrderPrice
-  //     );
-  //     setorderPriceId(id);
-  //     const payload: AddPriceLinePayload = {
-  //       id,
-  //       type: PriceLineType.OrderPrice,
-  //       price: Number(orderPrice),
-  //     };
-  //     emittery?.emit(OnPriceLine.add, payload);
-  //   } else {
-  //     const payload: UpdatePriceLinePayload = {
-  //       id: orderPriceId,
-  //       options: {
-  //         price: Number(orderPrice),
-  //       },
-  //     };
-  //     emittery?.emit(OnPriceLine.update, payload);
-  //   }
-  // }, [orderPrice, orderPriceId, isBackTestMode]);
-
   useEffect(() => {
     emittery?.on(OnPriceLine.updatePanel, updatePreOrderPriceByDrag);
 
