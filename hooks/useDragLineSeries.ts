@@ -98,6 +98,7 @@ export const useDragLineSeries = ({
           },
         };
         emittery?.emit(OnPriceLine.updatePanel, payload);
+        emittery?.emit(OnPriceLine.update, payload);
       } else if (selectedSeries) {
         // 如果是自定义画线
         const dynamicPoint: LineData<Time> = {

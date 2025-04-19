@@ -326,7 +326,7 @@ const LossAndProfit: React.ForwardRefRenderFunction<
   LossAndProfitRef,
   LossAndProfitProps
 > = ({ currentSide, orderPrice, unitValue }, ref) => {
-  const { currentSymbol, avgAmplitude } = useSelector(
+  const { currentSymbol, avgAmplitude, isBackTestMode } = useSelector(
     (state: RootState) => state.fetchData
   );
   const { emittery } = useContext(EmitteryContext);
@@ -503,6 +503,13 @@ const LossAndProfit: React.ForwardRefRenderFunction<
       emittery?.off(OnStopLossAndTakeProfit.reset, resetActive);
     };
   }, [emittery]);
+
+  useEffect(() => {
+    if ((!isBackTestMode && activeProfit) || (!isBackTestMode && activeStop)) {
+      setActiveProfit(false);
+      setActiveStop(false);
+    }
+  }, [isBackTestMode, activeProfit, activeStop]);
 
   useImperativeHandle(ref, () => ({
     stopPrice: Number(stopLossData[MiddleSection.Price]),

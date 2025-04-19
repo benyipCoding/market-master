@@ -123,7 +123,7 @@ export const selectCanMoveOrderPriceLine = createSelector(
   [selectMouseMovingEventParam, selectCurrentOrderType],
   (mouseMovingEventParam, currentOrderType) =>
     (mouseMovingEventParam?.hoveredObjectId as string)?.includes(
-      "priceLine_orderPrice"
+      PriceLineType.LimitOrderPrice
     ) && currentOrderType === OrderType.LIMIT
 );
 
