@@ -24,6 +24,31 @@ import { cn } from "@/lib/utils";
 import { setCurrentOrderTab } from "@/store/bottomPanelSlice";
 import { AuthContext } from "@/context/Auth";
 import { getProfile } from "@/app/playground/actions/getProfile";
+import { Ellipsis } from "lucide-react";
+import { Button } from "../ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import {
+  ContextMenu,
+  ContextMenuCheckboxItem,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuLabel,
+  ContextMenuRadioGroup,
+  ContextMenuRadioItem,
+  ContextMenuSeparator,
+  ContextMenuShortcut,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
+} from "../ui/context-menu";
 
 const OrdersPanel = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -144,45 +169,92 @@ const OrdersPanel = () => {
       </div>
 
       <ScrollArea className="flex-1">
-        <Table>
-          <TableCaption>
-            {displayOrders.length ? "" : "No order data"}
-          </TableCaption>
-          <TableHeader>
-            <TableRow>
-              {/* <TableHead>ID</TableHead> */}
-              <TableHead>Time</TableHead>
-              <TableHead>Quantity</TableHead>
-              <TableHead>Sell / Buy</TableHead>
-              <TableHead className="text-right">Opening</TableHead>
-              <TableHead className="text-right">Closed</TableHead>
-              <TableHead className="text-right">Stop</TableHead>
-              <TableHead className="text-right">Limit</TableHead>
-              <TableHead className="text-right">Profit / Loss</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {displayOrders.map((order) => (
-              <TableRow key={order.id}>
-                {/* <TableCell className="font-medium">{order.id}</TableCell> */}
-                <TableCell>{timestampToDateStr(order.create_at!)}</TableCell>
-                <TableCell>{order.quantity}</TableCell>
-                <TableCell>{TitleCase(order.side)}</TableCell>
-                <TableCell className="text-right">
-                  {order.opening_price}
-                </TableCell>
-                <TableCell className="text-right">
-                  {order.closing_price}
-                </TableCell>
-                <TableCell className="text-right">{order.stop_price}</TableCell>
-                <TableCell className="text-right">
-                  {order.limit_price}
-                </TableCell>
-                <TableCell className="text-right">$250.00</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <ContextMenu>
+          <ContextMenuTrigger>
+            <Table>
+              <TableCaption>
+                {displayOrders.length ? "" : "No order data"}
+              </TableCaption>
+              <TableHeader>
+                <TableRow>
+                  {/* <TableHead>ID</TableHead> */}
+                  <TableHead>Time</TableHead>
+                  <TableHead>Quantity</TableHead>
+                  <TableHead>Sell / Buy</TableHead>
+                  <TableHead className="text-right">Opening</TableHead>
+                  <TableHead className="text-right">Closed</TableHead>
+                  <TableHead className="text-right">Stop</TableHead>
+                  <TableHead className="text-right">Limit</TableHead>
+                  <TableHead className="text-right">Profit / Loss</TableHead>
+                  <TableHead className="w-7"></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {displayOrders.map((order) => (
+                  <TableRow key={order.id}>
+                    <TableCell>
+                      {timestampToDateStr(order.create_at!)}
+                    </TableCell>
+                    <TableCell>{order.quantity}</TableCell>
+                    <TableCell>{TitleCase(order.side)}</TableCell>
+                    <TableCell className="text-right">
+                      {order.opening_price}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {order.closing_price}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {order.stop_price}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {order.limit_price}
+                    </TableCell>
+                    <TableCell className="text-right">$250.00</TableCell>
+                    <TableCell className="">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant={"ghost"} className="p-2">
+                            <Ellipsis size={24} />
+                          </Button>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent className="w-fit">
+                          <DropdownMenuLabel inset>
+                            Order Actions
+                          </DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem inset>
+                            Set stop loss
+                          </DropdownMenuItem>
+                          <DropdownMenuItem inset>
+                            Set limit price
+                          </DropdownMenuItem>
+                          <DropdownMenuItem inset>
+                            Close position
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem inset>
+                            Close all positions
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </ContextMenuTrigger>
+
+          <ContextMenuContent className="w-fit">
+            <ContextMenuLabel inset>Order Actions</ContextMenuLabel>
+            <ContextMenuSeparator />
+            <ContextMenuItem inset>Set stop loss</ContextMenuItem>
+            <ContextMenuItem inset>Set limit price</ContextMenuItem>
+            <ContextMenuItem inset>Close position</ContextMenuItem>
+            <ContextMenuSeparator />
+            <ContextMenuItem inset>Close all positions</ContextMenuItem>
+          </ContextMenuContent>
+        </ContextMenu>
       </ScrollArea>
     </div>
   );

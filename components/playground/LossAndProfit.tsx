@@ -320,6 +320,8 @@ export interface LossAndProfitRef {
   limitPrice: number;
   activeStop: boolean;
   activeProfit: boolean;
+  setActiveStop: React.Dispatch<React.SetStateAction<boolean>>;
+  setActiveProfit: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const LossAndProfit: React.ForwardRefRenderFunction<
@@ -516,6 +518,8 @@ const LossAndProfit: React.ForwardRefRenderFunction<
     limitPrice: Number(takeProfitData[MiddleSection.Price]),
     activeStop,
     activeProfit,
+    setActiveProfit,
+    setActiveStop,
   }));
 
   return (

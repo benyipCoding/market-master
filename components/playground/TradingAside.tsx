@@ -164,6 +164,10 @@ const TradingAside: React.FC = () => {
     };
     emittery?.emit(OnPriceLine.add, payload2);
 
+    // 止损止盈的激活状态设置为false
+    lossAndProfitRef.current?.setActiveProfit(false);
+    lossAndProfitRef.current?.setActiveStop(false);
+
     // 查询订单表
     dispatch(fetchOpeningOrders(OperationMode.PRACTISE));
   };
