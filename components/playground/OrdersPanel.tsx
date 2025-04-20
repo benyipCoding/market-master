@@ -1,5 +1,12 @@
 "use client";
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Table,
   TableBody,
@@ -13,7 +20,12 @@ import { ScrollArea } from "../ui/scroll-area";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { fetchLimitOrders, fetchOpeningOrders } from "@/store/fetchDataSlice";
-import { OperationMode, OrderNavs, OrderTabs } from "../interfaces/Playground";
+import {
+  OperationMode,
+  Order,
+  OrderNavs,
+  OrderTabs,
+} from "../interfaces/Playground";
 import {
   formatNumberWithCommas,
   timestampToDateStr,
@@ -49,12 +61,13 @@ import {
   ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from "../ui/context-menu";
+import Big from "big.js";
+import { OrderSide } from "../interfaces/CandlestickSeries";
 
 const OrdersPanel = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { openingOrders, operationMode, limitOrders } = useSelector(
-    (state: RootState) => state.fetchData
-  );
+  const { openingOrders, operationMode, limitOrders, currentCandle } =
+    useSelector((state: RootState) => state.fetchData);
   const { currentOrderTab } = useSelector(
     (state: RootState) => state.bottomPanel
   );
@@ -105,6 +118,33 @@ const OrdersPanel = () => {
     });
     obs.current.observe(dom);
   };
+
+  const [currentRowOrderId, setCurrentRowOrderId] = useState<string | null>(
+    null
+  );
+
+  const onRowContextMenu = (
+    e: React.MouseEvent<HTMLTableRowElement, MouseEvent>,
+    orderId: string
+  ) => {
+    setCurrentRowOrderId(orderId);
+  };
+
+  const calFloatingProfit = useCallback(
+    (order: Order) => {
+      if (!currentCandle) return 0;
+      if (order.side === OrderSide.BUY) {
+        return new Big(currentCandle.close)
+          .minus(order.opening_price)
+          .toFixed(2);
+      } else {
+        return new Big(order.opening_price)
+          .minus(currentCandle.close)
+          .toFixed(2);
+      }
+    },
+    [currentCandle]
+  );
 
   useEffect(() => {
     if (!currentOrderTab) return;
@@ -169,15 +209,16 @@ const OrdersPanel = () => {
       </div>
 
       <ScrollArea className="flex-1">
-        <ContextMenu>
+        <ContextMenu
+          onOpenChange={(open) => !open && setCurrentRowOrderId(null)}
+        >
           <ContextMenuTrigger>
             <Table>
               <TableCaption>
                 {displayOrders.length ? "" : "No order data"}
               </TableCaption>
               <TableHeader>
-                <TableRow>
-                  {/* <TableHead>ID</TableHead> */}
+                <TableRow onContextMenu={(e) => e.preventDefault()}>
                   <TableHead>Time</TableHead>
                   <TableHead>Quantity</TableHead>
                   <TableHead>Sell / Buy</TableHead>
@@ -191,7 +232,10 @@ const OrdersPanel = () => {
               </TableHeader>
               <TableBody>
                 {displayOrders.map((order) => (
-                  <TableRow key={order.id}>
+                  <TableRow
+                    key={order.id}
+                    onContextMenu={(e) => onRowContextMenu(e, order.id)}
+                  >
                     <TableCell>
                       {timestampToDateStr(order.create_at!)}
                     </TableCell>
@@ -209,9 +253,16 @@ const OrdersPanel = () => {
                     <TableCell className="text-right">
                       {order.limit_price}
                     </TableCell>
-                    <TableCell className="text-right">$250.00</TableCell>
                     <TableCell className="text-right">
-                      <DropdownMenu>
+                      $ {calFloatingProfit(order)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu
+                        onOpenChange={(open) => {
+                          !open && setCurrentRowOrderId(null);
+                          open && setCurrentRowOrderId(order.id);
+                        }}
+                      >
                         <DropdownMenuTrigger asChild className="w-full">
                           <Ellipsis
                             className={cn(
@@ -221,21 +272,13 @@ const OrdersPanel = () => {
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent className="w-fit">
-                          <DropdownMenuLabel inset>
-                            Order Actions
-                          </DropdownMenuLabel>
+                          <DropdownMenuLabel>Order Actions</DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem inset>
-                            Set stop loss
-                          </DropdownMenuItem>
-                          <DropdownMenuItem inset>
-                            Set limit price
-                          </DropdownMenuItem>
-                          <DropdownMenuItem inset>
-                            Close position
-                          </DropdownMenuItem>
+                          <DropdownMenuItem>Set stop loss</DropdownMenuItem>
+                          <DropdownMenuItem>Set limit price</DropdownMenuItem>
+                          <DropdownMenuItem>Close position</DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem inset>
+                          <DropdownMenuItem>
                             Close all positions
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -248,13 +291,13 @@ const OrdersPanel = () => {
           </ContextMenuTrigger>
 
           <ContextMenuContent className="w-fit">
-            <ContextMenuLabel inset>Order Actions</ContextMenuLabel>
+            <ContextMenuLabel>Order Actions</ContextMenuLabel>
             <ContextMenuSeparator />
-            <ContextMenuItem inset>Set stop loss</ContextMenuItem>
-            <ContextMenuItem inset>Set limit price</ContextMenuItem>
-            <ContextMenuItem inset>Close position</ContextMenuItem>
+            <ContextMenuItem>Set stop loss</ContextMenuItem>
+            <ContextMenuItem>Set limit price</ContextMenuItem>
+            <ContextMenuItem>Close position</ContextMenuItem>
             <ContextMenuSeparator />
-            <ContextMenuItem inset>Close all positions</ContextMenuItem>
+            <ContextMenuItem>Close all positions</ContextMenuItem>
           </ContextMenuContent>
         </ContextMenu>
       </ScrollArea>
