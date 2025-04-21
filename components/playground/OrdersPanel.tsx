@@ -35,9 +35,7 @@ import {
 import { cn } from "@/lib/utils";
 import { setCurrentOrderTab } from "@/store/bottomPanelSlice";
 import { AuthContext } from "@/context/Auth";
-import { getProfile } from "@/app/playground/actions/getProfile";
 import { Ellipsis } from "lucide-react";
-import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,21 +46,15 @@ import {
 } from "../ui/dropdown-menu";
 import {
   ContextMenu,
-  ContextMenuCheckboxItem,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuLabel,
-  ContextMenuRadioGroup,
-  ContextMenuRadioItem,
   ContextMenuSeparator,
-  ContextMenuShortcut,
-  ContextMenuSub,
-  ContextMenuSubContent,
-  ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from "../ui/context-menu";
 import Big from "big.js";
 import { OrderSide } from "../interfaces/CandlestickSeries";
+import { postClosePosition } from "@/app/playground/actions/postClosePosition";
 
 const OrdersPanel = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -146,6 +138,12 @@ const OrdersPanel = () => {
     [currentCandle]
   );
 
+  const closePosition = async () => {
+    if (!currentRowOrderId) return;
+    const res = await postClosePosition(currentRowOrderId);
+    console.log(res);
+  };
+
   useEffect(() => {
     if (!currentOrderTab) return;
     const dom = document.getElementById(currentOrderTab);
@@ -156,8 +154,8 @@ const OrdersPanel = () => {
   }, [currentOrderTab]);
 
   useEffect(() => {
-    dispatch(fetchOpeningOrders(OperationMode.PRACTISE));
-    dispatch(fetchLimitOrders(OperationMode.PRACTISE));
+    // dispatch(fetchOpeningOrders(OperationMode.PRACTISE));
+    // dispatch(fetchLimitOrders(OperationMode.PRACTISE));
     return () => {
       if (obs.current) {
         obs.current?.disconnect();
@@ -182,7 +180,7 @@ const OrdersPanel = () => {
             {tab.label}
           </div>
         ))}
-        {/* slide block */}
+
         <div
           className="absolute bottom-0 left-0 transition-all duration-200 bg-secondary/50 border-b-[2px] dark:border-white border-black rounded-sm rounded-b-none"
           style={{
@@ -272,13 +270,21 @@ const OrdersPanel = () => {
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent className="w-fit">
-                          <DropdownMenuLabel>Order Actions</DropdownMenuLabel>
+                          <DropdownMenuLabel inset>
+                            Order Actions
+                          </DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem>Set stop loss</DropdownMenuItem>
-                          <DropdownMenuItem>Set limit price</DropdownMenuItem>
-                          <DropdownMenuItem>Close position</DropdownMenuItem>
+                          <DropdownMenuItem inset>
+                            Set stop loss
+                          </DropdownMenuItem>
+                          <DropdownMenuItem inset>
+                            Set limit price
+                          </DropdownMenuItem>
+                          <DropdownMenuItem inset>
+                            Close position
+                          </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem>
+                          <DropdownMenuItem inset>
                             Close all positions
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -291,13 +297,15 @@ const OrdersPanel = () => {
           </ContextMenuTrigger>
 
           <ContextMenuContent className="w-fit">
-            <ContextMenuLabel>Order Actions</ContextMenuLabel>
+            <ContextMenuLabel inset>Order Actions</ContextMenuLabel>
             <ContextMenuSeparator />
-            <ContextMenuItem>Set stop loss</ContextMenuItem>
-            <ContextMenuItem>Set limit price</ContextMenuItem>
-            <ContextMenuItem>Close position</ContextMenuItem>
+            <ContextMenuItem inset>Set stop loss</ContextMenuItem>
+            <ContextMenuItem inset>Set limit price</ContextMenuItem>
+            <ContextMenuItem inset onSelect={closePosition}>
+              Close position
+            </ContextMenuItem>
             <ContextMenuSeparator />
-            <ContextMenuItem>Close all positions</ContextMenuItem>
+            <ContextMenuItem inset>Close all positions</ContextMenuItem>
           </ContextMenuContent>
         </ContextMenu>
       </ScrollArea>
