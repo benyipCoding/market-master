@@ -22,3 +22,13 @@ export async function createOrUpdateBackTestRecord(dto: CreateRecordDto) {
     return ErrorResponse(errObj.message, errObj.statusCode);
   }
 }
+
+export async function deleteBackTestRecord(key: string) {
+  try {
+    const res = await request.delete(`/back-test/${key}`);
+    return SuccessResponse(res.data);
+  } catch (error: any) {
+    const errObj = JSON.parse(error.message);
+    return ErrorResponse(errObj.message, errObj.statusCode);
+  }
+}

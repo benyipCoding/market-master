@@ -54,6 +54,7 @@ interface FetchDataState {
   limitOrders: Order[];
   currentCandle: CandlestickData<Time> | undefined;
   operationMode: OperationMode;
+  backTestRecordKey: string | undefined;
 }
 
 const initialState: FetchDataState = {
@@ -74,6 +75,7 @@ const initialState: FetchDataState = {
   limitOrders: [],
   currentCandle: undefined,
   operationMode: OperationMode.PRACTISE,
+  backTestRecordKey: undefined,
 };
 
 export const fetchPeriods = createAsyncThunk("fetch/periods", () => {
@@ -149,6 +151,9 @@ export const fetchDataSlice = createSlice({
     setOperationMode(state, action: PayloadAction<OperationMode>) {
       state.operationMode = action.payload;
     },
+    setBackTestRecordKey(state, action: PayloadAction<string | undefined>) {
+      state.backTestRecordKey = action.payload;
+    },
   },
   extraReducers(builder) {
     builder.addCase(fetchPeriods.fulfilled, (state, action) => {
@@ -206,6 +211,7 @@ export const {
   setHasVol,
   setCurrentCandle,
   setOperationMode,
+  setBackTestRecordKey,
 } = fetchDataSlice.actions;
 
 export default fetchDataSlice.reducer;

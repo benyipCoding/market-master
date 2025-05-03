@@ -40,6 +40,7 @@ import {
 } from "../ui/dropdown-menu";
 import { ScrollArea } from "../ui/scroll-area";
 import {
+  setBackTestRecordKey,
   setCandleDataSlice,
   setCurrentPeriod,
   setIsBackTestMode,
@@ -73,6 +74,13 @@ import { AuthContext } from "@/context/Auth";
 import { ColourfulText } from "../ui/colourful-text";
 import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
+import {
+  createOrUpdateBackTestRecord,
+  CreateRecordDto,
+  deleteBackTestRecord,
+} from "@/app/playground/actions/BackTestRecord";
+import { toast } from "sonner";
+import { Status } from "@/utils/apis/response";
 
 const Navbar: React.FC<NavbarProps> = ({
   className,
@@ -95,6 +103,7 @@ const Navbar: React.FC<NavbarProps> = ({
     isPreselect,
     operationMode,
     currentCandle,
+    backTestRecordKey,
   } = useSelector((state: RootState) => state.fetchData);
 
   const { mouseClickEventParam } = useSelector(
@@ -379,6 +388,44 @@ const Navbar: React.FC<NavbarProps> = ({
     if (isBlindbox) dispatch(setOperationMode(OperationMode.BLINDBOX));
     else dispatch(setOperationMode(OperationMode.PRACTISE));
   }, [isBlindbox]);
+
+  const enterBackTestSideEffect = useCallback(async () => {
+    if (!currentCandle || !currentPeriod || !currentSymbol) return;
+    const payload: CreateRecordDto = {
+      latest_price: currentCandle.close,
+      operation_mode: operationMode,
+      period_id: currentPeriod.id,
+      symbol_id: currentSymbol?.id,
+      sliceLeft,
+      sliceRight,
+    };
+
+    const res = await createOrUpdateBackTestRecord(payload);
+    if (res.status !== Status.OK) return toast.error(res.msg);
+    dispatch(setBackTestRecordKey(res.data));
+  }, [
+    currentCandle,
+    currentPeriod,
+    currentSymbol,
+    dispatch,
+    operationMode,
+    sliceLeft,
+    sliceRight,
+  ]);
+
+  const exitBackTestSideEffect = useCallback(() => {
+    if (!backTestRecordKey) return;
+    deleteBackTestRecord(backTestRecordKey);
+    dispatch(setBackTestRecordKey(undefined));
+  }, [backTestRecordKey, dispatch]);
+
+  useEffect(() => {
+    if (isBackTestMode) {
+      enterBackTestSideEffect();
+    } else {
+      exitBackTestSideEffect();
+    }
+  }, [isBackTestMode, enterBackTestSideEffect, exitBackTestSideEffect]);
 
   return (
     <TooltipProvider delayDuration={0}>
