@@ -58,8 +58,13 @@ import { postClosePosition } from "@/app/playground/actions/postClosePosition";
 
 const OrdersPanel = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { openingOrders, operationMode, limitOrders, currentCandle } =
-    useSelector((state: RootState) => state.fetchData);
+  const {
+    openingOrders,
+    operationMode,
+    limitOrders,
+    currentCandle,
+    isBackTestMode,
+  } = useSelector((state: RootState) => state.fetchData);
   const { currentOrderTab } = useSelector(
     (state: RootState) => state.bottomPanel
   );
@@ -154,8 +159,8 @@ const OrdersPanel = () => {
   }, [currentOrderTab]);
 
   useEffect(() => {
-    // dispatch(fetchOpeningOrders(OperationMode.PRACTISE));
-    // dispatch(fetchLimitOrders(OperationMode.PRACTISE));
+    dispatch(fetchOpeningOrders(OperationMode.PRACTISE));
+    dispatch(fetchLimitOrders(OperationMode.PRACTISE));
     return () => {
       if (obs.current) {
         obs.current?.disconnect();

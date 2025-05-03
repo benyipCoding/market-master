@@ -61,6 +61,10 @@ import {
 } from "@/providers/EmitteryProvider";
 import { getProfile } from "./actions/getProfile";
 import { AuthContext } from "@/context/Auth";
+import {
+  createOrUpdateBackTestRecord,
+  CreateRecordDto,
+} from "./actions/postBackTestRecord";
 
 const Playground = () => {
   // TChart component instance
@@ -78,6 +82,8 @@ const Playground = () => {
     isBackTestMode,
     sliceLeft,
     sliceRight,
+    operationMode,
+    currentCandle,
   } = useSelector((state: RootState) => state.fetchData);
   const isDrawedLineSettings = useMemo(
     () => dialogContent === DialogContentType.DrawedLineSettings,
@@ -115,7 +121,18 @@ const Playground = () => {
 
   useEffect(() => {
     dispatch(setCurrentCandle(displayCandlestickData[0]));
-  }, [displayCandlestickData]);
+    // 当进入回测模式，向Redis创建一个记录
+    if (isBackTestMode) {
+      console.log("进入回测模式：", {
+        sliceLeft,
+        sliceRight,
+        operationMode,
+        currentSymbol,
+        currentPeriod,
+        price: currentCandle?.close,
+      });
+    }
+  }, [displayCandlestickData, currentCandle?.close]);
 
   // The list of drawed line series
   const [drawedLineList, setDrawedLineList] = useState<
@@ -237,7 +254,6 @@ const Playground = () => {
     dispatch(fetchSymbols());
     window.addEventListener("mouseup", cancelResizing);
     getProfile().then((res) => setUserProfile(res.data));
-
     return () => {
       window.removeEventListener("mouseup", cancelResizing);
     };

@@ -2,6 +2,7 @@ import axios, { AxiosResponse } from "axios";
 import { cookies } from "next/headers";
 import { tokenRefresh } from "@/app/(root)/auth/login/tokenRefresh";
 import { RefreshTokenKey } from "../cookieHelper";
+import CryptoJS from "crypto-js";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL + "/api";
 
@@ -12,7 +13,10 @@ const request = axios.create({
 request.interceptors.request.use(
   (config) => {
     config.headers.Cookie = cookies().toString();
-
+    const sk = process.env.NEXT_PUBLIC_REQUEST_SK || "";
+    const msg = process.env.NEXT_PUBLIC_REQUEST_MSG || "";
+    const encrypted = CryptoJS.AES.encrypt(msg, sk).toString();
+    config.headers["User-Agent"] = encrypted;
     return config;
   },
   (err) => {}

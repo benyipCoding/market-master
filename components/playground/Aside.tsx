@@ -17,7 +17,6 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { toast } from "sonner";
-import { fetchOpeningOrders } from "@/store/fetchDataSlice";
 import TradingAside from "./TradingAside";
 import { ScrollArea } from "../ui/scroll-area";
 
@@ -38,34 +37,6 @@ const Aside: React.ForwardRefRenderFunction<AsideRef, AsideProps> = (
     if (!tChartRef.current) return;
     return tChartRef.current.childSeries[0] as ISeriesApi<"Candlestick", Time>;
   };
-
-  // const marketOrderAction = async (side: OrderSide) => {
-  //   const mainSeries = extraMainSeries()!;
-  //   const currentCandle = mainSeries.data()[
-  //     mainSeries?.data().length - 1
-  //   ] as CandlestickData;
-
-  //   const payload: CreateOrderDto = {
-  //     side,
-  //     opening_price: currentCandle.close,
-  //     time: currentCandle.time!,
-  //     order_type: OrderType.MARKET,
-  //     symbol_id: currentSymbol?.id!,
-  //     quantity: 1000, // 暂时写死
-  //     operation_mode: OperationMode.PRACTISE,
-  //   };
-
-  //   try {
-  //     const res = await postMarketOrder(payload);
-  //     if (res.status !== 200) return toast.error(res.msg);
-
-  //     // 增加marker
-  //     emittery?.emit(OnOrderMarker.add, payload);
-
-  //     // 查询订单表
-  //     dispatch(fetchOpeningOrders(OperationMode.PRACTISE));
-  //   } catch (error) {}
-  // };
 
   return (
     <ScrollArea className={cn(className)} ref={asideRef}>

@@ -85,14 +85,16 @@ const Navbar: React.FC<NavbarProps> = ({
   const { dialogContent } = useSelector((state: RootState) => state.dialog);
   const { emittery } = useContext(EmitteryContext);
   const { userInfo } = useContext(AuthContext);
-
   const {
     periods,
     currentPeriod,
     currentSymbol,
     sliceLeft,
+    sliceRight,
     isBackTestMode,
     isPreselect,
+    operationMode,
+    currentCandle,
   } = useSelector((state: RootState) => state.fetchData);
 
   const { mouseClickEventParam } = useSelector(
@@ -236,17 +238,17 @@ const Navbar: React.FC<NavbarProps> = ({
     });
   };
 
-  const enterBackTestMode = () => {
+  const enterBackTestMode = async (logical?: number) => {
     if (!tChartRef.current) return;
     // 清除所有线
     emittery?.emit(OnContronPanel.cleanLineSeries);
 
     const { childSeries } = tChartRef.current!;
     const length = childSeries[0].data().length;
+    const log = logical || length - 1 - mouseClickEventParam?.logical!;
+
     freezeRange(() => {
-      dispatch(
-        setCandleDataSlice([length - 1 - mouseClickEventParam?.logical!])
-      );
+      dispatch(setCandleDataSlice([log]));
       dispatch(setIsPreselect(false));
       dispatch(setIsBackTestMode(true));
     });
@@ -299,9 +301,14 @@ const Navbar: React.FC<NavbarProps> = ({
     window.location.reload();
   };
 
-  const [isBlindbox, setIsBlindbox] = useState(false);
+  const isBlindbox = useMemo(
+    () => operationMode === OperationMode.BLINDBOX,
+    [operationMode]
+  );
+
   const operationModeChange = (checked: boolean) => {
-    setIsBlindbox(checked);
+    if (checked) dispatch(setOperationMode(OperationMode.BLINDBOX));
+    else dispatch(setOperationMode(OperationMode.PRACTISE));
   };
 
   useEffect(() => {
