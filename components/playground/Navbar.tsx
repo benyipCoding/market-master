@@ -43,6 +43,7 @@ import {
   setBackTestRecordKey,
   setCandleDataSlice,
   setCurrentPeriod,
+  setCurrentSymbol,
   setIsBackTestMode,
   setIsPreselect,
   setOperationMode,
@@ -75,12 +76,23 @@ import { ColourfulText } from "../ui/colourful-text";
 import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
 import {
+  checkBackTestRecord,
   createOrUpdateBackTestRecord,
   CreateRecordDto,
   deleteBackTestRecord,
 } from "@/app/playground/actions/BackTestRecord";
 import { toast } from "sonner";
 import { Status } from "@/utils/apis/response";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const Navbar: React.FC<NavbarProps> = ({
   className,
@@ -427,377 +439,419 @@ const Navbar: React.FC<NavbarProps> = ({
     }
   }, [isBackTestMode, enterBackTestSideEffect, exitBackTestSideEffect]);
 
+  const [alertDialogOpen, setAlertDialogOpen] = useState(false);
+  const [resumeBackTestPayload, setResumeBackTestPayload] =
+    useState<null | CreateRecordDto>(null);
+
+  const resumeConfirm = useCallback(() => {
+    if (!resumeBackTestPayload) return;
+    dispatch(setCurrentSymbol(resumeBackTestPayload.symbol_id));
+    dispatch(setCurrentPeriod(`${resumeBackTestPayload.period_id}`));
+    setAlertDialogOpen(false);
+  }, [dispatch, resumeBackTestPayload]);
+
+  useEffect(() => {
+    checkBackTestRecord().then((res) => {
+      if (!res.data) return;
+      setResumeBackTestPayload(res.data);
+      setAlertDialogOpen(true);
+    });
+  }, []);
+
   return (
-    <TooltipProvider delayDuration={0}>
-      <nav
-        className={cn(
-          className,
-          "flex items-center bg-background w-full rounded-md p-1 gap-4 relative"
-        )}
-      >
-        {/* Google Avatar */}
-        <div className="w-12 nav-item">
-          <div className="w-7 h-7 bg-[#9f6360] rounded-full flex justify-center items-center relative">
-            B
-            <Badge
-              variant={"destructive"}
-              className="absolute -right-4 -top-2 text-xs flex justify-center items-center p-1 w-6 h-6 bg-red-600 text-white font-normal border-background border-2 pointer-events-none"
-            >
-              27
-            </Badge>
-          </div>
-        </div>
-
-        {/* Symbol */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              className={cn(
-                "nav-item px-2 gap-2 active:scale-100 nav-item-divider",
-                dialogContent === DialogContentType.SymbolSearch && "bg-muted"
-              )}
-              variant={"ghost"}
-              onClick={openSymbolSearch}
-            >
-              <Search size={18} />
-              {currentSymbol?.label}
-              <span className="sr-only">Symbol Search</span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent className="flex">
-            <p className="nav-item-divider">Symbol Search</p>
-            <span className="short-cut">S</span>
-          </TooltipContent>
-        </Tooltip>
-
-        {/* Period */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              className="nav-item px-2 gap-2 active:scale-100 nav-item-divider w-20 text-md"
-              variant={"ghost"}
-            >
-              <Hourglass size={20} />
-              {currentPeriod?.label}
-              <span className="sr-only">Select Period</span>
-            </Button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent className="w-fit">
-            <ScrollArea
-              className="h-72 rounded-md pr-3"
-              thumbClass="dark:bg-primary-foreground"
-            >
-              <DropdownMenuRadioGroup
-                value={`${currentPeriod?.id}`}
-                onValueChange={(value) => dispatch(setCurrentPeriod(value))}
-              >
-                {periods?.map((p) => (
-                  <DropdownMenuRadioItem
-                    value={`${p.id}`}
-                    key={p.id}
-                    className="cursor-pointer"
-                  >
-                    {p.label}
-                  </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
-            </ScrollArea>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {/* Candle shape */}
-        <Button
-          className="nav-item px-2 gap-2 active:scale-100 nav-item-divider"
-          variant={"ghost"}
+    <>
+      <TooltipProvider delayDuration={0}>
+        <nav
+          className={cn(
+            className,
+            "flex items-center bg-background w-full rounded-md p-1 gap-4 relative"
+          )}
         >
-          <BiCandles size={24} />
-        </Button>
+          {/* Google Avatar */}
+          <div className="w-12 nav-item">
+            <div className="w-7 h-7 bg-[#9f6360] rounded-full flex justify-center items-center relative">
+              B
+              <Badge
+                variant={"destructive"}
+                className="absolute -right-4 -top-2 text-xs flex justify-center items-center p-1 w-6 h-6 bg-red-600 text-white font-normal border-background border-2 pointer-events-none"
+              >
+                27
+              </Badge>
+            </div>
+          </div>
 
-        {/* Indicators */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              className={cn(
-                "nav-item px-2 gap-2 active:scale-100 nav-item-divider",
-                dialogContent === DialogContentType.TechnicalIndex && "bg-muted"
-              )}
-              variant={"ghost"}
-              onClick={openTechnicalIndexDialog}
-            >
-              <FcComboChart size={24} />
-              Indicators
-              <span className="sr-only">Indicators, Metrics</span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent className="flex">
-            <p className="nav-item-divider">Indicators, Metrics</p>
-            <span className="short-cut">I</span>
-          </TooltipContent>
-        </Tooltip>
-
-        {/* Scroll to start */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              className={cn("nav-item px-2 gap-2 active:scale-100")}
-              variant={"ghost"}
-              onClick={scrollToStart}
-              disabled={autoDrawing}
-            >
-              <ArrowLeftToLine size={24} />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent className="flex">
-            <p>Scroll to start</p>
-            {/* <span className="short-cut"></span> */}
-          </TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              className={cn("nav-item px-2 gap-2 active:scale-100 -ml-2")}
-              variant={"ghost"}
-              disabled={autoDrawing}
-            >
-              <CalendarSearch size={22} />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent className="flex">
-            <p>Go to</p>
-          </TooltipContent>
-        </Tooltip>
-
-        {/* Scroll to end */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              className={cn(
-                "nav-item px-2 gap-2 active:scale-100 nav-item-divider -ml-2"
-              )}
-              variant={"ghost"}
-              onClick={scrollToEnd}
-              disabled={autoDrawing}
-            >
-              <ArrowRightToLine size={24} />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent className="flex">
-            <p>Scroll to end</p>
-            {/* <span className="short-cut"></span> */}
-          </TooltipContent>
-        </Tooltip>
-
-        {/* 画笔 */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              className={cn("nav-item px-2 gap-2 active:scale-100")}
-              variant={"ghost"}
-              onClick={drawLineInVisibleRange}
-              disabled={autoDrawing}
-            >
-              <PiLineSegments size={24} color={yellow} />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent className="flex">
-            <p className="nav-item-divider">Pens</p>
-            <span className="short-cut">F</span>
-          </TooltipContent>
-        </Tooltip>
-
-        {/* 画线段 */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              className={cn("nav-item px-2 gap-2 active:scale-100 -ml-2")}
-              variant={"ghost"}
-              onClick={drawSegment}
-              disabled={autoDrawing}
-            >
-              <PiLineSegments size={24} color={green} />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent className="flex">
-            <p className="nav-item-divider">Segments</p>
-            <span className="short-cut">R</span>
-          </TooltipContent>
-        </Tooltip>
-
-        {/* 画大线段 */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              className={cn("nav-item px-2 gap-2 active:scale-100 -ml-2")}
-              variant={"ghost"}
-              disabled={autoDrawing}
-              onClick={drawGreateSegment}
-            >
-              <PiLineSegments size={24} color={orange} />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent className="flex">
-            <p className="nav-item-divider">Greate Segments</p>
-            <span className="short-cut px-1">Ctrl + R</span>
-          </TooltipContent>
-        </Tooltip>
-
-        {/* 删除按钮 */}
-        <Tooltip>
-          <DropdownMenu>
+          {/* Symbol */}
+          <Tooltip>
             <TooltipTrigger asChild>
-              <DropdownMenuTrigger asChild disabled={autoDrawing}>
-                <Button
-                  className="nav-item px-2 gap-2 active:scale-100 nav-item-divider -ml-2"
-                  variant={"ghost"}
-                >
-                  <CiEraser size={26} />
-                  <span className="sr-only">Select Period</span>
-                </Button>
-              </DropdownMenuTrigger>
+              <Button
+                className={cn(
+                  "nav-item px-2 gap-2 active:scale-100 nav-item-divider",
+                  dialogContent === DialogContentType.SymbolSearch && "bg-muted"
+                )}
+                variant={"ghost"}
+                onClick={openSymbolSearch}
+              >
+                <Search size={18} />
+                {currentSymbol?.label}
+                <span className="sr-only">Symbol Search</span>
+              </Button>
             </TooltipTrigger>
+            <TooltipContent className="flex">
+              <p className="nav-item-divider">Symbol Search</p>
+              <span className="short-cut">S</span>
+            </TooltipContent>
+          </Tooltip>
+
+          {/* Period */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                className="nav-item px-2 gap-2 active:scale-100 nav-item-divider w-20 text-md"
+                variant={"ghost"}
+              >
+                <Hourglass size={20} />
+                {currentPeriod?.label}
+                <span className="sr-only">Select Period</span>
+              </Button>
+            </DropdownMenuTrigger>
 
             <DropdownMenuContent className="w-fit">
-              <DropdownMenuItem
-                onClick={() =>
-                  deleteAutomaticLines(CustomLineSeriesType.AutomaticDrawed)
-                }
+              <ScrollArea
+                className="h-72 rounded-md pr-3"
+                thumbClass="dark:bg-primary-foreground"
               >
-                <PiLineSegments color={yellow} />
-                Pens
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() =>
-                  deleteAutomaticLines(CustomLineSeriesType.SegmentDrawed)
-                }
-              >
-                <PiLineSegments color={green} />
-                Segments
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() =>
-                  deleteAutomaticLines(CustomLineSeriesType.GreatSegmentDrawed)
-                }
-              >
-                <PiLineSegments color={orange} />
-                Greate Segments
-              </DropdownMenuItem>
+                <DropdownMenuRadioGroup
+                  value={`${currentPeriod?.id}`}
+                  onValueChange={(value) => dispatch(setCurrentPeriod(value))}
+                >
+                  {periods?.map((p) => (
+                    <DropdownMenuRadioItem
+                      value={`${p.id}`}
+                      key={p.id}
+                      className="cursor-pointer"
+                    >
+                      {p.label}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </ScrollArea>
             </DropdownMenuContent>
           </DropdownMenu>
-          <TooltipContent className="flex">
-            <p className="">Eraser</p>
-          </TooltipContent>
-        </Tooltip>
 
-        {/* Back test */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              className={cn(
-                "nav-item px-2 gap-2 active:scale-100 nav-item-divider",
-                (isBackTestMode || isPreselect) && "bg-primary hover:bg-primary"
-              )}
-              variant={"ghost"}
-              onClick={preselectBackTest}
-            >
-              {isBackTestMode ? <Loading /> : <IoPlayBackOutline size={24} />}
-              {/* {isBackTestMode && <Loading />} */}
-              {isBackTestMode ? (
-                "Back testing..."
-              ) : (
-                <ColourfulText
-                  text="BACK TEST"
-                  isColorful={false}
-                  intervalTime={3000}
+          {/* Candle shape */}
+          <Button
+            className="nav-item px-2 gap-2 active:scale-100 nav-item-divider"
+            variant={"ghost"}
+          >
+            <BiCandles size={24} />
+          </Button>
+
+          {/* Indicators */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className={cn(
+                  "nav-item px-2 gap-2 active:scale-100 nav-item-divider",
+                  dialogContent === DialogContentType.TechnicalIndex &&
+                    "bg-muted"
+                )}
+                variant={"ghost"}
+                onClick={openTechnicalIndexDialog}
+              >
+                <FcComboChart size={24} />
+                Indicators
+                <span className="sr-only">Indicators, Metrics</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="flex">
+              <p className="nav-item-divider">Indicators, Metrics</p>
+              <span className="short-cut">I</span>
+            </TooltipContent>
+          </Tooltip>
+
+          {/* Scroll to start */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className={cn("nav-item px-2 gap-2 active:scale-100")}
+                variant={"ghost"}
+                onClick={scrollToStart}
+                disabled={autoDrawing}
+              >
+                <ArrowLeftToLine size={24} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="flex">
+              <p>Scroll to start</p>
+              {/* <span className="short-cut"></span> */}
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className={cn("nav-item px-2 gap-2 active:scale-100 -ml-2")}
+                variant={"ghost"}
+                disabled={autoDrawing}
+              >
+                <CalendarSearch size={22} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="flex">
+              <p>Go to</p>
+            </TooltipContent>
+          </Tooltip>
+
+          {/* Scroll to end */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className={cn(
+                  "nav-item px-2 gap-2 active:scale-100 nav-item-divider -ml-2"
+                )}
+                variant={"ghost"}
+                onClick={scrollToEnd}
+                disabled={autoDrawing}
+              >
+                <ArrowRightToLine size={24} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="flex">
+              <p>Scroll to end</p>
+              {/* <span className="short-cut"></span> */}
+            </TooltipContent>
+          </Tooltip>
+
+          {/* 画笔 */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className={cn("nav-item px-2 gap-2 active:scale-100")}
+                variant={"ghost"}
+                onClick={drawLineInVisibleRange}
+                disabled={autoDrawing}
+              >
+                <PiLineSegments size={24} color={yellow} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="flex">
+              <p className="nav-item-divider">Pens</p>
+              <span className="short-cut">F</span>
+            </TooltipContent>
+          </Tooltip>
+
+          {/* 画线段 */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className={cn("nav-item px-2 gap-2 active:scale-100 -ml-2")}
+                variant={"ghost"}
+                onClick={drawSegment}
+                disabled={autoDrawing}
+              >
+                <PiLineSegments size={24} color={green} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="flex">
+              <p className="nav-item-divider">Segments</p>
+              <span className="short-cut">R</span>
+            </TooltipContent>
+          </Tooltip>
+
+          {/* 画大线段 */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className={cn("nav-item px-2 gap-2 active:scale-100 -ml-2")}
+                variant={"ghost"}
+                disabled={autoDrawing}
+                onClick={drawGreateSegment}
+              >
+                <PiLineSegments size={24} color={orange} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="flex">
+              <p className="nav-item-divider">Greate Segments</p>
+              <span className="short-cut px-1">Ctrl + R</span>
+            </TooltipContent>
+          </Tooltip>
+
+          {/* 删除按钮 */}
+          <Tooltip>
+            <DropdownMenu>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild disabled={autoDrawing}>
+                  <Button
+                    className="nav-item px-2 gap-2 active:scale-100 nav-item-divider -ml-2"
+                    variant={"ghost"}
+                  >
+                    <CiEraser size={26} />
+                    <span className="sr-only">Select Period</span>
+                  </Button>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+
+              <DropdownMenuContent className="w-fit">
+                <DropdownMenuItem
+                  onClick={() =>
+                    deleteAutomaticLines(CustomLineSeriesType.AutomaticDrawed)
+                  }
+                >
+                  <PiLineSegments color={yellow} />
+                  Pens
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() =>
+                    deleteAutomaticLines(CustomLineSeriesType.SegmentDrawed)
+                  }
+                >
+                  <PiLineSegments color={green} />
+                  Segments
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() =>
+                    deleteAutomaticLines(
+                      CustomLineSeriesType.GreatSegmentDrawed
+                    )
+                  }
+                >
+                  <PiLineSegments color={orange} />
+                  Greate Segments
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <TooltipContent className="flex">
+              <p className="">Eraser</p>
+            </TooltipContent>
+          </Tooltip>
+
+          {/* Back test */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className={cn(
+                  "nav-item px-2 gap-2 active:scale-100 nav-item-divider",
+                  (isBackTestMode || isPreselect) &&
+                    "bg-primary hover:bg-primary"
+                )}
+                variant={"ghost"}
+                onClick={preselectBackTest}
+              >
+                {isBackTestMode ? <Loading /> : <IoPlayBackOutline size={24} />}
+                {/* {isBackTestMode && <Loading />} */}
+                {isBackTestMode ? (
+                  "Back testing..."
+                ) : (
+                  <ColourfulText
+                    text="BACK TEST"
+                    isColorful={false}
+                    intervalTime={3000}
+                  />
+                )}
+                <span className="sr-only">Back test</span>
+              </Button>
+            </TooltipTrigger>
+
+            <TooltipContent className="flex">
+              <p className="nav-item-divider">Back test</p>
+              <span className="short-cut">T</span>
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="gap-3 flex items-center px-2 active:scale-100 nav-item-divider h-full">
+                <Label
+                  htmlFor="operation-mode"
+                  className={cn(
+                    "cursor-pointer text-input",
+                    !isBlindbox && "text-white"
+                  )}
+                >
+                  {OperationMode.PRACTISE}
+                </Label>
+                <Switch
+                  id="operation-mode"
+                  className="data-[state=checked]:bg-input"
+                  onCheckedChange={operationModeChange}
+                  disabled={isBackTestMode}
                 />
-              )}
-              <span className="sr-only">Back test</span>
-            </Button>
-          </TooltipTrigger>
+                <Label
+                  htmlFor="operation-mode"
+                  className={cn(
+                    "cursor-pointer text-input",
+                    isBlindbox && "text-white"
+                  )}
+                >
+                  {OperationMode.BLINDBOX}
+                </Label>
+              </div>
+            </TooltipTrigger>
 
-          <TooltipContent className="flex">
-            <p className="nav-item-divider">Back test</p>
-            <span className="short-cut">T</span>
-          </TooltipContent>
-        </Tooltip>
+            <TooltipContent className="flex">
+              <p className="">BackTest Mode</p>
+              <span className="sr-only">BackTest Mode</span>
+            </TooltipContent>
+          </Tooltip>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="gap-3 flex items-center px-2 active:scale-100 nav-item-divider h-full">
-              <Label
-                htmlFor="operation-mode"
-                className={cn(
-                  "cursor-pointer text-input",
-                  !isBlindbox && "text-white"
-                )}
-              >
-                {OperationMode.PRACTISE}
-              </Label>
-              <Switch
-                id="operation-mode"
-                className="data-[state=checked]:bg-input"
-                onCheckedChange={operationModeChange}
-                disabled={isBackTestMode}
-              />
-              <Label
-                htmlFor="operation-mode"
-                className={cn(
-                  "cursor-pointer text-input",
-                  isBlindbox && "text-white"
-                )}
-              >
-                {OperationMode.BLINDBOX}
-              </Label>
-            </div>
-          </TooltipTrigger>
+          <div className="absolute right-14 h-full flex py-1 gap-4 items-center">
+            {/* Upload data */}
+            {userInfo?.is_staff && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={"ghost"}
+                    className={cn("nav-item px-2")}
+                    onClick={openUploadForm}
+                  >
+                    <Upload size={20} />
+                    <span className="sr-only">Upload Data</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className="flex">
+                  <p className="nav-item-divider">Upload Data</p>
+                  <span className="short-cut">U</span>
+                </TooltipContent>
+              </Tooltip>
+            )}
 
-          <TooltipContent className="flex">
-            <p className="">BackTest Mode</p>
-            <span className="sr-only">BackTest Mode</span>
-          </TooltipContent>
-        </Tooltip>
-
-        <div className="absolute right-14 h-full flex py-1 gap-4 items-center">
-          {/* Upload data */}
-          {userInfo?.is_staff && (
+            {/* Logout button */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant={"ghost"}
                   className={cn("nav-item px-2")}
-                  onClick={openUploadForm}
+                  onClick={logoutAction}
                 >
-                  <Upload size={20} />
-                  <span className="sr-only">Upload Data</span>
+                  <GrLogout size={20} />
+                  <span className="sr-only">Logout</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="flex">
-                <p className="nav-item-divider">Upload Data</p>
-                <span className="short-cut">U</span>
+                <p>Logout</p>
               </TooltipContent>
             </Tooltip>
-          )}
+          </div>
+        </nav>
+      </TooltipProvider>
 
-          {/* Logout button */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant={"ghost"}
-                className={cn("nav-item px-2")}
-                onClick={logoutAction}
-              >
-                <GrLogout size={20} />
-                <span className="sr-only">Logout</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent className="flex">
-              <p>Logout</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-      </nav>
-    </TooltipProvider>
+      <AlertDialog open={alertDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Continue BackTest ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your last BackTest has not finished yet, do you need to continue?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={resumeConfirm}>
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 

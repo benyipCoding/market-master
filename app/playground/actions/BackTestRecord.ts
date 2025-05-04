@@ -32,3 +32,13 @@ export async function deleteBackTestRecord(key: string) {
     return ErrorResponse(errObj.message, errObj.statusCode);
   }
 }
+
+export async function checkBackTestRecord() {
+  try {
+    const res = await request.get(`/back-test`);
+    return SuccessResponse(res.data);
+  } catch (error: any) {
+    const errObj = JSON.parse(error.message);
+    return ErrorResponse(errObj.message, errObj.statusCode);
+  }
+}
