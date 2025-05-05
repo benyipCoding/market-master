@@ -11,6 +11,7 @@ export interface CreateRecordDto {
   period_id: number;
   sliceLeft: number;
   sliceRight: number;
+  key?: string;
 }
 
 export async function createOrUpdateBackTestRecord(dto: CreateRecordDto) {

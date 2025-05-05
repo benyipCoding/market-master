@@ -465,6 +465,13 @@ const Navbar: React.FC<NavbarProps> = ({
     setAlertDialogOpen(false);
   }, [dispatch, resumeBackTestPayload, emittery]);
 
+  const resumeCancel = () => {
+    if (!resumeBackTestPayload?.key) return;
+    deleteBackTestRecord(resumeBackTestPayload.key);
+    setResumeBackTestPayload(null);
+    setAlertDialogOpen(false);
+  };
+
   useEffect(() => {
     checkBackTestRecord().then((res) => {
       if (!res.data) return;
@@ -861,7 +868,7 @@ const Navbar: React.FC<NavbarProps> = ({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={resumeCancel}>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={resumeConfirm}>
               Confirm
             </AlertDialogAction>
