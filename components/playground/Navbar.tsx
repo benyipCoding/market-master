@@ -68,7 +68,12 @@ import {
   preselectBackTestOptions,
 } from "@/constants/chartOptions";
 import Loading from "../Loading";
-import { EmitteryContext, OnContronPanel } from "@/providers/EmitteryProvider";
+import {
+  EmitteryContext,
+  OnCandlestickData,
+  OnContronPanel,
+  OnLeftAside,
+} from "@/providers/EmitteryProvider";
 import { logout } from "@/app/(root)/auth/login/logout";
 import { GrLogout } from "react-icons/gr";
 import { AuthContext } from "@/context/Auth";
@@ -443,12 +448,22 @@ const Navbar: React.FC<NavbarProps> = ({
   const [resumeBackTestPayload, setResumeBackTestPayload] =
     useState<null | CreateRecordDto>(null);
 
+  const enterBackTestModeWhenDataLoaded = () => {
+    enterBackTestMode(resumeBackTestPayload?.sliceLeft!);
+    emittery?.off(OnCandlestickData.Loaded, enterBackTestModeWhenDataLoaded);
+    Promise.resolve().then(() => {
+      emittery?.emit(OnLeftAside.AutoResize);
+      scrollToEnd();
+    });
+  };
+
   const resumeConfirm = useCallback(() => {
     if (!resumeBackTestPayload) return;
+    emittery?.on(OnCandlestickData.Loaded, enterBackTestModeWhenDataLoaded);
     dispatch(setCurrentSymbol(resumeBackTestPayload.symbol_id));
     dispatch(setCurrentPeriod(`${resumeBackTestPayload.period_id}`));
     setAlertDialogOpen(false);
-  }, [dispatch, resumeBackTestPayload]);
+  }, [dispatch, resumeBackTestPayload, emittery]);
 
   useEffect(() => {
     checkBackTestRecord().then((res) => {
@@ -490,6 +505,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 )}
                 variant={"ghost"}
                 onClick={openSymbolSearch}
+                disabled={isBackTestMode}
               >
                 <Search size={18} />
                 {currentSymbol?.label}
@@ -508,6 +524,7 @@ const Navbar: React.FC<NavbarProps> = ({
               <Button
                 className="nav-item px-2 gap-2 active:scale-100 nav-item-divider w-20 text-md"
                 variant={"ghost"}
+                disabled={isBackTestMode}
               >
                 <Hourglass size={20} />
                 {currentPeriod?.label}

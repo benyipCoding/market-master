@@ -62,3 +62,11 @@ export enum OnPriceLine {
 export enum OnStopLossAndTakeProfit {
   reset = "stopLoss_takeProfit_reset_active",
 }
+
+export enum OnCandlestickData {
+  Loaded = "candlestick_data_loaded",
+}
+
+export enum OnLeftAside {
+  AutoResize = "leftAside_autoResize",
+}

@@ -54,6 +54,7 @@ import { CustomLineSeriesType } from "@/hooks/interfaces";
 import { toast } from "sonner";
 import {
   EmitteryContext,
+  OnCandlestickData,
   OnContronPanel,
   OnOrderMarker,
   OnPriceLine,
@@ -72,6 +73,8 @@ const Playground = () => {
   const [bottomPanelOpen, setBottomPanelOpen] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
   const { dialogContent } = useSelector((state: RootState) => state.dialog);
+  // 监听清除LineSeries的信号
+  const { emittery } = useContext(EmitteryContext);
   const {
     currentPeriod,
     currentSymbol,
@@ -287,11 +290,10 @@ const Playground = () => {
       dispatch(setCandleDataSlice([0, data.length]));
       if (!data.length) return;
       dispatch(setHasVol(data.some((d) => !!d.volume)));
+      emittery?.emit(OnCandlestickData.Loaded);
     });
-  }, [currentPeriod, currentSymbol]);
+  }, [currentPeriod, currentSymbol, emittery]);
 
-  // 监听清除LineSeries的信号
-  const { emittery } = useContext(EmitteryContext);
   useEffect(() => {
     emittery?.on(OnContronPanel.cleanLineSeries, cleanLineSeries);
     return () => {

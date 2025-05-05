@@ -1,5 +1,11 @@
 import { cn } from "@/lib/utils";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   BottomPanelContent,
   LeftAsideBtnsProps,
@@ -30,6 +36,7 @@ import { PanelRightClose, PanelRightOpen } from "lucide-react";
 import { RiListUnordered } from "react-icons/ri";
 import { MdBarChart } from "react-icons/md";
 import { setPanelContent } from "@/store/bottomPanelSlice";
+import { EmitteryContext, OnLeftAside } from "@/providers/EmitteryProvider";
 
 const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
   className,
@@ -44,6 +51,7 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
     useSelector((state: RootState) => state.common);
   const { panelContent } = useSelector((state: RootState) => state.bottomPanel);
   const dispatch = useDispatch<AppDispatch>();
+  const { emittery } = useContext(EmitteryContext);
   // const [orderTabsOpen, setOrderTabsOpen] = useState(false);
 
   const isAutoResize = useMemo<boolean>(
@@ -189,6 +197,14 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
       document.removeEventListener("contextmenu", contextmenuHandler);
     };
   }, []);
+
+  useEffect(() => {
+    emittery?.on(OnLeftAside.AutoResize, toggleAutoResize);
+
+    return () => {
+      emittery?.off(OnLeftAside.AutoResize, toggleAutoResize);
+    };
+  }, [emittery, toggleAutoResize]);
 
   return (
     <TooltipProvider delayDuration={0}>
