@@ -158,15 +158,17 @@ export const fetchDataSlice = createSlice({
   extraReducers(builder) {
     builder.addCase(fetchPeriods.fulfilled, (state, action) => {
       state.periods = action.payload.data.filter((d: any) => d.label !== "H12"); // 过滤掉H12
-      state.currentPeriod = (action.payload.data as BaseLabelType[]).find(
-        (p) => p.label === "D1"
-      );
+      // 这部分功能挪到Navbar.tsx 483行
+      // state.currentPeriod = (action.payload.data as BaseLabelType[]).find(
+      //   (p) => p.label === "D1"
+      // );
     });
     builder.addCase(fetchSymbols.fulfilled, (state, action) => {
       state.symbols = action.payload.data;
-      state.currentSymbol = (action.payload.data as Symbol[]).find(
-        (s) => s.label === "XAUUSD"
-      );
+      // 这部分功能挪到Navbar.tsx 483行
+      // state.currentSymbol = (action.payload.data as Symbol[]).find(
+      //   (s) => s.label === "XAUUSD"
+      // );
     });
     builder.addCase(fetchCategories.fulfilled, (state, action) => {
       const arr: SymbolCategory[] = action.payload.data;

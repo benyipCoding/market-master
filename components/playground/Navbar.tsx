@@ -121,6 +121,7 @@ const Navbar: React.FC<NavbarProps> = ({
     operationMode,
     currentCandle,
     backTestRecordKey,
+    symbols,
   } = useSelector((state: RootState) => state.fetchData);
 
   const { mouseClickEventParam } = useSelector(
@@ -473,12 +474,23 @@ const Navbar: React.FC<NavbarProps> = ({
   };
 
   useEffect(() => {
+    if (!periods || !symbols) return;
     checkBackTestRecord().then((res) => {
-      if (!res.data) return;
-      setResumeBackTestPayload(res.data);
-      setAlertDialogOpen(true);
+      if (res.data) {
+        setResumeBackTestPayload(res.data);
+        setAlertDialogOpen(true);
+        return;
+      }
+
+      // 如果没有未完成的回测，则默认显示
+      dispatch(
+        setCurrentSymbol(symbols.find((s) => s.label === "XAUUSD")?.id!)
+      );
+      dispatch(
+        setCurrentPeriod(String(periods.find((p) => p.label === "D1")?.id)!)
+      );
     });
-  }, []);
+  }, [periods, symbols, dispatch]);
 
   return (
     <>
