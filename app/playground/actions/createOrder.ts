@@ -21,6 +21,7 @@ export interface CreateOrderDto {
   time: number | Time;
   expiry_time?: Date;
   operation_mode: OperationMode;
+  backtest_id: string;
 }
 
 export async function createOrder(data: CreateOrderDto) {

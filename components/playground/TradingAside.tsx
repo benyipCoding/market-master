@@ -29,7 +29,7 @@ import {
   createOrder,
   CreateOrderDto,
 } from "@/app/playground/actions/createOrder";
-import { OperationMode } from "../interfaces/Playground";
+import { OperationMode, OrderStatus } from "../interfaces/Playground";
 import { Status } from "@/utils/apis/response";
 import { toast } from "sonner";
 import {
@@ -41,7 +41,9 @@ import { fetchOpeningOrders } from "@/store/fetchDataSlice";
 import { setCurrentOrderType } from "@/store/asideSlice";
 
 const TradingAside: React.FC = () => {
-  const { currentSymbol } = useSelector((state: RootState) => state.fetchData);
+  const { currentSymbol, backTestRecordKey } = useSelector(
+    (state: RootState) => state.fetchData
+  );
   const [currentSide, setCurrentSide] = useState<OrderSide>(OrderSide.SELL);
   const { currentOrderType } = useSelector((state: RootState) => state.aside);
   const [showCalculator, setShowCalculator] = useState(false);
@@ -125,7 +127,8 @@ const TradingAside: React.FC = () => {
     }
   };
 
-  const createMarketOrder = async () => {
+  const createMarketOrder = useCallback(async () => {
+    if (!backTestRecordKey) throw new Error("Back test key is Null");
     const orderPrice =
       currentOrderType === OrderType.MARKET
         ? currentCandle?.close
@@ -145,6 +148,7 @@ const TradingAside: React.FC = () => {
       limit_price: lossAndProfitRef.current?.activeProfit
         ? lossAndProfitRef.current?.limitPrice
         : undefined,
+      backtest_id: backTestRecordKey,
     };
 
     const res = await createOrder(payload);
@@ -170,7 +174,18 @@ const TradingAside: React.FC = () => {
 
     // 查询订单表
     dispatch(fetchOpeningOrders(OperationMode.PRACTISE));
-  };
+  }, [
+    backTestRecordKey,
+    currentCandle?.close,
+    currentCandle?.time,
+    currentOrderType,
+    currentSide,
+    currentSymbol?.id,
+    dispatch,
+    emittery,
+    preOrderPrice,
+    unitValue,
+  ]);
 
   const createLimitOrder = () => {};
 

@@ -12,6 +12,7 @@ export interface CreateRecordDto {
   sliceLeft: number;
   sliceRight: number;
   key?: string;
+  id?: string;
 }
 
 export async function createOrUpdateBackTestRecord(dto: CreateRecordDto) {

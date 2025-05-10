@@ -471,7 +471,21 @@ const Navbar: React.FC<NavbarProps> = ({
     deleteBackTestRecord(resumeBackTestPayload.key);
     setResumeBackTestPayload(null);
     setAlertDialogOpen(false);
+    setDefaultSymbol();
+    setDefaultPeriod();
   };
+
+  const setDefaultSymbol = useCallback(() => {
+    if (!symbols) return;
+    dispatch(setCurrentSymbol(symbols.find((s) => s.label === "XAUUSD")?.id!));
+  }, [dispatch, symbols]);
+
+  const setDefaultPeriod = useCallback(() => {
+    if (!periods) return;
+    dispatch(
+      setCurrentPeriod(String(periods.find((p) => p.label === "D1")?.id)!)
+    );
+  }, [dispatch, periods]);
 
   useEffect(() => {
     if (!periods || !symbols) return;
@@ -481,16 +495,11 @@ const Navbar: React.FC<NavbarProps> = ({
         setAlertDialogOpen(true);
         return;
       }
-
       // 如果没有未完成的回测，则默认显示
-      dispatch(
-        setCurrentSymbol(symbols.find((s) => s.label === "XAUUSD")?.id!)
-      );
-      dispatch(
-        setCurrentPeriod(String(periods.find((p) => p.label === "D1")?.id)!)
-      );
+      setDefaultSymbol();
+      setDefaultPeriod();
     });
-  }, [periods, symbols, dispatch]);
+  }, [symbols, periods, dispatch]);
 
   return (
     <>
