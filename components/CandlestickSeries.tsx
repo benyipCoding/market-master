@@ -82,7 +82,7 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   };
 
   const addOrderMarker = useCallback(
-    ({ side, opening_price, time }: CreateOrderMarkerPayload) => {
+    ({ side, opening_price, time, latestPrice }: CreateOrderMarkerPayload) => {
       const prevMarkers = series?.markers();
       const samePosition = prevMarkers?.find((m) => {
         const payload = parseMarkerId(m.id!);
@@ -97,7 +97,10 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
         id: generateMarkerId(side, opening_price, time),
         time: time as Time,
         position: side === OrderSide.BUY ? "belowBar" : "aboveBar",
-        color: MarkerColor.profit,
+        color:
+          latestPrice === undefined
+            ? MarkerColor.profit
+            : generateMarkerColor(side, opening_price, latestPrice),
         shape: side === OrderSide.BUY ? "arrowUp" : "arrowDown",
         text: `${opening_price}`,
         size: 2,
@@ -249,43 +252,54 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     };
   }, [currentAside, removePreOrderPriceLine]);
 
+  const generateMarkerColor = (
+    side: OrderSide,
+    markerPrice: number,
+    latestPrice?: number
+  ) => {
+    if (!latestPrice) return MarkerColor.profit;
+    if (side === OrderSide.BUY) {
+      if (latestPrice >= markerPrice) return MarkerColor.profit;
+      if (latestPrice < markerPrice) return MarkerColor.loss;
+    } else if (side === OrderSide.SELL) {
+      if (latestPrice <= markerPrice) return MarkerColor.profit;
+      if (latestPrice > markerPrice) return MarkerColor.loss;
+    }
+    return MarkerColor.profit;
+  };
+
   // 刷新Markers的状态
   useEffect(() => {
     if (!series) return;
     const markers = series.markers();
     if (!markers.length) return;
     markers.forEach((m) => {
-      const side = m.id!.split("_")[0];
-      if (side === OrderSide.BUY) {
-        currentCandle!.close >= Number(m.text) &&
-          (m.color = MarkerColor.profit);
-        currentCandle!.close < Number(m.text) && (m.color = MarkerColor.loss);
-      } else if (side === OrderSide.SELL) {
-        currentCandle!.close <= Number(m.text) &&
-          (m.color = MarkerColor.profit);
-        currentCandle!.close > Number(m.text) && (m.color = MarkerColor.loss);
-      }
+      const side = m.id!.split("_")[0] as OrderSide;
+      m.color = generateMarkerColor(side, Number(m.text), currentCandle?.close);
     });
 
     series.setMarkers(markers);
   }, [currentCandle, series]);
 
-  const originLength = useRef(0);
-
+  // const originLength = useRef(0);
   // 当openingOrders有变动
   useEffect(() => {
-    if (openingOrders.length === originLength.current) return;
-    originLength.current = openingOrders.length;
-
+    // if (openingOrders.length === originLength.current) return;
+    // originLength.current = openingOrders.length;
+    if (!currentCandle) return;
     // Marker和PriceLine变动
     removeOrderMarkers();
     removeOpeningOrderPriceLines();
     openingOrders.forEach((o) => {
+      if (o.time > currentCandle?.time) return;
+
       const payload: CreateOrderMarkerPayload = {
         opening_price: Number(o.opening_price),
         side: o.side,
         time: Number(o.time),
+        latestPrice: currentCandle?.close,
       };
+
       addOrderMarker(payload);
 
       const priceLinePayload: AddPriceLinePayload = {
@@ -305,6 +319,7 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     removeOrderMarkers,
     removeOpeningOrderPriceLines,
     addPriceLine,
+    currentCandle,
   ]);
 
   return null;

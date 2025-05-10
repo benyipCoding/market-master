@@ -27,7 +27,7 @@ export interface CreateOrderDto {
 export type CreateOrderMarkerPayload = Pick<
   CreateOrderDto,
   "side" | "opening_price" | "time"
->;
+> & { latestPrice?: number };
 
 export async function createOrder(data: CreateOrderDto) {
   try {

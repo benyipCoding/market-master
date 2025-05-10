@@ -154,16 +154,6 @@ const TradingAside: React.FC = () => {
     const res = await createOrder(payload);
 
     if (res.status !== Status.OK) return toast.error(res.msg);
-    // 增加priceLine
-    // const payload2: AddPriceLinePayload = {
-    //   id: generatePriceLineId(
-    //     payload.opening_price,
-    //     PriceLineType.OpeningPrice
-    //   ),
-    //   price: payload.opening_price,
-    //   type: PriceLineType.OpeningPrice,
-    // };
-    // emittery?.emit(OnPriceLine.add, payload2);
 
     // 止损止盈的激活状态设置为false
     lossAndProfitRef.current?.setActiveProfit(false);

@@ -98,6 +98,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { IoIosWarning } from "react-icons/io";
 
 const Navbar: React.FC<NavbarProps> = ({
   className,
@@ -122,6 +123,7 @@ const Navbar: React.FC<NavbarProps> = ({
     currentCandle,
     backTestRecordKey,
     symbols,
+    openingOrders,
   } = useSelector((state: RootState) => state.fetchData);
 
   const { mouseClickEventParam } = useSelector(
@@ -140,6 +142,8 @@ const Navbar: React.FC<NavbarProps> = ({
     () => SeriesColors.find((c) => c.label === "orange")?.value,
     []
   );
+
+  const [exitDoubleCheckOpen, setExitDoubleCheckOpen] = useState(false);
 
   const {
     autoDrawing,
@@ -281,8 +285,9 @@ const Navbar: React.FC<NavbarProps> = ({
     });
   };
 
-  const exitBackTestMode = async () => {
+  const exitBackTestMode = () => {
     if (!tChartRef.current) return;
+
     // 清除所有线
     emittery?.emit(OnContronPanel.cleanLineSeries);
 
@@ -886,6 +891,27 @@ const Navbar: React.FC<NavbarProps> = ({
             <AlertDialogTitle>Continue BackTest ?</AlertDialogTitle>
             <AlertDialogDescription>
               Your last BackTest has not finished yet, do you need to continue?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={resumeCancel}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={resumeConfirm}>
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={exitDoubleCheckOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              <IoIosWarning size={28} color="yellow" /> Are you sure ?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              You have open orders. If you exit backtesting mode these orders
+              will be closed at the current price. Are you sure you want to
+              exit?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
