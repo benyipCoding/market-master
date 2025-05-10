@@ -173,7 +173,7 @@ const TradingAside: React.FC = () => {
     lossAndProfitRef.current?.setActiveStop(false);
 
     // 查询订单表
-    dispatch(fetchOpeningOrders(OperationMode.PRACTISE));
+    dispatch(fetchOpeningOrders(backTestRecordKey));
   }, [
     backTestRecordKey,
     currentCandle?.close,

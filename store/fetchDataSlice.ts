@@ -96,20 +96,21 @@ export const fetchFavSymbols = createAsyncThunk("fetch/favSymbols", () => {
 
 export const fetchOpeningOrders = createAsyncThunk(
   "fetch/openingOrders",
-  (operationMode: OperationMode) => {
+  (backtest_id: string) => {
     return getOrders({
       orderStatus: OrderStatus.EXECUTED,
-      operationMode,
+
+      backtest_id,
     });
   }
 );
 
 export const fetchLimitOrders = createAsyncThunk(
   "fetch/limitOrders",
-  (operationMode: OperationMode) => {
+  (backtest_id: string) => {
     return getOrders({
       orderStatus: OrderStatus.PENDING,
-      operationMode,
+      backtest_id,
     });
   }
 );

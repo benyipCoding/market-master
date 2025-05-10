@@ -87,7 +87,8 @@ export enum OperationMode {
 
 export interface ListOrderDto {
   orderStatus: OrderStatus;
-  operationMode: OperationMode;
+  // operationMode: OperationMode;
+  backtest_id: string;
 }
 
 export interface Order {

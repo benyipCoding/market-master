@@ -64,6 +64,7 @@ const OrdersPanel = () => {
     limitOrders,
     currentCandle,
     isBackTestMode,
+    backTestRecordKey,
   } = useSelector((state: RootState) => state.fetchData);
   const { currentOrderTab } = useSelector(
     (state: RootState) => state.bottomPanel
@@ -159,8 +160,12 @@ const OrdersPanel = () => {
   }, [currentOrderTab]);
 
   useEffect(() => {
-    dispatch(fetchOpeningOrders(OperationMode.PRACTISE));
-    dispatch(fetchLimitOrders(OperationMode.PRACTISE));
+    if (!backTestRecordKey) return;
+    dispatch(fetchOpeningOrders(backTestRecordKey));
+    dispatch(fetchLimitOrders(backTestRecordKey));
+  }, [backTestRecordKey, dispatch]);
+
+  useEffect(() => {
     return () => {
       if (obs.current) {
         obs.current?.disconnect();
