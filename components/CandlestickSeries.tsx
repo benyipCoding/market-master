@@ -27,7 +27,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { setAvgAmplitude, symbolToSeriesOptions } from "@/store/fetchDataSlice";
-import { CreateOrderDto } from "@/app/playground/actions/createOrder";
+import { CreateOrderMarkerPayload } from "@/app/playground/actions/createOrder";
 import {
   limitOrderPriceLineOptions,
   openingOrderPriceLineOptions,
@@ -35,6 +35,7 @@ import {
   takeProfitPriceLineOptions,
 } from "@/constants/seriesOptions";
 import { AsideContent } from "./interfaces/Playground";
+import { generatePriceLineId } from "@/utils/helpers";
 
 const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   seriesData,
@@ -47,7 +48,7 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const priceLines = useRef<IPriceLine[]>([]);
   const { currentAside } = useSelector((state: RootState) => state.aside);
-  const { isBackTestMode, currentCandle } = useSelector(
+  const { isBackTestMode, currentCandle, openingOrders } = useSelector(
     (state: RootState) => state.fetchData
   );
 
@@ -81,9 +82,8 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   };
 
   const addOrderMarker = useCallback(
-    ({ side, opening_price, time }: CreateOrderDto) => {
+    ({ side, opening_price, time }: CreateOrderMarkerPayload) => {
       const prevMarkers = series?.markers();
-
       const samePosition = prevMarkers?.find((m) => {
         const payload = parseMarkerId(m.id!);
         return payload.side === side && payload.time === time;
@@ -107,15 +107,6 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     },
     [series]
   );
-
-  // const updateOrderMarker = useCallback(
-  //   (id: string, options: SeriesMarker<Time>) => {
-  //     const targetMarker = series?.markers().find((m) => m.id === id);
-  //     if (!targetMarker) return;
-  //     console.log({ targetMarker });
-  //   },
-  //   [series]
-  // );
 
   const removeOrderMarkers = useCallback(() => {
     series?.setMarkers([]);
@@ -160,11 +151,13 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     [series]
   );
 
-  const addPriceLine = (payload: AddPriceLinePayload) => {
-    const priceLine = createPriceLine(payload);
-    priceLines.current.push(priceLine!);
-    console.log(priceLine?.options().id);
-  };
+  const addPriceLine = useCallback(
+    (payload: AddPriceLinePayload) => {
+      const priceLine = createPriceLine(payload);
+      priceLines.current.push(priceLine!);
+    },
+    [createPriceLine]
+  );
 
   const removePriceLine = (id: string | undefined) => {
     if (!id) return;
@@ -190,11 +183,18 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     );
   }, [series]);
 
-  // const clearPriceLine = useCallback(() => {
-  //   priceLines.current.forEach((p) => {
-  //     series?.removePriceLine(p);
-  //   });
-  // }, [series]);
+  const removeOpeningOrderPriceLines = useCallback(() => {
+    const targets = priceLines.current.filter((p) =>
+      p.options().id?.includes(PriceLineType.OpeningPrice)
+    );
+    if (!targets.length) return;
+    targets.forEach((t) => {
+      series?.removePriceLine(t);
+      priceLines.current = priceLines.current.filter(
+        (p) => p.options().id !== t.options().id
+      );
+    });
+  }, [series]);
 
   useEffect(() => {
     emittery?.on(OnApply.ResetMainSeriesData, resetDataHandler);
@@ -249,11 +249,11 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     };
   }, [currentAside, removePreOrderPriceLine]);
 
+  // 刷新Markers的状态
   useEffect(() => {
     if (!series) return;
     const markers = series.markers();
     if (!markers.length) return;
-
     markers.forEach((m) => {
       const side = m.id!.split("_")[0];
       if (side === OrderSide.BUY) {
@@ -269,6 +269,43 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
 
     series.setMarkers(markers);
   }, [currentCandle, series]);
+
+  const originLength = useRef(0);
+
+  // 当openingOrders有变动
+  useEffect(() => {
+    if (openingOrders.length === originLength.current) return;
+    originLength.current = openingOrders.length;
+
+    // Marker和PriceLine变动
+    removeOrderMarkers();
+    removeOpeningOrderPriceLines();
+    openingOrders.forEach((o) => {
+      const payload: CreateOrderMarkerPayload = {
+        opening_price: Number(o.opening_price),
+        side: o.side,
+        time: Number(o.time),
+      };
+      addOrderMarker(payload);
+
+      const priceLinePayload: AddPriceLinePayload = {
+        id: generatePriceLineId(
+          payload.opening_price,
+          PriceLineType.OpeningPrice
+        ),
+        price: payload.opening_price,
+        type: PriceLineType.OpeningPrice,
+      };
+
+      addPriceLine(priceLinePayload);
+    });
+  }, [
+    addOrderMarker,
+    openingOrders,
+    removeOrderMarkers,
+    removeOpeningOrderPriceLines,
+    addPriceLine,
+  ]);
 
   return null;
 };

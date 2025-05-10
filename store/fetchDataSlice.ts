@@ -99,7 +99,6 @@ export const fetchOpeningOrders = createAsyncThunk(
   (backtest_id: string) => {
     return getOrders({
       orderStatus: OrderStatus.EXECUTED,
-
       backtest_id,
     });
   }

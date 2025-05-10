@@ -50,7 +50,6 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ dragConstraints }) => {
 
   const playAction = (interval: number = 1000) => {
     const timeId = setInterval(() => {
-      console.log("Inside setInterval callback");
       emittery?.emit(OnContronPanel.nextTick);
     }, interval);
 

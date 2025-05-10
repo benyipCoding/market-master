@@ -24,6 +24,11 @@ export interface CreateOrderDto {
   backtest_id: string;
 }
 
+export type CreateOrderMarkerPayload = Pick<
+  CreateOrderDto,
+  "side" | "opening_price" | "time"
+>;
+
 export async function createOrder(data: CreateOrderDto) {
   try {
     const res = await request.post("/orders", data);

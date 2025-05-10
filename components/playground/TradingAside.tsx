@@ -29,7 +29,7 @@ import {
   createOrder,
   CreateOrderDto,
 } from "@/app/playground/actions/createOrder";
-import { OperationMode, OrderStatus } from "../interfaces/Playground";
+import { OperationMode } from "../interfaces/Playground";
 import { Status } from "@/utils/apis/response";
 import { toast } from "sonner";
 import {
@@ -154,19 +154,16 @@ const TradingAside: React.FC = () => {
     const res = await createOrder(payload);
 
     if (res.status !== Status.OK) return toast.error(res.msg);
-    // 增加marker
-    emittery?.emit(OnOrderMarker.add, payload);
-
     // 增加priceLine
-    const payload2: AddPriceLinePayload = {
-      id: generatePriceLineId(
-        payload.opening_price,
-        PriceLineType.OpeningPrice
-      ),
-      price: payload.opening_price,
-      type: PriceLineType.OpeningPrice,
-    };
-    emittery?.emit(OnPriceLine.add, payload2);
+    // const payload2: AddPriceLinePayload = {
+    //   id: generatePriceLineId(
+    //     payload.opening_price,
+    //     PriceLineType.OpeningPrice
+    //   ),
+    //   price: payload.opening_price,
+    //   type: PriceLineType.OpeningPrice,
+    // };
+    // emittery?.emit(OnPriceLine.add, payload2);
 
     // 止损止盈的激活状态设置为false
     lossAndProfitRef.current?.setActiveProfit(false);
@@ -182,7 +179,6 @@ const TradingAside: React.FC = () => {
     currentSide,
     currentSymbol?.id,
     dispatch,
-    emittery,
     preOrderPrice,
     unitValue,
   ]);
