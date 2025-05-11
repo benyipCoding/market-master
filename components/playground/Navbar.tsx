@@ -7,7 +7,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { NavbarProps, OperationMode } from "../interfaces/Playground";
+import { NavbarProps, OperationMode, Order } from "../interfaces/Playground";
 import { setSelectedIndicator, setSelectedSeries } from "@/store/commonSlice";
 import { setDialogContent, DialogContentType } from "@/store/dialogSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -100,6 +100,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { IoIosWarning } from "react-icons/io";
+import { postClosePosition } from "@/app/playground/actions/postClosePosition";
 
 const Navbar: React.FC<NavbarProps> = ({
   className,
@@ -307,12 +308,18 @@ const Navbar: React.FC<NavbarProps> = ({
     });
   };
 
+  const orderClosePosition = async (order: Order) => {
+    const res = await postClosePosition(order.id);
+    console.log(res);
+  };
+
   const exitBackTestMode = useCallback(async () => {
     if (!tChartRef.current) return;
     try {
       if (openingOrders.length) {
         await doubleCheck();
         console.log("平仓操作");
+        await orderClosePosition(openingOrders[0]);
       }
 
       exitBackTestModeAction();
@@ -439,8 +446,12 @@ const Navbar: React.FC<NavbarProps> = ({
     else dispatch(setOperationMode(OperationMode.PRACTISE));
   }, [isBlindbox]);
 
+  const latestPrice = useRef<number | undefined>(undefined);
   const enterBackTestSideEffect = useCallback(async () => {
     if (!currentCandle || !currentPeriod || !currentSymbol) return;
+    if (latestPrice.current === currentCandle.close) return;
+    latestPrice.current = currentCandle.close;
+
     const payload: CreateRecordDto = {
       latest_price: currentCandle.close,
       operation_mode: operationMode,

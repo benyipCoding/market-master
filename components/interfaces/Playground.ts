@@ -109,6 +109,7 @@ export interface Order {
   time: string;
   update_at: Date;
   user_id: string;
+  profit?: number;
 }
 
 export enum AsideContent {

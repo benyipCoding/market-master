@@ -281,11 +281,8 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     series.setMarkers(markers);
   }, [currentCandle, series]);
 
-  // const originLength = useRef(0);
   // 当openingOrders有变动
   useEffect(() => {
-    // if (openingOrders.length === originLength.current) return;
-    // originLength.current = openingOrders.length;
     if (!currentCandle) return;
     // Marker和PriceLine变动
     removeOrderMarkers();
