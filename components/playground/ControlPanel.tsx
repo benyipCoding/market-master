@@ -15,18 +15,6 @@ import {
 } from "../ui/tooltip";
 import { IoMdPause } from "react-icons/io";
 import hotkeys from "hotkeys-js";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 
 interface ControlPanelProps {
   dragConstraints: React.RefObject<HTMLDivElement> | undefined;
@@ -37,8 +25,6 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ dragConstraints }) => {
   const { emittery } = useContext(EmitteryContext);
   const [isPlaying, setIsPlaying] = useState(false);
   const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
-  const { openingOrders } = useSelector((state: RootState) => state.fetchData);
-  const [alertDialogOpen, setAlertDialogOpen] = useState(false);
   const startDrag = (event: React.PointerEvent<HTMLDivElement>) => {
     dragControls?.start(event);
   };
@@ -59,9 +45,6 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ dragConstraints }) => {
   const togglePlayingState = () => setIsPlaying((prev) => !prev);
 
   const handleExitBackTest = () => {
-    if (openingOrders.length) {
-      setAlertDialogOpen(true);
-    }
     stopPlaying(true);
   };
 
@@ -190,21 +173,6 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ dragConstraints }) => {
           </div>
         </motion.div>
       </TooltipProvider>
-
-      <AlertDialog open={alertDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Continue BackTest ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Your last BackTest has not finished yet, do you need to continue?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction>Confirm</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 };

@@ -4,6 +4,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { NavbarProps, OperationMode } from "../interfaces/Playground";
@@ -142,8 +143,6 @@ const Navbar: React.FC<NavbarProps> = ({
     () => SeriesColors.find((c) => c.label === "orange")?.value,
     []
   );
-
-  const [exitDoubleCheckOpen, setExitDoubleCheckOpen] = useState(false);
 
   const {
     autoDrawing,
@@ -285,9 +284,11 @@ const Navbar: React.FC<NavbarProps> = ({
     });
   };
 
-  const exitBackTestMode = () => {
-    if (!tChartRef.current) return;
+  const [exitDoubleCheckOpen, setExitDoubleCheckOpen] = useState(false);
+  const doubleCheckCancelRef = useRef<HTMLButtonElement>(null);
+  const doubleCheckConfirmRef = useRef<HTMLButtonElement>(null);
 
+  const exitBackTestModeAction = () => {
     // 清除所有线
     emittery?.emit(OnContronPanel.cleanLineSeries);
 
@@ -295,6 +296,32 @@ const Navbar: React.FC<NavbarProps> = ({
       dispatch(setIsBackTestMode(false));
     });
   };
+
+  const doubleCheck = () => {
+    return new Promise((resolve, reject) => {
+      setExitDoubleCheckOpen(true);
+      Promise.resolve().then(() => {
+        doubleCheckConfirmRef.current!.onclick = () => resolve(true);
+        doubleCheckCancelRef.current!.onclick = () => reject();
+      });
+    });
+  };
+
+  const exitBackTestMode = useCallback(async () => {
+    if (!tChartRef.current) return;
+    try {
+      if (openingOrders.length) {
+        await doubleCheck();
+        console.log("平仓操作");
+      }
+
+      exitBackTestModeAction();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setExitDoubleCheckOpen(false);
+    }
+  }, [openingOrders]);
 
   const autoDrawAction = (
     e: KeyboardEvent | React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -405,7 +432,7 @@ const Navbar: React.FC<NavbarProps> = ({
       emittery?.off(OnContronPanel.nextTick, onNextTick);
       emittery?.off(OnContronPanel.prevTick, onPrevTick);
     };
-  }, [emittery, onNextTick]);
+  }, [emittery, onNextTick, exitBackTestMode, onPrevTick]);
 
   useEffect(() => {
     if (isBlindbox) dispatch(setOperationMode(OperationMode.BLINDBOX));
@@ -906,17 +933,21 @@ const Navbar: React.FC<NavbarProps> = ({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              <IoIosWarning size={28} color="yellow" /> Are you sure ?
+              <div className="flex items-center gap-2">
+                <IoIosWarning size={28} color="yellow" /> Open orders will be
+                closed
+              </div>
             </AlertDialogTitle>
             <AlertDialogDescription>
-              You have open orders. If you exit backtesting mode these orders
-              will be closed at the current price. Are you sure you want to
-              exit?
+              You have open orders. Exiting BackTest mode will close these
+              orders at the current price. Are you sure to exit?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={resumeCancel}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={resumeConfirm}>
+            <AlertDialogCancel ref={doubleCheckCancelRef}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction ref={doubleCheckConfirmRef}>
               Confirm
             </AlertDialogAction>
           </AlertDialogFooter>
