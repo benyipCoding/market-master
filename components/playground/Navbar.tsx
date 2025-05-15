@@ -460,15 +460,15 @@ const Navbar: React.FC<NavbarProps> = ({
       sliceLeft,
       sliceRight,
     };
-    console.log(payload);
 
-    // const res = await createOrUpdateBackTestRecord(payload);
-    // if (res.status !== Status.OK) return toast.error(res.msg);
-    // dispatch(setBackTestRecordKey(res.data));
+    const res = await createOrUpdateBackTestRecord(payload);
+    if (res.status !== Status.OK) return toast.error(res.msg);
+    dispatch(setBackTestRecordKey(res.data));
   }, [
     currentCandle,
     currentPeriod,
     currentSymbol,
+    dispatch,
     operationMode,
     sliceLeft,
     sliceRight,
@@ -476,7 +476,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
   const exitBackTestSideEffect = useCallback(() => {
     if (!backTestRecordKey) return;
-    deleteBackTestRecord(backTestRecordKey);
+    deleteBackTestRecord();
     dispatch(setBackTestRecordKey(undefined));
   }, [backTestRecordKey, dispatch]);
 
@@ -511,7 +511,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
   const resumeCancel = () => {
     if (!resumeBackTestPayload?.key) return;
-    deleteBackTestRecord(resumeBackTestPayload.key);
+    deleteBackTestRecord();
     setResumeBackTestPayload(null);
     setAlertDialogOpen(false);
     setDefaultSymbol();
