@@ -41,6 +41,7 @@ import {
 } from "../ui/dropdown-menu";
 import { ScrollArea } from "../ui/scroll-area";
 import {
+  clearOrders,
   setBackTestRecordKey,
   setCandleDataSlice,
   setCurrentPeriod,
@@ -308,18 +309,17 @@ const Navbar: React.FC<NavbarProps> = ({
     });
   };
 
-  const orderClosePosition = async (order: Order) => {
-    const res = await postClosePosition(order.id);
-    console.log(res);
-  };
-
   const exitBackTestMode = useCallback(async () => {
-    if (!tChartRef.current) return;
+    if (!tChartRef.current || !backTestRecordKey) return;
     try {
       if (openingOrders.length) {
         await doubleCheck();
-        console.log("平仓操作");
-        await orderClosePosition(openingOrders[0]);
+        const tasks: Promise<any>[] = [];
+        openingOrders.forEach((o) => {
+          tasks.push(postClosePosition(o.id));
+        });
+        await Promise.all(tasks);
+        dispatch(clearOrders());
       }
 
       exitBackTestModeAction();
@@ -328,7 +328,7 @@ const Navbar: React.FC<NavbarProps> = ({
     } finally {
       setExitDoubleCheckOpen(false);
     }
-  }, [openingOrders]);
+  }, [backTestRecordKey, openingOrders]);
 
   const autoDrawAction = (
     e: KeyboardEvent | React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -460,15 +460,15 @@ const Navbar: React.FC<NavbarProps> = ({
       sliceLeft,
       sliceRight,
     };
+    console.log(payload);
 
-    const res = await createOrUpdateBackTestRecord(payload);
-    if (res.status !== Status.OK) return toast.error(res.msg);
-    dispatch(setBackTestRecordKey(res.data));
+    // const res = await createOrUpdateBackTestRecord(payload);
+    // if (res.status !== Status.OK) return toast.error(res.msg);
+    // dispatch(setBackTestRecordKey(res.data));
   }, [
     currentCandle,
     currentPeriod,
     currentSymbol,
-    dispatch,
     operationMode,
     sliceLeft,
     sliceRight,

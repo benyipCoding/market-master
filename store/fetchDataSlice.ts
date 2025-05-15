@@ -55,6 +55,7 @@ interface FetchDataState {
   currentCandle: CandlestickData<Time> | undefined;
   operationMode: OperationMode;
   backTestRecordKey: string | undefined;
+  closedOrders: Order[];
 }
 
 const initialState: FetchDataState = {
@@ -73,6 +74,7 @@ const initialState: FetchDataState = {
   hasVol: false,
   openingOrders: [],
   limitOrders: [],
+  closedOrders: [],
   currentCandle: undefined,
   operationMode: OperationMode.PRACTISE,
   backTestRecordKey: undefined,
@@ -99,6 +101,16 @@ export const fetchOpeningOrders = createAsyncThunk(
   (backtest_id: string) => {
     return getOrders({
       orderStatus: OrderStatus.EXECUTED,
+      backtest_id,
+    });
+  }
+);
+
+export const fetchClosedOrders = createAsyncThunk(
+  "fetch/closedOrders",
+  (backtest_id: string) => {
+    return getOrders({
+      orderStatus: OrderStatus.CLOSED,
       backtest_id,
     });
   }
@@ -154,6 +166,11 @@ export const fetchDataSlice = createSlice({
     setBackTestRecordKey(state, action: PayloadAction<string | undefined>) {
       state.backTestRecordKey = action.payload;
     },
+    clearOrders(state) {
+      state.openingOrders = [];
+      state.limitOrders = [];
+      state.closedOrders = [];
+    },
   },
   extraReducers(builder) {
     builder.addCase(fetchPeriods.fulfilled, (state, action) => {
@@ -185,6 +202,9 @@ export const fetchDataSlice = createSlice({
     builder.addCase(fetchLimitOrders.fulfilled, (state, action) => {
       state.limitOrders = action.payload.data;
     });
+    builder.addCase(fetchClosedOrders.fulfilled, (state, action) => {
+      state.closedOrders = action.payload.data;
+    });
   },
 });
 
@@ -214,6 +234,7 @@ export const {
   setCurrentCandle,
   setOperationMode,
   setBackTestRecordKey,
+  clearOrders,
 } = fetchDataSlice.actions;
 
 export default fetchDataSlice.reducer;

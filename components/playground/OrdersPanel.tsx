@@ -19,7 +19,11 @@ import {
 import { ScrollArea } from "../ui/scroll-area";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
-import { fetchLimitOrders, fetchOpeningOrders } from "@/store/fetchDataSlice";
+import {
+  fetchClosedOrders,
+  fetchLimitOrders,
+  fetchOpeningOrders,
+} from "@/store/fetchDataSlice";
 import {
   OperationMode,
   Order,
@@ -61,6 +65,7 @@ const OrdersPanel = () => {
   const {
     openingOrders,
     operationMode,
+    closedOrders,
     limitOrders,
     currentCandle,
     isBackTestMode,
@@ -94,8 +99,10 @@ const OrdersPanel = () => {
       return openingOrders.map((order) => transferNullToStr(order));
     else if (currentOrderTab === OrderTabs.Limit)
       return limitOrders.map((order) => transferNullToStr(order));
+    else if (currentOrderTab === OrderTabs.Closed)
+      return closedOrders.map((order) => transferNullToStr(order));
     else return [];
-  }, [currentOrderTab, openingOrders, limitOrders]);
+  }, [currentOrderTab, openingOrders, limitOrders, closedOrders]);
 
   const switchOrderTab = (tab: OrderTabs) => {
     dispatch(setCurrentOrderTab(tab));
@@ -144,11 +151,12 @@ const OrdersPanel = () => {
     [currentCandle]
   );
 
-  const closePosition = async () => {
-    if (!currentRowOrderId) return;
-    const res = await postClosePosition(currentRowOrderId);
-    console.log(res);
-  };
+  const closePosition = useCallback(async () => {
+    if (!currentRowOrderId || !backTestRecordKey) return;
+    await postClosePosition(currentRowOrderId);
+    dispatch(fetchOpeningOrders(backTestRecordKey));
+    dispatch(fetchClosedOrders(backTestRecordKey));
+  }, [currentRowOrderId, dispatch, backTestRecordKey]);
 
   useEffect(() => {
     if (!currentOrderTab) return;
@@ -163,6 +171,7 @@ const OrdersPanel = () => {
     if (!backTestRecordKey) return;
     dispatch(fetchOpeningOrders(backTestRecordKey));
     dispatch(fetchLimitOrders(backTestRecordKey));
+    dispatch(fetchClosedOrders(backTestRecordKey));
   }, [backTestRecordKey, dispatch]);
 
   useEffect(() => {
