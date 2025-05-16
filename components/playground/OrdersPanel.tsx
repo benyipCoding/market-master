@@ -59,33 +59,23 @@ import {
 import Big from "big.js";
 import { OrderSide } from "../interfaces/CandlestickSeries";
 import { postClosePosition } from "@/app/playground/actions/postClosePosition";
+import { getProfile } from "@/app/playground/actions/getProfile";
 
 const OrdersPanel = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const { setUserProfile } = useContext(AuthContext);
   const {
     openingOrders,
     operationMode,
     closedOrders,
     limitOrders,
     currentCandle,
-    isBackTestMode,
     backTestRecordKey,
   } = useSelector((state: RootState) => state.fetchData);
   const { currentOrderTab } = useSelector(
     (state: RootState) => state.bottomPanel
   );
   const { userInfo, userProfile } = useContext(AuthContext);
-  const displayBalance = useMemo(() => {
-    if (operationMode === OperationMode.PRACTISE) {
-      return userProfile?.balance_p
-        ? formatNumberWithCommas(userProfile.balance_p)
-        : 0;
-    } else {
-      return userProfile?.balance_b
-        ? formatNumberWithCommas(userProfile.balance_b)
-        : 0;
-    }
-  }, [operationMode, userProfile?.balance_b, userProfile?.balance_p]);
 
   // slide block
   const [slideBlock, setSlideBlock] = useState({
@@ -151,11 +141,38 @@ const OrdersPanel = () => {
     [currentCandle]
   );
 
+  // 浮动盈亏
+  const displayProfitLoss = useMemo(() => {
+    return openingOrders.reduce(
+      (total, order) =>
+        Number(new Big(total).add(calFloatingProfit(order)).toFixed(2)),
+      0
+    );
+  }, [calFloatingProfit, openingOrders]);
+
+  // 浮动余额
+  const displayBalance = useMemo(() => {
+    if (!userProfile) return 0;
+
+    if (operationMode === OperationMode.PRACTISE) {
+      const balance = Number(
+        new Big(userProfile.balance_p).add(displayProfitLoss).toFixed(2)
+      );
+      return formatNumberWithCommas(balance);
+    } else {
+      const balance = Number(
+        new Big(userProfile.balance_b).add(displayProfitLoss).toFixed(2)
+      );
+      return formatNumberWithCommas(balance);
+    }
+  }, [displayProfitLoss, operationMode, userProfile]);
+
   const closePosition = useCallback(async () => {
     if (!currentRowOrderId || !backTestRecordKey) return;
     await postClosePosition(currentRowOrderId);
     dispatch(fetchOpeningOrders(backTestRecordKey));
     dispatch(fetchClosedOrders(backTestRecordKey));
+    getProfile().then((res) => setUserProfile(res.data));
   }, [currentRowOrderId, dispatch, backTestRecordKey]);
 
   useEffect(() => {
@@ -210,17 +227,17 @@ const OrdersPanel = () => {
         ></div>
 
         <div className="absolute right-0 h-full flex">
-          <div className="w-32">
+          <div className="min-w-32">
             <p className="text-xs">Account</p>
             <p>{userInfo?.display_name}</p>
           </div>
-          <div className="w-32">
+          <div className="min-w-32">
             <p className="text-xs">Balance</p>
-            <p>{displayBalance} $</p>
+            <p>$ {displayBalance}</p>
           </div>
-          <div className="w-32">
+          <div className="min-w-32">
             <p className="text-xs">Profit / Loss</p>
-            <p>0 $</p>
+            <p>$ {displayProfitLoss}</p>
           </div>
         </div>
       </div>

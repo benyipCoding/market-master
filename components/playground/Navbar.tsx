@@ -102,6 +102,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { IoIosWarning } from "react-icons/io";
 import { postClosePosition } from "@/app/playground/actions/postClosePosition";
+import { getProfile } from "@/app/playground/actions/getProfile";
 
 const Navbar: React.FC<NavbarProps> = ({
   className,
@@ -113,7 +114,7 @@ const Navbar: React.FC<NavbarProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const { dialogContent } = useSelector((state: RootState) => state.dialog);
   const { emittery } = useContext(EmitteryContext);
-  const { userInfo } = useContext(AuthContext);
+  const { userInfo, setUserProfile } = useContext(AuthContext);
   const {
     periods,
     currentPeriod,
@@ -239,14 +240,14 @@ const Navbar: React.FC<NavbarProps> = ({
     });
   }, [isBackTestMode, sliceLeft]);
 
-  const onPrevTick = useCallback(() => {
-    const length = tChartRef.current?.childSeries[0].data().length;
-    if (!isBackTestMode || sliceLeft === length) return;
-    dispatch(setCandleDataSlice([sliceLeft + 1]));
-    Promise.resolve().then(() => {
-      differDrawAction(DifferDrawType.Decremental);
-    });
-  }, [isBackTestMode, sliceLeft]);
+  // const onPrevTick = useCallback(() => {
+  //   const length = tChartRef.current?.childSeries[0].data().length;
+  //   if (!isBackTestMode || sliceLeft === length) return;
+  //   dispatch(setCandleDataSlice([sliceLeft + 1]));
+  //   Promise.resolve().then(() => {
+  //     differDrawAction(DifferDrawType.Decremental);
+  //   });
+  // }, [isBackTestMode, sliceLeft]);
 
   const preselectBackTest = useCallback(() => {
     if (!isPreselect && !isBackTestMode) dispatch(setIsPreselect(true));
@@ -297,6 +298,8 @@ const Navbar: React.FC<NavbarProps> = ({
     freezeRange(() => {
       dispatch(setIsBackTestMode(false));
     });
+
+    dispatch(clearOrders());
   };
 
   const doubleCheck = () => {
@@ -319,7 +322,7 @@ const Navbar: React.FC<NavbarProps> = ({
           tasks.push(postClosePosition(o.id));
         });
         await Promise.all(tasks);
-        dispatch(clearOrders());
+        getProfile().then((res) => setUserProfile(res.data));
       }
 
       exitBackTestModeAction();
@@ -427,19 +430,19 @@ const Navbar: React.FC<NavbarProps> = ({
 
   useEffect(() => {
     hotkeys("n", onNextTick);
-    hotkeys("b", onPrevTick);
+    // hotkeys("b", onPrevTick);
     emittery?.on(OnContronPanel.exit, exitBackTestMode);
     emittery?.on(OnContronPanel.nextTick, onNextTick);
-    emittery?.on(OnContronPanel.prevTick, onPrevTick);
+    // emittery?.on(OnContronPanel.prevTick, onPrevTick);
 
     return () => {
       hotkeys.unbind("n");
-      hotkeys.unbind("b");
+      // hotkeys.unbind("b");
       emittery?.off(OnContronPanel.exit, exitBackTestMode);
       emittery?.off(OnContronPanel.nextTick, onNextTick);
-      emittery?.off(OnContronPanel.prevTick, onPrevTick);
+      // emittery?.off(OnContronPanel.prevTick, onPrevTick);
     };
-  }, [emittery, onNextTick, exitBackTestMode, onPrevTick]);
+  }, [emittery, onNextTick, exitBackTestMode]);
 
   useEffect(() => {
     if (isBlindbox) dispatch(setOperationMode(OperationMode.BLINDBOX));

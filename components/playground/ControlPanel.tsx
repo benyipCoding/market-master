@@ -92,7 +92,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ dragConstraints }) => {
           className="bg-background border absolute left-1/2 top-0 z-50 flex p-1 rounded-lg items-center"
         >
           {/* Previous tick */}
-          <Tooltip>
+          {/* <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 className="px-2 active:scale-100"
@@ -107,7 +107,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ dragConstraints }) => {
               <p className="nav-item-divider">Previous tick</p>
               <span className="short-cut">B</span>
             </TooltipContent>
-          </Tooltip>
+          </Tooltip> */}
 
           {/* Play & Pause*/}
           <Tooltip>
