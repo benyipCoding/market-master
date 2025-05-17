@@ -57,9 +57,9 @@ const LeftAsideBtns: React.FC<LeftAsideBtnsProps> = ({
   const isAutoResize = useMemo<boolean>(
     () =>
       !!tChartRef.current
-        ? tChartRef.current?.chart.options().rightPriceScale.autoScale
+        ? tChartRef.current?.chart?.options().rightPriceScale.autoScale
         : false,
-    [tChartRef.current?.chart.options().rightPriceScale.autoScale]
+    [tChartRef.current?.chart?.options().rightPriceScale.autoScale]
   );
 
   const toggleDrawingLineSegment = useCallback(() => {

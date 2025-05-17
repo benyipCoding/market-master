@@ -123,7 +123,7 @@ export const limitOrderPriceLineOptions: Partial<PriceLineOptions> = {
 
 export const openingOrderPriceLineOptions: Partial<PriceLineOptions> = {
   lineStyle: LineStyle.LargeDashed,
-  color: "gray",
+  color: "#cad2d9",
   lineWidth: 1 as LineWidth,
   axisLabelVisible: true,
   title: "",

@@ -247,7 +247,7 @@ const OrdersPanel = () => {
           onOpenChange={(open) => !open && setCurrentRowOrderId(null)}
         >
           <ContextMenuTrigger>
-            <Table>
+            <Table className="text-base">
               <TableCaption>
                 {displayOrders.length ? "" : "No order data"}
               </TableCaption>
