@@ -99,6 +99,11 @@ export const stopLossPriceLineOptions: Partial<PriceLineOptions> = {
   axisLabelColor: "#ff6c37",
 };
 
+export const openOrderStopLoss: Partial<PriceLineOptions> = {
+  ...stopLossPriceLineOptions,
+  lineStyle: LineStyle.LargeDashed,
+};
+
 export const takeProfitPriceLineOptions: Partial<PriceLineOptions> = {
   lineStyle: LineStyle.Dashed,
   color: "#0ccf67",
@@ -108,6 +113,11 @@ export const takeProfitPriceLineOptions: Partial<PriceLineOptions> = {
   lineVisible: true,
   axisLabelTextColor: "white",
   axisLabelColor: "#0ccf67",
+};
+
+export const openOrderTakeProfit: Partial<PriceLineOptions> = {
+  ...takeProfitPriceLineOptions,
+  lineStyle: LineStyle.LargeDashed,
 };
 
 export const limitOrderPriceLineOptions: Partial<PriceLineOptions> = {

@@ -38,6 +38,8 @@ import { CreateOrderMarkerPayload } from "@/app/playground/actions/createOrder";
 import {
   limitOrderPriceLineOptions,
   openingOrderPriceLineOptions,
+  openOrderStopLoss,
+  openOrderTakeProfit,
   stopLossPriceLineOptions,
   takeProfitPriceLineOptions,
 } from "@/constants/seriesOptions";
@@ -153,6 +155,12 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
             priceLine,
             openingOrderPriceLineOptions
           );
+          break;
+        case PriceLineType.OpenOrderStopLoss:
+          priceLine = Object.assign({}, priceLine, openOrderStopLoss);
+          break;
+        case PriceLineType.OpenOrderTakeProfit:
+          priceLine = Object.assign({}, priceLine, openOrderTakeProfit);
           break;
 
         default:
@@ -344,6 +352,28 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
       };
 
       addPriceLine(priceLinePayload);
+
+      // 如果有止损
+      if (o.stop_price) {
+        priceLinePayload.id = generatePriceLineId(
+          o.stop_price,
+          PriceLineType.OpenOrderStopLoss
+        );
+        priceLinePayload.price = Number(o.stop_price);
+        priceLinePayload.type = PriceLineType.OpenOrderStopLoss;
+        addPriceLine(priceLinePayload);
+      }
+
+      // 如果有止盈
+      if (o.limit_price) {
+        priceLinePayload.id = generatePriceLineId(
+          o.limit_price,
+          PriceLineType.OpenOrderTakeProfit
+        );
+        priceLinePayload.price = Number(o.limit_price);
+        priceLinePayload.type = PriceLineType.OpenOrderTakeProfit;
+        addPriceLine(priceLinePayload);
+      }
     });
   }, [
     addOrderMarker,
