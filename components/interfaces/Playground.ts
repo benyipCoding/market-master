@@ -60,7 +60,7 @@ export enum OrderTabs {
 
 export const OrderNavs = [
   {
-    label: "Opening Orders",
+    label: "Open Orders",
     value: OrderTabs.Opening,
   },
   {

@@ -60,7 +60,12 @@ const Tooltips: React.FC<TooltipsProps> = ({ productName, tChartRef }) => {
   }, []);
 
   useEffect(() => {
-    if (!mouseClickEventParam?.point || !tChartRef.current) return;
+    if (
+      !mouseClickEventParam?.point ||
+      !tChartRef.current ||
+      mouseClickEventParam.hoveredObjectId
+    )
+      return;
 
     if (visible) return setVisible(false);
 

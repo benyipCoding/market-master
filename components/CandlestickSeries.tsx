@@ -8,7 +8,14 @@ import {
   PriceLineType,
   UpdatePriceLinePayload,
 } from "./interfaces/CandlestickSeries";
-import { memo, useCallback, useContext, useEffect, useRef } from "react";
+import {
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import {
   EmitteryContext,
   OnApply,
@@ -35,7 +42,7 @@ import {
   takeProfitPriceLineOptions,
 } from "@/constants/seriesOptions";
 import { AsideContent } from "./interfaces/Playground";
-import { generatePriceLineId } from "@/utils/helpers";
+import { generatePriceLineId, isMarker } from "@/utils/helpers";
 
 const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   seriesData,
@@ -48,6 +55,9 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const priceLines = useRef<IPriceLine[]>([]);
   const { currentAside } = useSelector((state: RootState) => state.aside);
+  const { mouseClickEventParam } = useSelector(
+    (state: RootState) => state.common
+  );
   const { isBackTestMode, currentCandle, openingOrders } = useSelector(
     (state: RootState) => state.fetchData
   );
@@ -68,7 +78,7 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     opening_price: number,
     time: number | Time
   ): string => {
-    return `${side}_${opening_price}_${time}_${Date.now()}`;
+    return `${side}_${opening_price}_${time}_${Date.now()}_marker`;
   };
 
   const parseMarkerId = (id: string) => {
@@ -252,6 +262,28 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     };
   }, [currentAside, removePreOrderPriceLine]);
 
+  // 监听鼠标移动到图表的Marker时显示该订单的止损止盈priceLine
+  useEffect(() => {
+    if (
+      !mouseClickEventParam?.hoveredObjectId ||
+      !isMarker(mouseClickEventParam.hoveredObjectId as string)
+    )
+      return;
+
+    const parseData = parseMarkerId(
+      mouseClickEventParam.hoveredObjectId as string
+    );
+
+    const targetOrders = openingOrders.filter(
+      (o) =>
+        Number(o.opening_price) === parseData.opening_price &&
+        Number(o.time) === parseData.time &&
+        o.side === parseData.side
+    );
+
+    console.log({ targetOrders });
+  }, [mouseClickEventParam, openingOrders]);
+
   const generateMarkerColor = (
     side: OrderSide,
     markerPrice: number,
@@ -282,8 +314,11 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   }, [currentCandle, series]);
 
   // 当openingOrders有变动
+  const openOrderLen = useRef(0);
   useEffect(() => {
-    if (!currentCandle) return;
+    if (!currentCandle || openOrderLen.current === openingOrders.length) return;
+    openOrderLen.current = openingOrders.length;
+
     // Marker和PriceLine变动
     removeOrderMarkers();
     removeOpeningOrderPriceLines();

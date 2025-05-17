@@ -567,3 +567,7 @@ export function formatNumberWithCommas(num: number): string {
 export const generatePriceLineId = (price: number, type: PriceLineType) => {
   return `${type}_${price}_${Date.now()}`;
 };
+
+export const isMarker = (id: string) => {
+  return id.endsWith("marker");
+};

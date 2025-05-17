@@ -16,7 +16,8 @@ export const defaultCandleStickOptions: CandlestickSeriesPartialOptions = {
   borderDownColor: "#00ffff", // 阴线边框颜色为#00ffff
   wickUpColor: "#ff0000", // 阳线线颜色为红色
   wickDownColor: "#00ffff", // 阴线线颜色为#00ffff
-  priceLineVisible: false,
+  priceLineVisible: true,
+  priceLineColor: "gray",
 };
 
 // default line series options
@@ -88,7 +89,7 @@ export const LineWidthOptions = [1, 2, 3, 4] as const;
 export const LineStyleOptions = ["solid", "dashed", "dotted"];
 
 export const stopLossPriceLineOptions: Partial<PriceLineOptions> = {
-  lineStyle: LineStyle.Dotted,
+  lineStyle: LineStyle.Dashed,
   color: "#ff6c37",
   lineWidth: 1 as LineWidth,
   axisLabelVisible: true,
@@ -99,7 +100,7 @@ export const stopLossPriceLineOptions: Partial<PriceLineOptions> = {
 };
 
 export const takeProfitPriceLineOptions: Partial<PriceLineOptions> = {
-  lineStyle: LineStyle.Dotted,
+  lineStyle: LineStyle.Dashed,
   color: "#0ccf67",
   lineWidth: 1 as LineWidth,
   axisLabelVisible: true,
@@ -121,7 +122,7 @@ export const limitOrderPriceLineOptions: Partial<PriceLineOptions> = {
 };
 
 export const openingOrderPriceLineOptions: Partial<PriceLineOptions> = {
-  lineStyle: LineStyle.Dashed,
+  lineStyle: LineStyle.LargeDashed,
   color: "gray",
   lineWidth: 1 as LineWidth,
   axisLabelVisible: true,

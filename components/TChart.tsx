@@ -32,6 +32,7 @@ import {
   Equation,
   findHoveringIndicator,
   findHoveringSeries,
+  isMarker,
 } from "@/utils/helpers";
 import {
   selectCanMoveOrderPriceLine,
@@ -116,6 +117,12 @@ const TChart: React.ForwardRefRenderFunction<
   const contextMenuRef = useRef<TChartContextMenuRef>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const dividerRef = useRef<HTMLDivElement>(null);
+  const hoveringObject = useMemo(
+    () =>
+      !!mouseMovingEventParam?.hoveredObjectId &&
+      isMarker(mouseMovingEventParam?.hoveredObjectId as string),
+    [mouseMovingEventParam?.hoveredObjectId]
+  );
 
   // Activate the function of drawing straight lines
   const { drawStart, cleanUp: cleanUp1 } = useEnableDrawingLine({
@@ -346,7 +353,8 @@ const TChart: React.ForwardRefRenderFunction<
               (isCanGrab || isHoveringLossOrProfit || canMoveOrderPriceLine) &&
                 "cursor-grab",
               mousePressing && "cursor-grabbing",
-              isDrawing && !mousePressing && "cursor-crosshair"
+              isDrawing && !mousePressing && "cursor-crosshair",
+              hoveringObject && "cursor-pointer"
             )}
             ref={container}
             // Only unselected series can trigger the line drawing function
