@@ -32,11 +32,7 @@ import {
 import { OperationMode } from "../interfaces/Playground";
 import { Status } from "@/utils/apis/response";
 import { toast } from "sonner";
-import {
-  EmitteryContext,
-  OnOrderMarker,
-  OnPriceLine,
-} from "@/providers/EmitteryProvider";
+import { EmitteryContext, OnPriceLine } from "@/providers/EmitteryProvider";
 import { fetchOpeningOrders } from "@/store/fetchDataSlice";
 import { setCurrentOrderType } from "@/store/asideSlice";
 
@@ -129,10 +125,6 @@ const TradingAside: React.FC = () => {
 
   const createMarketOrder = useCallback(async () => {
     if (!backTestRecordKey) throw new Error("Back test key is Null");
-    const orderPrice =
-      currentOrderType === OrderType.MARKET
-        ? currentCandle?.close
-        : preOrderPrice;
 
     const payload: CreateOrderDto = {
       symbol_id: currentSymbol?.id!,
@@ -163,13 +155,12 @@ const TradingAside: React.FC = () => {
     dispatch(fetchOpeningOrders(backTestRecordKey));
   }, [
     backTestRecordKey,
-    currentCandle?.close,
     currentCandle?.time,
     currentOrderType,
     currentSide,
     currentSymbol?.id,
     dispatch,
-    preOrderPrice,
+    orderPrice,
     unitValue,
   ]);
 
@@ -188,6 +179,16 @@ const TradingAside: React.FC = () => {
       setPreOrderPrice(String(payload.options.price));
     }
   };
+
+  const [subCanSubmit, setSubCanSubmit] = useState(false);
+  const canSubmit = useMemo(
+    () => isBackTestMode && subCanSubmit,
+    [isBackTestMode, subCanSubmit]
+  );
+
+  const canSubmitChange = useCallback((canSubmit: boolean) => {
+    setSubCanSubmit(canSubmit);
+  }, []);
 
   useEffect(() => {
     if (currentOrderType === OrderType.LIMIT && !preOrderPrice)
@@ -325,6 +326,7 @@ const TradingAside: React.FC = () => {
         currentSide={currentSide}
         orderPrice={orderPrice}
         unitValue={Number(unitValue)}
+        canSubmitChange={canSubmitChange}
         ref={lossAndProfitRef}
       />
 
@@ -337,6 +339,7 @@ const TradingAside: React.FC = () => {
           currentSide === OrderSide.SELL && "bg-red-600 hover:bg-red-600"
         )}
         onClick={createOrderAction}
+        disabled={!canSubmit}
       >
         <p className="text-lg">{TitleCase(currentSide)}</p>
         <p className="text-xs">

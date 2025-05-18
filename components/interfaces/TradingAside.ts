@@ -18,4 +18,5 @@ export interface LossAndProfitProps {
   currentSide: OrderSide;
   orderPrice: string | number | undefined;
   unitValue: number;
+  canSubmitChange: (value: boolean) => void;
 }

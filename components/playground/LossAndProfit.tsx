@@ -327,7 +327,7 @@ export interface LossAndProfitRef {
 const LossAndProfit: React.ForwardRefRenderFunction<
   LossAndProfitRef,
   LossAndProfitProps
-> = ({ currentSide, orderPrice, unitValue }, ref) => {
+> = ({ currentSide, orderPrice, unitValue, canSubmitChange }, ref) => {
   const { currentSymbol, avgAmplitude, isBackTestMode } = useSelector(
     (state: RootState) => state.fetchData
   );
@@ -351,6 +351,35 @@ const LossAndProfit: React.ForwardRefRenderFunction<
 
   const [activeStop, setActiveStop] = useState(false);
   const [activeProfit, setActiveProfit] = useState(false);
+
+  const canSubmit = useMemo<boolean>(() => {
+    if (!orderPrice) return false;
+    let stopLossValid = true;
+    let takeProfitValid = true;
+
+    if (activeStop) {
+      stopLossValid =
+        currentSide === OrderSide.BUY
+          ? Number(orderPrice) > Number(stopLossData.price)
+          : Number(orderPrice) < Number(stopLossData.price);
+    }
+
+    if (activeProfit) {
+      takeProfitValid =
+        currentSide === OrderSide.BUY
+          ? Number(orderPrice) < Number(takeProfitData.price)
+          : Number(orderPrice) > Number(takeProfitData.price);
+    }
+
+    return stopLossValid && takeProfitValid;
+  }, [
+    orderPrice,
+    activeStop,
+    activeProfit,
+    currentSide,
+    stopLossData.price,
+    takeProfitData.price,
+  ]);
 
   const updatePanel = (payload: UpdatePriceLinePayload) => {
     if (payload.id.includes(PriceLineType.StopLoss)) {
@@ -521,6 +550,10 @@ const LossAndProfit: React.ForwardRefRenderFunction<
     setActiveProfit,
     setActiveStop,
   }));
+
+  useEffect(() => {
+    canSubmitChange(canSubmit);
+  }, [canSubmit, canSubmitChange]);
 
   return (
     <div className="flex">
