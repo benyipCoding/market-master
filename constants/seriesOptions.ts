@@ -16,8 +16,8 @@ export const defaultCandleStickOptions: CandlestickSeriesPartialOptions = {
   borderDownColor: "#00ffff", // 阴线边框颜色为#00ffff
   wickUpColor: "#ff0000", // 阳线线颜色为红色
   wickDownColor: "#00ffff", // 阴线线颜色为#00ffff
-  priceLineVisible: true,
-  priceLineColor: "gray",
+  priceLineVisible: false,
+  // priceLineColor: "gray",
 };
 
 // default line series options

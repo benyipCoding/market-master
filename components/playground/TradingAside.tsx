@@ -212,6 +212,7 @@ const TradingAside: React.FC = () => {
         Number(orderPrice),
         PriceLineType.LimitOrderPrice
       );
+
       setLimitOrderPriceLineId(id);
       const payload: AddPriceLinePayload = {
         id,
