@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 7777",
-    "build": "node --max-old-space-size=2048 node_modules/.bin/next build",
+    "build": "next build",
     "start": "next start -p 3001",
     "lint": "next lint",
     "test": "jest"
