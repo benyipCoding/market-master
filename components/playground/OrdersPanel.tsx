@@ -25,13 +25,16 @@ import {
   fetchOpeningOrders,
 } from "@/store/fetchDataSlice";
 import {
+  ClosePosAction,
   OperationMode,
   Order,
   OrderNavs,
+  OrderStatus,
   OrderTabs,
 } from "../interfaces/Playground";
 import {
   formatNumberWithCommas,
+  isInRange,
   timestampToDateStr,
   TitleCase,
   transferNullToStr,
@@ -57,7 +60,7 @@ import {
   ContextMenuTrigger,
 } from "../ui/context-menu";
 import Big from "big.js";
-import { OrderSide } from "../interfaces/CandlestickSeries";
+import { OrderSide, OrderType } from "../interfaces/CandlestickSeries";
 import { postClosePosition } from "@/app/playground/actions/postClosePosition";
 import { getProfile } from "@/app/playground/actions/getProfile";
 
@@ -71,6 +74,7 @@ const OrdersPanel = () => {
     limitOrders,
     currentCandle,
     backTestRecordKey,
+    currentSymbol,
   } = useSelector((state: RootState) => state.fetchData);
   const { currentOrderTab } = useSelector(
     (state: RootState) => state.bottomPanel
@@ -131,23 +135,31 @@ const OrdersPanel = () => {
       if (order.side === OrderSide.BUY) {
         return new Big(currentCandle.close)
           .minus(order.opening_price)
+          .div(currentSymbol?.price_per_tick!)
+          .times(order.quantity)
+          .div(100)
           .toFixed(2);
       } else {
         return new Big(order.opening_price)
           .minus(currentCandle.close)
+          .div(currentSymbol?.price_per_tick!)
+          .times(order.quantity)
+          .div(100)
           .toFixed(2);
       }
     },
-    [currentCandle]
+    [currentCandle, currentSymbol?.price_per_tick]
   );
 
   // 浮动盈亏
   const displayProfitLoss = useMemo(() => {
-    return openingOrders.reduce(
-      (total, order) =>
-        Number(new Big(total).add(calFloatingProfit(order)).toFixed(2)),
-      0
-    );
+    return openingOrders
+      .reduce(
+        (total, order) =>
+          Number(new Big(total).add(calFloatingProfit(order)).toFixed(2)),
+        0
+      )
+      .toFixed(2);
   }, [calFloatingProfit, openingOrders]);
 
   // 浮动余额
@@ -167,13 +179,21 @@ const OrdersPanel = () => {
     }
   }, [displayProfitLoss, operationMode, userProfile]);
 
-  const closePosition = useCallback(async () => {
-    if (!currentRowOrderId || !backTestRecordKey) return;
-    await postClosePosition(currentRowOrderId);
-    dispatch(fetchOpeningOrders(backTestRecordKey));
-    dispatch(fetchClosedOrders(backTestRecordKey));
-    getProfile().then((res) => setUserProfile(res.data));
-  }, [currentRowOrderId, dispatch, backTestRecordKey]);
+  const closePosition = useCallback(
+    async (
+      orderId?: string,
+      action: ClosePosAction = ClosePosAction.Actively
+    ) => {
+      if (!backTestRecordKey) return;
+      const id = orderId || currentRowOrderId;
+      if (!id) return;
+      await postClosePosition(id, action);
+      dispatch(fetchOpeningOrders(backTestRecordKey));
+      dispatch(fetchClosedOrders(backTestRecordKey));
+      getProfile().then((res) => setUserProfile(res.data));
+    },
+    [currentRowOrderId, backTestRecordKey, dispatch, setUserProfile]
+  );
 
   useEffect(() => {
     if (!currentOrderTab) return;
@@ -199,6 +219,31 @@ const OrdersPanel = () => {
       }
     };
   }, []);
+
+  // 监听是否有打止损或止盈的情况
+  useEffect(() => {
+    if (!currentCandle) return;
+    const range = [Number(currentCandle?.low), Number(currentCandle?.high)];
+
+    for (const o of openingOrders) {
+      if (Number(o.time) === Number(currentCandle.time)) continue;
+
+      // 打止损
+      if (o.stop_price) {
+        if (isInRange(Number(o.stop_price), range)) {
+          closePosition(o.id, ClosePosAction.StopLoss);
+          continue;
+        }
+      }
+      // 打止盈
+      if (o.limit_price) {
+        if (isInRange(Number(o.limit_price), range)) {
+          closePosition(o.id, ClosePosAction.TakeProfit);
+          continue;
+        }
+      }
+    }
+  }, [closePosition, currentCandle, openingOrders]);
 
   return (
     <div className="h-full flex flex-col gap-2">
@@ -276,7 +321,9 @@ const OrdersPanel = () => {
                     <TableCell>{order.quantity}</TableCell>
                     <TableCell>{TitleCase(order.side)}</TableCell>
                     <TableCell className="text-right">
-                      {order.opening_price}
+                      {order.status === OrderStatus.EXECUTED
+                        ? currentCandle?.close
+                        : order.opening_price}
                     </TableCell>
                     <TableCell className="text-right">
                       {order.closing_price}
@@ -288,7 +335,10 @@ const OrdersPanel = () => {
                       {order.limit_price}
                     </TableCell>
                     <TableCell className="text-right">
-                      $ {calFloatingProfit(order)}
+                      ${" "}
+                      {order.status === OrderStatus.EXECUTED
+                        ? calFloatingProfit(order)
+                        : order.profit}
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu
@@ -337,7 +387,7 @@ const OrdersPanel = () => {
             <ContextMenuSeparator />
             <ContextMenuItem inset>Set stop loss</ContextMenuItem>
             <ContextMenuItem inset>Set limit price</ContextMenuItem>
-            <ContextMenuItem inset onSelect={closePosition}>
+            <ContextMenuItem inset onSelect={() => closePosition()}>
               Close position
             </ContextMenuItem>
             <ContextMenuSeparator />

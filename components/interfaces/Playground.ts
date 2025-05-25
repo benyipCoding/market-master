@@ -115,3 +115,9 @@ export interface Order {
 export enum AsideContent {
   Trade = "trade",
 }
+
+export enum ClosePosAction {
+  Actively = 0,
+  StopLoss = 1,
+  TakeProfit = 2,
+}

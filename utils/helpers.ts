@@ -13,7 +13,10 @@ import {
   LineStyleOptions,
   SeriesOptionsCommon,
 } from "lightweight-charts";
-import { PriceLineType } from "@/components/interfaces/CandlestickSeries";
+import {
+  OrderSide,
+  PriceLineType,
+} from "@/components/interfaces/CandlestickSeries";
 
 export const calcMouseCoordinate = (
   mouseEvent: React.MouseEvent<HTMLDivElement, MouseEvent> | MouseEvent,
@@ -571,3 +574,8 @@ export const generatePriceLineId = (price: number, type: PriceLineType) => {
 export const isMarker = (id: string) => {
   return id.endsWith("marker");
 };
+
+export function isInRange(value: number, range: number[]): boolean {
+  const [min, max] = range;
+  return value >= min && value <= max;
+}
