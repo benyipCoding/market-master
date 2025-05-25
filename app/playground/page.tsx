@@ -62,6 +62,7 @@ import {
 } from "@/providers/EmitteryProvider";
 import { getProfile } from "./actions/getProfile";
 import { AuthContext } from "@/context/Auth";
+import OrderActions from "@/components/playground/OrderActions";
 
 const Playground = () => {
   // TChart component instance
@@ -102,6 +103,11 @@ const Playground = () => {
     () => dialogContent === DialogContentType.UploadData,
     [dialogContent]
   );
+  const isOrderActions = useMemo(
+    () => dialogContent === DialogContentType.OrderActions,
+    [dialogContent]
+  );
+
   const { setUserProfile } = useContext(AuthContext);
 
   const [candlestickData, setCandlestickData] = useState<
@@ -392,7 +398,7 @@ const Playground = () => {
       <Dialog
         onOpenChange={setDialogVisible}
         open={dialogVisible}
-        modal={!isTechnicalIndex && !SymbolSearch}
+        modal={!isTechnicalIndex && !isSymbolSearch}
       >
         <DialogContext.Provider
           value={{ setDialogVisible, tChartRef, setTechnicalIndicatorLines }}
@@ -413,6 +419,7 @@ const Playground = () => {
               )}
               {isSymbolSearch && <SymbolSearch />}
               {isUploadData && <UploadForm />}
+              {isOrderActions && <OrderActions />}
             </CustomDialogContent>
           )}
         </DialogContext.Provider>

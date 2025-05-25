@@ -13,3 +13,13 @@ export async function getOrders(params: ListOrderDto) {
     return ErrorResponse(errObj.message, errObj.statusCode);
   }
 }
+
+export async function retriveOrder(orderId: string) {
+  try {
+    const res = await request.get(`/orders/${orderId}`);
+    return SuccessResponse(res.data);
+  } catch (error: any) {
+    const errObj = JSON.parse(error.message);
+    return ErrorResponse(errObj.message, errObj.statusCode);
+  }
+}

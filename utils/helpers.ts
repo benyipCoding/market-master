@@ -563,8 +563,11 @@ export function TitleCase(str: string): string {
   return str[0].toUpperCase() + str.slice(1);
 }
 
-export function formatNumberWithCommas(num: number): string {
-  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+export function formatNumberWithCommas(
+  num: number,
+  precision: number = 2
+): string {
+  return num.toFixed(precision).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 export const generatePriceLineId = (price: number, type: PriceLineType) => {

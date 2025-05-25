@@ -389,7 +389,12 @@ const TChart: React.ForwardRefRenderFunction<
         ref={dividerRef}
       ></div>
       {/* 底部操作台 */}
-      {bottomPanelOpen && !!chartHeight && <BottomPanel />}
+      {bottomPanelOpen && !!chartHeight && (
+        <BottomPanel
+          dialogVisible={dialogVisible}
+          setDialogVisible={setDialogVisible}
+        />
+      )}
     </div>
   );
 };

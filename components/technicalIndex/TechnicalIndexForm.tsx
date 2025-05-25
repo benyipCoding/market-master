@@ -12,9 +12,9 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search } from "lucide-react";
 import {
-  MASettings,
+  // MASettings,
   EMASettings,
-  MACDSettings,
+  // MACDSettings,
 } from "@/components/technicalIndex";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
@@ -121,9 +121,9 @@ const TechnicalIndexForm: React.FC<TechnicalIndexFormProps> = () => {
       <Card className="min-w-[28rem]">
         <TechnicalIndexFormContext.Provider value={{ currentTab }}>
           {!currentTab && <EmptyState />}
-          {currentTab === "MA" && <MASettings />}
+          {/* {currentTab === "MA" && <MASettings />} */}
           {currentTab === "EMA" && <EMASettings />}
-          {currentTab === "MACD" && <MACDSettings />}
+          {/* {currentTab === "MACD" && <MACDSettings />} */}
         </TechnicalIndexFormContext.Provider>
       </Card>
     </div>

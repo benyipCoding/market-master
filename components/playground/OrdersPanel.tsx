@@ -29,6 +29,7 @@ import {
   OperationMode,
   Order,
   OrderNavs,
+  OrdersPanelProps,
   OrderStatus,
   OrderTabs,
 } from "../interfaces/Playground";
@@ -60,11 +61,17 @@ import {
   ContextMenuTrigger,
 } from "../ui/context-menu";
 import Big from "big.js";
-import { OrderSide, OrderType } from "../interfaces/CandlestickSeries";
+import { OrderSide } from "../interfaces/CandlestickSeries";
 import { postClosePosition } from "@/app/playground/actions/postClosePosition";
 import { getProfile } from "@/app/playground/actions/getProfile";
+import {
+  DialogContentType,
+  setCurrentOrderId,
+  setDialogContent,
+} from "@/store/dialogSlice";
+import { Button } from "../ui/button";
 
-const OrdersPanel = () => {
+const OrdersPanel: React.FC<OrdersPanelProps> = ({ setDialogVisible }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { setUserProfile } = useContext(AuthContext);
   const {
@@ -153,13 +160,13 @@ const OrdersPanel = () => {
 
   // 浮动盈亏
   const displayProfitLoss = useMemo(() => {
-    return openingOrders
-      .reduce(
-        (total, order) =>
-          Number(new Big(total).add(calFloatingProfit(order)).toFixed(2)),
-        0
-      )
-      .toFixed(2);
+    const num = openingOrders.reduce(
+      (total, order) =>
+        Number(new Big(total).add(calFloatingProfit(order)).toFixed(2)),
+      0
+    );
+
+    return num;
   }, [calFloatingProfit, openingOrders]);
 
   // 浮动余额
@@ -194,6 +201,28 @@ const OrdersPanel = () => {
     },
     [currentRowOrderId, backTestRecordKey, dispatch, setUserProfile]
   );
+
+  // 打开OrderActions弹窗
+  const openOrderActionsDialog = (order: Order) => {
+    dispatch(setDialogContent(DialogContentType.OrderActions));
+    dispatch(setCurrentOrderId(order.id));
+    setDialogVisible(true);
+  };
+
+  const dynamicDisplay = (order: Order, type: "stop" | "limit") => {
+    const price = type === "stop" ? order.stop_price : order.limit_price;
+    if (isNaN(Number(price)))
+      return (
+        <Button
+          variant={"outline"}
+          size={"sm"}
+          onClick={() => openOrderActionsDialog(order)}
+        >
+          Set
+        </Button>
+      );
+    return price;
+  };
 
   useEffect(() => {
     if (!currentOrderTab) return;
@@ -271,7 +300,7 @@ const OrdersPanel = () => {
           }}
         ></div>
 
-        <div className="absolute right-0 h-full flex">
+        <div className="absolute right-0 h-full flex gap-4">
           <div className="min-w-32">
             <p className="text-xs">Account</p>
             <p>{userInfo?.display_name}</p>
@@ -282,7 +311,7 @@ const OrdersPanel = () => {
           </div>
           <div className="min-w-32">
             <p className="text-xs">Profit / Loss</p>
-            <p>$ {displayProfitLoss}</p>
+            <p>$ {formatNumberWithCommas(displayProfitLoss)}</p>
           </div>
         </div>
       </div>
@@ -315,32 +344,40 @@ const OrdersPanel = () => {
                     key={order.id}
                     onContextMenu={(e) => onRowContextMenu(e, order.id)}
                   >
-                    <TableCell>
+                    <TableCell className="py-2">
                       {timestampToDateStr(order.create_at!)}
                     </TableCell>
                     <TableCell>{order.quantity}</TableCell>
                     <TableCell>{TitleCase(order.side)}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right py-2">
+                      {order.opening_price}
+                    </TableCell>
+                    <TableCell className="text-right py-2">
                       {order.status === OrderStatus.EXECUTED
                         ? currentCandle?.close
-                        : order.opening_price}
+                        : order.closing_price}
                     </TableCell>
-                    <TableCell className="text-right">
-                      {order.closing_price}
+
+                    {/* 止损 */}
+                    <TableCell className="text-right py-2">
+                      {order.status === OrderStatus.EXECUTED
+                        ? dynamicDisplay(order, "stop")
+                        : order.stop_price}
                     </TableCell>
-                    <TableCell className="text-right">
-                      {order.stop_price}
+
+                    {/* 止盈 */}
+                    <TableCell className="text-right py-2">
+                      {order.status === OrderStatus.EXECUTED
+                        ? dynamicDisplay(order, "limit")
+                        : order.limit_price}
                     </TableCell>
-                    <TableCell className="text-right">
-                      {order.limit_price}
-                    </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right py-2">
                       ${" "}
                       {order.status === OrderStatus.EXECUTED
                         ? calFloatingProfit(order)
                         : order.profit}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right py-2">
                       <DropdownMenu
                         onOpenChange={(open) => {
                           !open && setCurrentRowOrderId(null);
@@ -361,12 +398,6 @@ const OrdersPanel = () => {
                           </DropdownMenuLabel>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem inset>
-                            Set stop loss
-                          </DropdownMenuItem>
-                          <DropdownMenuItem inset>
-                            Set limit price
-                          </DropdownMenuItem>
-                          <DropdownMenuItem inset>
                             Close position
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
@@ -385,8 +416,6 @@ const OrdersPanel = () => {
           <ContextMenuContent className="w-fit">
             <ContextMenuLabel inset>Order Actions</ContextMenuLabel>
             <ContextMenuSeparator />
-            <ContextMenuItem inset>Set stop loss</ContextMenuItem>
-            <ContextMenuItem inset>Set limit price</ContextMenuItem>
             <ContextMenuItem inset onSelect={() => closePosition()}>
               Close position
             </ContextMenuItem>

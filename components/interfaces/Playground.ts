@@ -16,13 +16,17 @@ export interface AsideRef {
   container: HTMLDivElement | null;
 }
 
-export interface LeftAsideBtnsProps {
+interface DialogController {
+  setDialogVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  dialogVisible?: boolean;
+}
+
+export interface LeftAsideBtnsProps extends DialogController {
   className?: string;
   tChartRef: React.RefObject<TChartRef>;
   setDrawedLineList: React.Dispatch<
     React.SetStateAction<DeepPartial<LineStyleOptions & SeriesOptionsCommon>[]>
   >;
-  setDialogVisible: React.Dispatch<React.SetStateAction<boolean>>;
   setTechnicalIndicatorLines: React.Dispatch<
     React.SetStateAction<TechnicalIndicatorLine[]>
   >;
@@ -30,9 +34,8 @@ export interface LeftAsideBtnsProps {
   bottomPanelOpen: boolean;
 }
 
-export interface NavbarProps {
+export interface NavbarProps extends DialogController {
   className?: string;
-  setDialogVisible: React.Dispatch<React.SetStateAction<boolean>>;
   dialogVisible: boolean;
   tChartRef: React.RefObject<TChartRef>;
   setDrawedLineList: React.Dispatch<
@@ -121,3 +124,7 @@ export enum ClosePosAction {
   StopLoss = 1,
   TakeProfit = 2,
 }
+
+export interface BottomPanelProps extends DialogController {}
+
+export interface OrdersPanelProps extends DialogController {}

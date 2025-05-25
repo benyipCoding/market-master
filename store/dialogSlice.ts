@@ -7,16 +7,19 @@ export enum DialogContentType {
   IndicatorSettings = "Indicator Settings",
   SymbolSearch = "Symbol Search",
   UploadData = "Upload Data",
+  OrderActions = "Order Actions",
 }
 
 interface DialogSliceState {
   dialogContent: DialogContentType | undefined;
   recentlyIndicator: TechnicalIndexItemTitleType | undefined;
+  currentOrderId: string | null;
 }
 
 const initialState: DialogSliceState = {
   dialogContent: undefined,
   recentlyIndicator: undefined,
+  currentOrderId: null,
 };
 
 const dialogSlice = createSlice({
@@ -35,9 +38,13 @@ const dialogSlice = createSlice({
     ) {
       state.recentlyIndicator = action.payload;
     },
+    setCurrentOrderId(state, action: PayloadAction<string | null>) {
+      state.currentOrderId = action.payload;
+    },
   },
 });
 
-export const { setDialogContent, setRecentlyIndicator } = dialogSlice.actions;
+export const { setDialogContent, setRecentlyIndicator, setCurrentOrderId } =
+  dialogSlice.actions;
 
 export default dialogSlice.reducer;
