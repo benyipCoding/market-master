@@ -407,7 +407,8 @@ const Playground = () => {
             <CustomDialogContent
               dragConstraints={mainWrapper}
               motionDivClass={cn(
-                (isTechnicalIndex || isSymbolSearch) && "max-w-none w-fit"
+                (isTechnicalIndex || isSymbolSearch || isOrderActions) &&
+                  "max-w-none w-fit"
               )}
               overlayClass={cn(
                 (isSymbolSearch || isUploadData) && "bg-black/80"

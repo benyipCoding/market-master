@@ -72,7 +72,7 @@ const SymbolSearch: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-fit md:w-[500px] lg:w-[750px] flex flex-col gap-4 ">
+    <div className="w-fit md:w-[500px] lg:w-[750px] flex flex-col gap-4">
       <div className="flex items-center">
         <div className="relative w-full">
           <Input

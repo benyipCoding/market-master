@@ -23,10 +23,6 @@ const OrderActionItem: React.FC<OrderActionItemProps> = ({
   label,
   order,
 }) => {
-  //   useEffect(() => {
-  //     console.log({ order });
-  //   }, [order]);
-
   return (
     <div className="form-item">
       <Label htmlFor={id} className="flex items-center gap-2 cursor-pointer">

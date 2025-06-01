@@ -558,7 +558,7 @@ export const transferNullToStr = <T = Record<any, any>>(obj: T): T => {
   return newObj;
 };
 
-export function TitleCase(str: string): string {
+export function TitleCase(str?: string): string {
   if (!str) return "";
   return str[0].toUpperCase() + str.slice(1);
 }

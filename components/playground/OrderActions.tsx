@@ -8,18 +8,30 @@ import OrderActionItem from "../commonFormItem/OrderActionItem";
 import {
   Table,
   TableBody,
-  TableCaption,
+  // TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "../ui/table";
+import { timestampToDateStr, TitleCase } from "@/utils/helpers";
+import { MiddleSection } from "../interfaces/TradingAside";
 
 const OrderActions = () => {
   const { currentOrderId } = useSelector((state: RootState) => state.dialog);
   const dispatch = useDispatch<AppDispatch>();
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
   const { currentCandle } = useSelector((state: RootState) => state.fetchData);
+  const [stoploss, setStoploss] = useState({
+    active: false,
+    displayType: MiddleSection.Price,
+    stopPrice: 0,
+  });
+
+  const formatNull = (value: any) => {
+    if (!value) return "N/A";
+    return value;
+  };
 
   useEffect(() => {
     if (!currentOrderId) return;
@@ -34,24 +46,36 @@ const OrderActions = () => {
     };
   }, []);
 
+  useEffect(() => {
+    console.log({ currentOrder });
+  }, [currentOrder]);
+
   return (
-    <div className="flex flex-col gap-4">
+    <div className="w-fit flex flex-col gap-4">
       <Table>
-        <TableCaption>Order information.</TableCaption>
+        {/* <TableCaption>Order information.</TableCaption> */}
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">Side</TableHead>
+            <TableHead>Time</TableHead>
             <TableHead>Quantity</TableHead>
+            <TableHead>Side</TableHead>
             <TableHead>Opening</TableHead>
-            <TableHead className="text-right">Current</TableHead>
+            <TableHead>Stop</TableHead>
+            <TableHead>Limit</TableHead>
+            <TableHead>Current</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody className="text-base">
           <TableRow>
-            <TableCell className="font-medium">INV001</TableCell>
-            <TableCell>Paid</TableCell>
-            <TableCell>Credit Card</TableCell>
-            <TableCell className="text-right">$250.00</TableCell>
+            <TableCell>
+              {timestampToDateStr(currentOrder?.create_at!)}
+            </TableCell>
+            <TableCell>{currentOrder?.quantity}</TableCell>
+            <TableCell>{TitleCase(currentOrder?.side)}</TableCell>
+            <TableCell>{currentOrder?.opening_price}</TableCell>
+            <TableCell>{formatNull(currentOrder?.stop_price)}</TableCell>
+            <TableCell>{formatNull(currentOrder?.limit_price)}</TableCell>
+            <TableCell>{currentCandle?.close}</TableCell>
           </TableRow>
         </TableBody>
       </Table>
