@@ -33,6 +33,7 @@ import {
 } from "@/providers/EmitteryProvider";
 import { PriceLineOptions } from "lightweight-charts";
 import { generatePriceLineId } from "@/utils/helpers";
+import { OperationMode } from "../interfaces/Playground";
 
 const ControlItem: React.FC<{
   index: number;
@@ -201,7 +202,9 @@ const BracketControl: React.FC<{
   setChecked,
 }) => {
   const [currentSection, setCurrentSection] = useState<MiddleSection>();
-  const { currentSymbol } = useSelector((state: RootState) => state.fetchData);
+  const { currentSymbol, operationMode } = useSelector(
+    (state: RootState) => state.fetchData
+  );
   const { userProfile } = useContext(AuthContext);
 
   const displaySectionData = useMemo<LossAndProfitDataType | null>(() => {
@@ -218,8 +221,12 @@ const BracketControl: React.FC<{
         : (Number(relativeProfitTicks) * -1).toFixed(2);
 
     const usd = new Big(Number(ticks)).times(unitValue).div(100).toFixed(2);
-    const percentage = userProfile?.balance_p
-      ? new Big(usd).div(userProfile?.balance_p).times(100).toFixed(2)
+    const balance =
+      operationMode === OperationMode.PRACTISE
+        ? userProfile?.balance_p
+        : userProfile?.balance_b;
+    const percentage = balance
+      ? new Big(usd).div(balance).times(100).toFixed(2)
       : 0;
 
     return {
@@ -236,7 +243,8 @@ const BracketControl: React.FC<{
     orderPrice,
     currentSide,
     unitValue,
-    userProfile?.balance_p,
+    operationMode,
+    userProfile,
   ]);
 
   const focusSection = (value: MiddleSection) => {
@@ -405,7 +413,9 @@ const LossAndProfit: React.ForwardRefRenderFunction<
   useEffect(() => {
     if (!orderPrice || !currentSymbol || !avgAmplitude) return;
     const price = new Big(orderPrice);
-    const TICKS = new Big(avgAmplitude!).div(currentSymbol.price_per_tick!);
+    const TICKS = new Big(avgAmplitude!)
+      .times(3)
+      .div(currentSymbol.price_per_tick!);
 
     if (currentSide === OrderSide.BUY) {
       // 做多
