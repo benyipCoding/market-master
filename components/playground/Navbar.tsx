@@ -277,7 +277,7 @@ const Navbar: React.FC<NavbarProps> = ({
           rightPriceScale: { autoScale: true },
         });
         resolve();
-      }, 1000);
+      }, 500);
     });
   };
 

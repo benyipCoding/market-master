@@ -103,20 +103,17 @@ const selectMouseMovingEventParam = (state: RootState) =>
 const selectCurrentOrderType = (state: RootState) =>
   state.aside.currentOrderType;
 
+const movableType = [
+  PriceLineType.StopLoss,
+  PriceLineType.TakeProfit,
+  PriceLineType.OpenOrderStopLoss,
+  PriceLineType.OpenOrderTakeProfit,
+];
 export const selectIsHoveringLossOrProfit = createSelector(
   [selectMouseMovingEventParam],
   (mouseMovingEventParam) =>
-    (mouseMovingEventParam?.hoveredObjectId as string)?.includes(
-      PriceLineType.StopLoss
-    ) ||
-    (mouseMovingEventParam?.hoveredObjectId as string)?.includes(
-      PriceLineType.TakeProfit
-    ) ||
-    (mouseMovingEventParam?.hoveredObjectId as string)?.includes(
-      PriceLineType.OpenOrderStopLoss
-    ) ||
-    (mouseMovingEventParam?.hoveredObjectId as string)?.includes(
-      PriceLineType.OpenOrderTakeProfit
+    movableType.some((type) =>
+      (mouseMovingEventParam?.hoveredObjectId as string)?.includes(type)
     )
 );
 
