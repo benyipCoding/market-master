@@ -111,6 +111,12 @@ export const selectIsHoveringLossOrProfit = createSelector(
     ) ||
     (mouseMovingEventParam?.hoveredObjectId as string)?.includes(
       PriceLineType.TakeProfit
+    ) ||
+    (mouseMovingEventParam?.hoveredObjectId as string)?.includes(
+      PriceLineType.OpenOrderStopLoss
+    ) ||
+    (mouseMovingEventParam?.hoveredObjectId as string)?.includes(
+      PriceLineType.OpenOrderTakeProfit
     )
 );
 

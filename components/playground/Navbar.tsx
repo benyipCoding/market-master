@@ -258,16 +258,26 @@ const Navbar: React.FC<NavbarProps> = ({
   }, [isBackTestMode, isPreselect]);
 
   const freezeRange = (callback: (...args: any[]) => void): Promise<void> => {
-    return new Promise((resolve) => {
-      const range = tChartRef
-        .current!.chart.timeScale()
+    return new Promise((resolve, reject) => {
+      if (!tChartRef.current) {
+        reject("tChartRef.current is undefined");
+        return;
+      }
+      const range = tChartRef.current.chart
+        .timeScale()
         .getVisibleLogicalRange();
-      tChartRef.current?.chart.applyOptions({
+      const { chart } = tChartRef.current;
+      chart.applyOptions({
         rightPriceScale: { autoScale: false },
       });
       callback();
-      tChartRef.current!.chart.timeScale().setVisibleLogicalRange(range!);
-      resolve();
+      chart.timeScale().setVisibleLogicalRange(range!);
+      setTimeout(() => {
+        chart.applyOptions({
+          rightPriceScale: { autoScale: true },
+        });
+        resolve();
+      }, 1000);
     });
   };
 

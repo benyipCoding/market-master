@@ -73,7 +73,7 @@ export const useDragLineSeries = ({
         setFixed(fixedPoint);
       }
 
-      // // Bind events when the mouse move and mouse up
+      // Bind events when the mouse move and mouse up
       document.onmousemove = dragMove;
       document.onmouseup = dragEnd;
     },
@@ -91,6 +91,7 @@ export const useDragLineSeries = ({
       if (isHoveringLossOrProfit || canMoveOrderPriceLine) {
         // 如果是拖动priceLine
         dispatch(setSelectedSeries(null));
+
         const payload: UpdatePriceLinePayload = {
           id: hoveredObjectId as string,
           options: {

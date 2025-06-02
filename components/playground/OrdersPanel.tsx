@@ -43,15 +43,6 @@ import {
 import { cn } from "@/lib/utils";
 import { setCurrentOrderTab } from "@/store/bottomPanelSlice";
 import { AuthContext } from "@/context/Auth";
-import { Ellipsis } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -377,34 +368,14 @@ const OrdersPanel: React.FC<OrdersPanelProps> = ({ setDialogVisible }) => {
                         : order.profit}
                     </TableCell>
                     <TableCell className="text-right py-2">
-                      <DropdownMenu
-                        onOpenChange={(open) => {
-                          !open && setCurrentRowOrderId(null);
-                          open && setCurrentRowOrderId(order.id);
-                        }}
+                      <Button
+                        variant={"secondary"}
+                        size={"sm"}
+                        onClick={() => closePosition(order.id)}
+                        className="active:scale-100"
                       >
-                        <DropdownMenuTrigger asChild className="w-full">
-                          <Ellipsis
-                            className={cn(
-                              "cursor-pointer text-gray-400 hover:text-white"
-                            )}
-                          />
-                        </DropdownMenuTrigger>
-
-                        <DropdownMenuContent className="w-fit">
-                          <DropdownMenuLabel inset>
-                            Order Actions
-                          </DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem inset>
-                            Close position
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem inset>
-                            Close all positions
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                        Close
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

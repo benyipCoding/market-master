@@ -161,6 +161,8 @@ const OrderActionItem: React.FC<OrderActionItemProps> = ({
     valueType,
   ]);
 
+  useEffect(() => {}, []);
+
   return (
     <div className="form-item">
       <Label htmlFor={id} className="flex items-center gap-2 cursor-pointer">
@@ -182,7 +184,6 @@ const OrderActionItem: React.FC<OrderActionItemProps> = ({
         <Select
           disabled={!active}
           value={valueType}
-          // onValueChange={(value) => setValueType(value as MiddleSection)}
           onValueChange={handleSelect}
         >
           <SelectTrigger>
