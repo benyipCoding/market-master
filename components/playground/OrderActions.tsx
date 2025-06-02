@@ -37,7 +37,7 @@ const OrderActions = () => {
   }, []);
 
   return (
-    <div className="w-[500px] flex flex-col gap-4">
+    <div className="w-[400px] flex flex-col gap-4">
       <Table>
         {/* <TableCaption>Order information.</TableCaption> */}
         <TableHeader>
