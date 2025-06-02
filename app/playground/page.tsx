@@ -398,7 +398,7 @@ const Playground = () => {
       <Dialog
         onOpenChange={setDialogVisible}
         open={dialogVisible}
-        modal={!isTechnicalIndex && !isSymbolSearch}
+        modal={!isTechnicalIndex && !isSymbolSearch && !isOrderActions}
       >
         <DialogContext.Provider
           value={{ setDialogVisible, tChartRef, setTechnicalIndicatorLines }}

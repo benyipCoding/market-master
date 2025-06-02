@@ -211,17 +211,16 @@ const OrdersPanel: React.FC<OrdersPanelProps> = ({ setDialogVisible }) => {
 
   const dynamicDisplay = (order: Order, type: "stop" | "limit") => {
     const price = type === "stop" ? order.stop_price : order.limit_price;
-    if (isNaN(Number(price)))
-      return (
-        <Button
-          variant={"outline"}
-          size={"sm"}
-          onClick={() => openOrderActionsDialog(order)}
-        >
-          Set
-        </Button>
-      );
-    return price;
+    const textContent = isNaN(Number(price)) ? "Set" : `${price}`;
+    return (
+      <Button
+        variant={"outline"}
+        size={"sm"}
+        onClick={() => openOrderActionsDialog(order)}
+      >
+        {textContent}
+      </Button>
+    );
   };
 
   useEffect(() => {
