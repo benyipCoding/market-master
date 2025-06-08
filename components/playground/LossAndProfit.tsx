@@ -467,6 +467,8 @@ const LossAndProfit: React.ForwardRefRenderFunction<
 
   // 监听止损的激活情况设置priceLine
   useEffect(() => {
+    if (!isBackTestMode) return;
+
     const price = Number(stopLossData[MiddleSection.Price]);
     const id = generatePriceLineId(price, PriceLineType.StopLoss);
     if (activeStop) {
@@ -484,10 +486,11 @@ const LossAndProfit: React.ForwardRefRenderFunction<
         setStopLossData((prev) => ({ ...prev, id: undefined }));
       }
     };
-  }, [activeStop]);
+  }, [activeStop, isBackTestMode]);
 
   // 监听止盈的激活情况设置priceLine
   useEffect(() => {
+    if (!isBackTestMode) return;
     const price = Number(takeProfitData[MiddleSection.Price]);
     const id = generatePriceLineId(price, PriceLineType.TakeProfit);
     if (activeProfit) {
@@ -505,7 +508,7 @@ const LossAndProfit: React.ForwardRefRenderFunction<
         setTakeProfitData((prev) => ({ ...prev, id: undefined }));
       }
     };
-  }, [activeProfit]);
+  }, [activeProfit, isBackTestMode]);
 
   // 监听止损价格update priceLine
   useEffect(() => {
