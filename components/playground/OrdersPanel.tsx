@@ -67,6 +67,7 @@ import {
 } from "@/store/dialogSlice";
 import { Button } from "../ui/button";
 import { EmitteryContext, OnPriceLine } from "@/providers/EmitteryProvider";
+import { PriceLineOptions } from "lightweight-charts";
 
 const OrdersPanel: React.FC<OrdersPanelProps> = ({ setDialogVisible }) => {
   const dispatch = useDispatch<AppDispatch>();
@@ -232,15 +233,19 @@ const OrdersPanel: React.FC<OrdersPanelProps> = ({ setDialogVisible }) => {
     dragingPriceLinePayload.current = payload;
   }, []);
 
-  const onPriceLineChangeWithDebonce = useMemo(
-    () => debonce(onPriceLineChange, 100),
-    [onPriceLineChange]
-  );
-
-  const onDragEnd = () => {
-    console.log("DragEnd", dragingPriceLinePayload.current);
+  const onDragEnd = useCallback(() => {
+    emittery?.emit(OnPriceLine.retrive, dragingPriceLinePayload.current?.id);
     dragingPriceLinePayload.current = null;
-  };
+  }, [emittery]);
+
+  const onPriceLineResponse = useCallback(
+    (payload: Readonly<PriceLineOptions>) => {
+      const order = openingOrders.find((o) => o.id === payload.orderId);
+      if (!order) return;
+      console.log(order);
+    },
+    [openingOrders]
+  );
 
   useEffect(() => {
     if (!currentOrderTab) return;
@@ -293,14 +298,16 @@ const OrdersPanel: React.FC<OrdersPanelProps> = ({ setDialogVisible }) => {
   }, [closePosition, currentCandle, openingOrders]);
 
   useEffect(() => {
-    emittery?.on(OnPriceLine.updatePanel, onPriceLineChangeWithDebonce);
+    emittery?.on(OnPriceLine.updatePanel, onPriceLineChange);
     emittery?.on(OnPriceLine.dragEnd, onDragEnd);
+    emittery?.on(OnPriceLine.response, onPriceLineResponse);
 
     return () => {
-      emittery?.off(OnPriceLine.updatePanel, onPriceLineChangeWithDebonce);
+      emittery?.off(OnPriceLine.updatePanel, onPriceLineChange);
       emittery?.off(OnPriceLine.dragEnd, onDragEnd);
+      emittery?.off(OnPriceLine.response, onPriceLineResponse);
     };
-  }, [emittery, onPriceLineChangeWithDebonce]);
+  }, [emittery, onDragEnd, onPriceLineChange, onPriceLineResponse]);
 
   return (
     <div className="h-full flex flex-col gap-2">

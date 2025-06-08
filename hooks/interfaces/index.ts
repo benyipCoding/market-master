@@ -33,6 +33,10 @@ declare module "lightweight-charts" {
     period?: number;
     calculatePrice?: CalculatePriceType;
   }
+
+  interface PriceLineOptions {
+    orderId?: string;
+  }
 }
 export interface IEnableDrawingLine {
   childSeries: ISeriesApi<SeriesType, Time>[];

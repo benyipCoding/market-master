@@ -8,14 +8,7 @@ import {
   PriceLineType,
   UpdatePriceLinePayload,
 } from "./interfaces/CandlestickSeries";
-import {
-  memo,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-} from "react";
+import { memo, useCallback, useContext, useEffect, useRef } from "react";
 import {
   EmitteryContext,
   OnApply,
@@ -228,6 +221,11 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     });
   }, [series]);
 
+  const retrivePriceLine = (id: string) => {
+    const target = priceLines.current.find((p) => p.options().id === id);
+    emittery?.emit(OnPriceLine.response, target?.options());
+  };
+
   useEffect(() => {
     emittery?.on(OnApply.ResetMainSeriesData, resetDataHandler);
     emittery?.on(OnOrderMarker.add, addOrderMarker);
@@ -235,6 +233,7 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     emittery?.on(OnPriceLine.add, addPriceLine);
     emittery?.on(OnPriceLine.remove, removePriceLine);
     emittery?.on(OnPriceLine.update, updatePriceLine);
+    emittery?.on(OnPriceLine.retrive, retrivePriceLine);
     // emittery?.on(OnPriceLine.clear, clearPriceLine);
 
     return () => {
@@ -244,6 +243,8 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
       emittery?.off(OnPriceLine.add, addPriceLine);
       emittery?.off(OnPriceLine.remove, removePriceLine);
       emittery?.off(OnPriceLine.update, updatePriceLine);
+      emittery?.off(OnPriceLine.retrive, retrivePriceLine);
+
       // emittery?.off(OnPriceLine.clear, clearPriceLine);
     };
   }, [series, emittery]);
