@@ -57,6 +57,7 @@ export enum OnPriceLine {
   update = "price_line_update",
   updatePanel = "price_line_update_panel",
   clear = "price_line_clear",
+  dragEnd = "price_line_drag_end",
 }
 
 export enum OnStopLossAndTakeProfit {

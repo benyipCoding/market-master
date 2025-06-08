@@ -132,6 +132,7 @@ export const useDragLineSeries = ({
     dispatch(setGraphType(""));
     dispatch(toggleMousePressing(false));
     Promise.resolve().then(cleanUp);
+    emittery?.emit(OnPriceLine.dragEnd);
   };
 
   useEffect(() => {

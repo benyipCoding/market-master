@@ -28,6 +28,7 @@ export interface AddPriceLinePayload {
   price: number;
   id: string;
   type: PriceLineType;
+  orderId?: string;
 }
 
 export interface UpdatePriceLinePayload {

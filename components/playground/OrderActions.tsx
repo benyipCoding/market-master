@@ -16,6 +16,8 @@ import {
 } from "../ui/table";
 import { TitleCase } from "@/utils/helpers";
 import { MiddleSection } from "../interfaces/TradingAside";
+import { Button } from "../ui/button";
+import { PriceLineType } from "../interfaces/CandlestickSeries";
 
 const OrderActions = () => {
   const { currentOrderId } = useSelector((state: RootState) => state.dialog);
@@ -69,15 +71,27 @@ const OrderActions = () => {
       <OrderActionItem
         label="Stop Loss"
         order={currentOrder}
-        id="stoploss"
+        id={PriceLineType.OpenOrderStopLoss}
         prop="stop_price"
       />
       <OrderActionItem
         label="Take Profit"
         order={currentOrder}
-        id="takeprofit"
+        id={PriceLineType.OpenOrderTakeProfit}
         prop="limit_price"
       />
+
+      <div className="flex items-center justify-end gap-4 mt-4">
+        {/* <Button type="button" variant={"ghost"} size="sm">
+          Reset
+        </Button> */}
+        <Button type="button" variant={"secondary"} size="sm">
+          Cancel
+        </Button>
+        <Button type="button" variant={"default"} size="sm">
+          Confirm
+        </Button>
+      </div>
     </div>
   );
 };

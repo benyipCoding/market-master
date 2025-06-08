@@ -128,7 +128,7 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
   }, [series]);
 
   const createPriceLine = useCallback(
-    ({ price, id, type }: AddPriceLinePayload) => {
+    ({ price, id, type, orderId }: AddPriceLinePayload) => {
       if (!series) return;
       // @ts-ignore
       let priceLine: PriceLineOptions = {
@@ -152,15 +152,23 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
         case PriceLineType.OpeningPrice:
           priceLine = Object.assign(
             {},
-            priceLine,
+            { ...priceLine, orderId },
             openingOrderPriceLineOptions
           );
           break;
         case PriceLineType.OpenOrderStopLoss:
-          priceLine = Object.assign({}, priceLine, openOrderStopLoss);
+          priceLine = Object.assign(
+            {},
+            { ...priceLine, orderId },
+            openOrderStopLoss
+          );
           break;
         case PriceLineType.OpenOrderTakeProfit:
-          priceLine = Object.assign({}, priceLine, openOrderTakeProfit);
+          priceLine = Object.assign(
+            {},
+            { ...priceLine, orderId },
+            openOrderTakeProfit
+          );
           break;
 
         default:
@@ -185,6 +193,9 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     const target = priceLines.current.find((p) => p.options().id === id);
     if (!target) return;
     series?.removePriceLine(target);
+    priceLines.current = priceLines.current.filter(
+      (p) => p.options().id !== id
+    );
   };
 
   const updatePriceLine = ({ id, options }: UpdatePriceLinePayload) => {
@@ -349,6 +360,7 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
         ),
         price: payload.opening_price,
         type: PriceLineType.OpeningPrice,
+        orderId: o.id,
       };
 
       addPriceLine(priceLinePayload);

@@ -34,6 +34,7 @@ import {
   OrderTabs,
 } from "../interfaces/Playground";
 import {
+  debonce,
   formatNumberWithCommas,
   isInRange,
   timestampToDateStr,
@@ -52,7 +53,11 @@ import {
   ContextMenuTrigger,
 } from "../ui/context-menu";
 import Big from "big.js";
-import { OrderSide } from "../interfaces/CandlestickSeries";
+import {
+  OrderSide,
+  PriceLineType,
+  UpdatePriceLinePayload,
+} from "../interfaces/CandlestickSeries";
 import { postClosePosition } from "@/app/playground/actions/postClosePosition";
 import { getProfile } from "@/app/playground/actions/getProfile";
 import {
@@ -61,6 +66,7 @@ import {
   setDialogContent,
 } from "@/store/dialogSlice";
 import { Button } from "../ui/button";
+import { EmitteryContext, OnPriceLine } from "@/providers/EmitteryProvider";
 
 const OrdersPanel: React.FC<OrdersPanelProps> = ({ setDialogVisible }) => {
   const dispatch = useDispatch<AppDispatch>();
@@ -78,6 +84,7 @@ const OrdersPanel: React.FC<OrdersPanelProps> = ({ setDialogVisible }) => {
     (state: RootState) => state.bottomPanel
   );
   const { userInfo, userProfile } = useContext(AuthContext);
+  const { emittery } = useContext(EmitteryContext);
 
   // slide block
   const [slideBlock, setSlideBlock] = useState({
@@ -214,6 +221,27 @@ const OrdersPanel: React.FC<OrdersPanelProps> = ({ setDialogVisible }) => {
     );
   };
 
+  const dragingPriceLinePayload = useRef<UpdatePriceLinePayload | null>(null);
+
+  const onPriceLineChange = useCallback((payload: UpdatePriceLinePayload) => {
+    const acceptTypes = [
+      PriceLineType.OpenOrderStopLoss,
+      PriceLineType.OpenOrderTakeProfit,
+    ];
+    if (!acceptTypes.some((type) => payload.id.includes(type))) return;
+    dragingPriceLinePayload.current = payload;
+  }, []);
+
+  const onPriceLineChangeWithDebonce = useMemo(
+    () => debonce(onPriceLineChange, 100),
+    [onPriceLineChange]
+  );
+
+  const onDragEnd = () => {
+    console.log("DragEnd", dragingPriceLinePayload.current);
+    dragingPriceLinePayload.current = null;
+  };
+
   useEffect(() => {
     if (!currentOrderTab) return;
     const dom = document.getElementById(currentOrderTab);
@@ -263,6 +291,16 @@ const OrdersPanel: React.FC<OrdersPanelProps> = ({ setDialogVisible }) => {
       }
     }
   }, [closePosition, currentCandle, openingOrders]);
+
+  useEffect(() => {
+    emittery?.on(OnPriceLine.updatePanel, onPriceLineChangeWithDebonce);
+    emittery?.on(OnPriceLine.dragEnd, onDragEnd);
+
+    return () => {
+      emittery?.off(OnPriceLine.updatePanel, onPriceLineChangeWithDebonce);
+      emittery?.off(OnPriceLine.dragEnd, onDragEnd);
+    };
+  }, [emittery, onPriceLineChangeWithDebonce]);
 
   return (
     <div className="h-full flex flex-col gap-2">

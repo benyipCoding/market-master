@@ -16,11 +16,11 @@ import { useSelector } from "react-redux";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { MiddleSection } from "../interfaces/TradingAside";
 import Big from "big.js";
-import { OrderSide } from "../interfaces/CandlestickSeries";
+import { OrderSide, PriceLineType } from "../interfaces/CandlestickSeries";
 import { AuthContext } from "@/context/Auth";
 
 interface OrderActionItemProps {
-  id: string;
+  id: PriceLineType;
   label: string;
   order: Order | null;
   prop: keyof Order;
@@ -160,8 +160,6 @@ const OrderActionItem: React.FC<OrderActionItemProps> = ({
     userProfile,
     valueType,
   ]);
-
-  useEffect(() => {}, []);
 
   return (
     <div className="form-item">
