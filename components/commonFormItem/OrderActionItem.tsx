@@ -53,6 +53,10 @@ const OrderActionItem: React.FC<OrderActionItemProps> = ({
     setValueType(value);
   };
 
+  const onActiveChange = (checked: boolean) => {
+    setActive(checked);
+  };
+
   useEffect(() => {
     if (!order || !currentCandle || !avgAmplitude) return;
     if (order[prop]) {
@@ -62,7 +66,9 @@ const OrderActionItem: React.FC<OrderActionItemProps> = ({
     }
 
     // 给默认值
-    if (!active) {
+    if (!order[prop]) {
+      console.log("给默认值");
+
       const multiple = 3;
       // 当作为止损的情况
       if (prop === "stop_price") {
@@ -101,7 +107,6 @@ const OrderActionItem: React.FC<OrderActionItemProps> = ({
       }
     }
   }, [
-    active,
     avgAmplitude,
     currentCandle,
     currentSymbol?.precision,
@@ -175,7 +180,7 @@ const OrderActionItem: React.FC<OrderActionItemProps> = ({
           id={id}
           className="border-secondary-foreground dark:data-[state=checked]:bg-white dark:data-[state=checked]:text-black"
           checked={active}
-          onCheckedChange={(checked) => setActive(checked)}
+          onCheckedChange={onActiveChange}
         />
         {label}
       </Label>
