@@ -24,6 +24,7 @@ interface OrderActionItemProps {
   label: string;
   order: Order | null;
   prop: keyof Order;
+  dynamicPrice: number | undefined;
 }
 
 const OrderActionItem: React.FC<OrderActionItemProps> = ({
@@ -31,9 +32,11 @@ const OrderActionItem: React.FC<OrderActionItemProps> = ({
   label,
   order,
   prop,
+  dynamicPrice,
 }) => {
   const { currentSymbol, avgAmplitude, currentCandle, operationMode } =
     useSelector((state: RootState) => state.fetchData);
+
   const [active, setActive] = useState<CheckedState>(false);
   const [displayValue, setDisplayValue] = useState("");
   const [actualValue, setActualValue] = useState(0);
@@ -53,26 +56,27 @@ const OrderActionItem: React.FC<OrderActionItemProps> = ({
   useEffect(() => {
     if (!order || !currentCandle || !avgAmplitude) return;
     if (order[prop]) {
+      setActualValue(dynamicPrice || Number(order[prop]));
       setActive(true);
-      setActualValue(Number(order[prop]));
       return;
     }
 
     // 给默认值
     if (!active) {
+      const multiple = 3;
       // 当作为止损的情况
       if (prop === "stop_price") {
         // 多单
         if (order.side === OrderSide.BUY) {
           const price = new Big(currentCandle.close)
-            .minus(new Big(avgAmplitude).times(3))
+            .minus(new Big(avgAmplitude).times(multiple))
             .toFixed(currentSymbol?.precision);
           setActualValue(Number(price));
         }
         // 空单
         else {
           const price = new Big(currentCandle.close)
-            .add(new Big(avgAmplitude).times(3))
+            .add(new Big(avgAmplitude).times(multiple))
             .toFixed(currentSymbol?.precision);
           setActualValue(Number(price));
         }
@@ -83,14 +87,14 @@ const OrderActionItem: React.FC<OrderActionItemProps> = ({
         // 多单
         if (order.side === OrderSide.BUY) {
           const price = new Big(currentCandle.close)
-            .add(new Big(avgAmplitude).times(3))
+            .add(new Big(avgAmplitude).times(multiple))
             .toFixed(currentSymbol?.precision);
           setActualValue(Number(price));
         }
         // 空单
         else {
           const price = new Big(currentCandle.close)
-            .minus(new Big(avgAmplitude).times(3))
+            .minus(new Big(avgAmplitude).times(multiple))
             .toFixed(currentSymbol?.precision);
           setActualValue(Number(price));
         }
@@ -101,12 +105,15 @@ const OrderActionItem: React.FC<OrderActionItemProps> = ({
     avgAmplitude,
     currentCandle,
     currentSymbol?.precision,
+    dynamicPrice,
     order,
     prop,
   ]);
 
+  // 根据actualValue改变displayValue
   useEffect(() => {
     let diff, ticks, usd, percentage;
+
     switch (valueType) {
       case MiddleSection.Price:
         setDisplayValue(String(actualValue));

@@ -64,6 +64,9 @@ import {
   DialogContentType,
   setCurrentOrderId,
   setDialogContent,
+  setPreLimitPrice,
+  setPreStopPrice,
+  setPriceLineIds,
 } from "@/store/dialogSlice";
 import { Button } from "../ui/button";
 import { EmitteryContext, OnPriceLine } from "@/providers/EmitteryProvider";
@@ -202,9 +205,19 @@ const OrdersPanel: React.FC<OrdersPanelProps> = ({ setDialogVisible }) => {
   );
 
   // 打开OrderActions弹窗
-  const openOrderActionsDialog = (order: Order) => {
+  const openOrderActionsDialog = (
+    order: Order,
+    payload?: UpdatePriceLinePayload
+  ) => {
     dispatch(setDialogContent(DialogContentType.OrderActions));
     dispatch(setCurrentOrderId(order.id));
+    if (payload) {
+      payload.id.includes(PriceLineType.OpenOrderStopLoss) &&
+        dispatch(setPreStopPrice(payload.options.price));
+      payload.id.includes(PriceLineType.OpenOrderTakeProfit) &&
+        dispatch(setPreLimitPrice(payload.options.price));
+      dispatch(setPriceLineIds(payload.id));
+    }
     setDialogVisible(true);
   };
 
@@ -235,14 +248,14 @@ const OrdersPanel: React.FC<OrdersPanelProps> = ({ setDialogVisible }) => {
 
   const onDragEnd = useCallback(() => {
     emittery?.emit(OnPriceLine.retrive, dragingPriceLinePayload.current?.id);
-    dragingPriceLinePayload.current = null;
+    // dragingPriceLinePayload.current = null;
   }, [emittery]);
 
   const onPriceLineResponse = useCallback(
     (payload: Readonly<PriceLineOptions>) => {
       const order = openingOrders.find((o) => o.id === payload.orderId);
       if (!order) return;
-      console.log(order);
+      openOrderActionsDialog(order, dragingPriceLinePayload.current!);
     },
     [openingOrders]
   );

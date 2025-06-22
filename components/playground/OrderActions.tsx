@@ -1,9 +1,14 @@
 import { retriveOrder } from "@/app/playground/actions/getOrders";
 import { AppDispatch, RootState } from "@/store";
-import { useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Order } from "../interfaces/Playground";
-import { setCurrentOrderId } from "@/store/dialogSlice";
+import {
+  setCurrentOrderId,
+  setPreLimitPrice,
+  setPreStopPrice,
+  setPriceLineIds,
+} from "@/store/dialogSlice";
 import OrderActionItem from "../commonFormItem/OrderActionItem";
 import {
   Table,
@@ -17,13 +22,40 @@ import {
 import { TitleCase } from "@/utils/helpers";
 import { MiddleSection } from "../interfaces/TradingAside";
 import { Button } from "../ui/button";
-import { PriceLineType } from "../interfaces/CandlestickSeries";
+import {
+  PriceLineType,
+  UpdatePriceLinePayload,
+} from "../interfaces/CandlestickSeries";
+import { DialogContext } from "@/context/Dialog";
+import { EmitteryContext, OnPriceLine } from "@/providers/EmitteryProvider";
 
 const OrderActions = () => {
-  const { currentOrderId } = useSelector((state: RootState) => state.dialog);
+  const { currentOrderId, preStopPrice, preLimitPrice, priceLineIds } =
+    useSelector((state: RootState) => state.dialog);
   const dispatch = useDispatch<AppDispatch>();
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
   const { currentCandle } = useSelector((state: RootState) => state.fetchData);
+  const { setDialogVisible } = useContext(DialogContext);
+  const { emittery } = useContext(EmitteryContext);
+
+  const onCancel = useCallback(() => {
+    // 还原priceLine为订单原来的止损止盈位置
+    priceLineIds.forEach((id) => {
+      const payload: UpdatePriceLinePayload = {
+        id,
+        options: {
+          price: id.includes(PriceLineType.OpenOrderStopLoss)
+            ? Number(currentOrder?.stop_price)
+            : id.includes(PriceLineType.OpenOrderTakeProfit)
+            ? Number(currentOrder?.limit_price)
+            : undefined,
+        },
+      };
+      emittery?.emit(OnPriceLine.update, payload);
+    });
+
+    setDialogVisible(false);
+  }, [currentOrder, emittery, priceLineIds, setDialogVisible]);
 
   useEffect(() => {
     if (!currentOrderId) return;
@@ -35,6 +67,9 @@ const OrderActions = () => {
   useEffect(() => {
     return () => {
       dispatch(setCurrentOrderId(null));
+      dispatch(setPreStopPrice(undefined));
+      dispatch(setPreLimitPrice(undefined));
+      dispatch(setPriceLineIds(null));
     };
   }, []);
 
@@ -73,19 +108,26 @@ const OrderActions = () => {
         order={currentOrder}
         id={PriceLineType.OpenOrderStopLoss}
         prop="stop_price"
+        dynamicPrice={preStopPrice}
       />
       <OrderActionItem
         label="Take Profit"
         order={currentOrder}
         id={PriceLineType.OpenOrderTakeProfit}
         prop="limit_price"
+        dynamicPrice={preLimitPrice}
       />
 
       <div className="flex items-center justify-end gap-4 mt-4">
         {/* <Button type="button" variant={"ghost"} size="sm">
           Reset
         </Button> */}
-        <Button type="button" variant={"secondary"} size="sm">
+        <Button
+          type="button"
+          variant={"secondary"}
+          size="sm"
+          onClick={onCancel}
+        >
           Cancel
         </Button>
         <Button type="button" variant={"default"} size="sm">
