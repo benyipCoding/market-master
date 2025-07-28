@@ -113,6 +113,9 @@ export interface Order {
   update_at: Date;
   user_id: string;
   profit?: number;
+  opening_price_line_id?: string;
+  limit_price_line_id?: string;
+  stop_price_line_id?: string;
 }
 
 export enum AsideContent {

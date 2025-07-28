@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import {
@@ -18,6 +18,7 @@ import { MiddleSection } from "../interfaces/TradingAside";
 import Big from "big.js";
 import { OrderSide, PriceLineType } from "../interfaces/CandlestickSeries";
 import { AuthContext } from "@/context/Auth";
+import { EmitteryContext } from "@/providers/EmitteryProvider";
 
 interface OrderActionItemProps {
   id: PriceLineType;
@@ -34,8 +35,14 @@ const OrderActionItem: React.FC<OrderActionItemProps> = ({
   prop,
   dynamicPrice,
 }) => {
-  const { currentSymbol, avgAmplitude, currentCandle, operationMode } =
-    useSelector((state: RootState) => state.fetchData);
+  const {
+    currentSymbol,
+    avgAmplitude,
+    currentCandle,
+    operationMode,
+    openingOrders,
+  } = useSelector((state: RootState) => state.fetchData);
+  const { currentOrderId } = useSelector((state: RootState) => state.dialog);
 
   const [active, setActive] = useState<CheckedState>(false);
   const [displayValue, setDisplayValue] = useState("");
@@ -44,6 +51,7 @@ const OrderActionItem: React.FC<OrderActionItemProps> = ({
     MiddleSection.Price
   );
   const { userProfile } = useContext(AuthContext);
+  const { emittery } = useContext(EmitteryContext);
 
   const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
     setDisplayValue((e.target as HTMLInputElement).value);
@@ -53,9 +61,22 @@ const OrderActionItem: React.FC<OrderActionItemProps> = ({
     setValueType(value);
   };
 
-  const onActiveChange = (checked: boolean) => {
-    setActive(checked);
-  };
+  const onActiveChange = useCallback(
+    (checked: boolean) => {
+      setActive(checked);
+      const order = openingOrders.find((o) => o.id === currentOrderId);
+      console.log(order);
+      console.log(prop);
+
+      if (checked) {
+        // 激活时显示priceLine
+        // emittery?.emit(OnPriceLine.remove, id);
+      } else {
+        // 灭活时隐藏priceLine
+      }
+    },
+    [currentOrderId, openingOrders, prop]
+  );
 
   useEffect(() => {
     if (!order || !currentCandle || !avgAmplitude) return;
@@ -67,8 +88,6 @@ const OrderActionItem: React.FC<OrderActionItemProps> = ({
 
     // 给默认值
     if (!order[prop]) {
-      console.log("给默认值");
-
       const multiple = 3;
       // 当作为止损的情况
       if (prop === "stop_price") {

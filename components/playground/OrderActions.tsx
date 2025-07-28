@@ -13,14 +13,12 @@ import OrderActionItem from "../commonFormItem/OrderActionItem";
 import {
   Table,
   TableBody,
-  // TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "../ui/table";
 import { TitleCase } from "@/utils/helpers";
-import { MiddleSection } from "../interfaces/TradingAside";
 import { Button } from "../ui/button";
 import {
   PriceLineType,

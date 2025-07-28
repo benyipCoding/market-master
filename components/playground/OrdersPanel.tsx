@@ -219,6 +219,8 @@ const OrdersPanel: React.FC<OrdersPanelProps> = ({ setDialogVisible }) => {
       dispatch(setPriceLineIds(payload.id));
     }
     setDialogVisible(true);
+
+    console.log("@@@@@", order);
   };
 
   const dynamicDisplay = (order: Order, type: "stop" | "limit") => {
@@ -253,7 +255,7 @@ const OrdersPanel: React.FC<OrdersPanelProps> = ({ setDialogVisible }) => {
 
   const onPriceLineResponse = useCallback(
     (payload: Readonly<PriceLineOptions>) => {
-      const order = openingOrders.find((o) => o.id === payload.orderId);
+      const order = openingOrders.find((o) => o.id === payload?.orderId);
       if (!order) return;
       openOrderActionsDialog(order, dragingPriceLinePayload.current!);
     },

@@ -26,7 +26,11 @@ import {
 } from "lightweight-charts";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
-import { setAvgAmplitude, symbolToSeriesOptions } from "@/store/fetchDataSlice";
+import {
+  setAvgAmplitude,
+  setOpenOrdersPriceLineId,
+  symbolToSeriesOptions,
+} from "@/store/fetchDataSlice";
 import { CreateOrderMarkerPayload } from "@/app/playground/actions/createOrder";
 import {
   limitOrderPriceLineOptions,
@@ -215,10 +219,10 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     if (!targets.length) return;
     targets.forEach((t) => {
       series?.removePriceLine(t);
-      priceLines.current = priceLines.current.filter(
-        (p) => p.options().id !== t.options().id
-      );
     });
+    priceLines.current = priceLines.current.filter(
+      (p) => !p.options().id?.includes(PriceLineType.OpeningPrice)
+    );
   }, [series]);
 
   const retrivePriceLine = (id: string) => {
@@ -300,8 +304,6 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
         Number(o.time) === parseData.time &&
         o.side === parseData.side
     );
-
-    console.log({ targetOrders });
   }, [mouseClickEventParam, openingOrders]);
 
   const generateMarkerColor = (
@@ -365,6 +367,13 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
       };
 
       addPriceLine(priceLinePayload);
+      dispatch(
+        setOpenOrdersPriceLineId({
+          orderId: o.id,
+          key: "opening_price_line_id",
+          value: priceLinePayload.id,
+        })
+      );
 
       // 如果有止损
       if (o.stop_price) {
@@ -375,6 +384,13 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
         priceLinePayload.price = Number(o.stop_price);
         priceLinePayload.type = PriceLineType.OpenOrderStopLoss;
         addPriceLine(priceLinePayload);
+        dispatch(
+          setOpenOrdersPriceLineId({
+            orderId: o.id,
+            key: "stop_price_line_id",
+            value: priceLinePayload.id,
+          })
+        );
       }
 
       // 如果有止盈
@@ -386,6 +402,13 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
         priceLinePayload.price = Number(o.limit_price);
         priceLinePayload.type = PriceLineType.OpenOrderTakeProfit;
         addPriceLine(priceLinePayload);
+        dispatch(
+          setOpenOrdersPriceLineId({
+            orderId: o.id,
+            key: "limit_price_line_id",
+            value: priceLinePayload.id,
+          })
+        );
       }
     });
   }, [

@@ -171,6 +171,21 @@ export const fetchDataSlice = createSlice({
       state.limitOrders = [];
       state.closedOrders = [];
     },
+    setOpenOrdersPriceLineId(
+      state,
+      action: PayloadAction<{
+        orderId: string;
+        key: keyof Order;
+        value: string;
+      }>
+    ) {
+      const { orderId, key, value } = action.payload;
+      state.openingOrders = state.openingOrders.map((o) => {
+        const isTarget = o.id === orderId;
+        if (!isTarget) return { ...o };
+        return { ...o, [key]: value };
+      });
+    },
   },
   extraReducers(builder) {
     builder.addCase(fetchPeriods.fulfilled, (state, action) => {
@@ -235,6 +250,7 @@ export const {
   setOperationMode,
   setBackTestRecordKey,
   clearOrders,
+  setOpenOrdersPriceLineId,
 } = fetchDataSlice.actions;
 
 export default fetchDataSlice.reducer;
