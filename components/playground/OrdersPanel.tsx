@@ -220,7 +220,7 @@ const OrdersPanel: React.FC<OrdersPanelProps> = ({ setDialogVisible }) => {
     }
     setDialogVisible(true);
 
-    console.log("@@@@@", order);
+    // console.log("@@@@@", order);
   };
 
   const dynamicDisplay = (order: Order, type: "stop" | "limit") => {

@@ -18,7 +18,7 @@ import { MiddleSection } from "../interfaces/TradingAside";
 import Big from "big.js";
 import { OrderSide, PriceLineType } from "../interfaces/CandlestickSeries";
 import { AuthContext } from "@/context/Auth";
-import { EmitteryContext } from "@/providers/EmitteryProvider";
+import { EmitteryContext, OnPriceLine } from "@/providers/EmitteryProvider";
 
 interface OrderActionItemProps {
   id: PriceLineType;
@@ -65,17 +65,26 @@ const OrderActionItem: React.FC<OrderActionItemProps> = ({
     (checked: boolean) => {
       setActive(checked);
       const order = openingOrders.find((o) => o.id === currentOrderId);
-      console.log(order);
-      console.log(prop);
+      if (!order) return;
+      const property: keyof Order | undefined =
+        prop === "stop_price"
+          ? "stop_price_line_id"
+          : prop === "limit_price"
+          ? "limit_price_line_id"
+          : undefined;
+      if (!property) return;
 
       if (checked) {
         // 激活时显示priceLine
-        // emittery?.emit(OnPriceLine.remove, id);
+        // console.log(order.);
+        console.log(order[property], "activate");
       } else {
         // 灭活时隐藏priceLine
+        console.log(order[property], "demised");
+        emittery?.emit(OnPriceLine.remove, order[property]);
       }
     },
-    [currentOrderId, openingOrders, prop]
+    [openingOrders, prop, currentOrderId, emittery]
   );
 
   useEffect(() => {

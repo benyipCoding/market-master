@@ -60,6 +60,7 @@ export enum OnPriceLine {
   dragEnd = "price_line_drag_end",
   retrive = "price_line_retrive",
   response = "price_line_response",
+  refresh = "price_line_refresh",
 }
 
 export enum OnStopLossAndTakeProfit {

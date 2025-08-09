@@ -179,6 +179,13 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
 
   const addPriceLine = useCallback(
     (payload: AddPriceLinePayload) => {
+      const existed = priceLines.current.some(
+        (p) => p.options().id === payload.id
+      );
+      if (existed) {
+        console.log(`${payload.id} has been created`);
+        return;
+      }
       const priceLine = createPriceLine(payload);
       priceLines.current.push(priceLine!);
     },
@@ -230,6 +237,88 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     emittery?.emit(OnPriceLine.response, target?.options());
   };
 
+  const refreshMarkerAndPriceLine = useCallback(() => {
+    if (!currentCandle) return;
+
+    removeOrderMarkers();
+    removeOpeningOrderPriceLines();
+    openingOrders.forEach((o) => {
+      if (o.time > currentCandle.time) return;
+
+      const payload: CreateOrderMarkerPayload = {
+        opening_price: Number(o.opening_price),
+        side: o.side,
+        time: Number(o.time),
+        latestPrice: currentCandle.close,
+      };
+
+      addOrderMarker(payload);
+
+      const priceLinePayload: AddPriceLinePayload = {
+        id: generatePriceLineId(
+          payload.opening_price,
+          PriceLineType.OpeningPrice
+        ),
+        price: payload.opening_price,
+        type: PriceLineType.OpeningPrice,
+        orderId: o.id,
+      };
+
+      addPriceLine(priceLinePayload);
+      dispatch(
+        setOpenOrdersPriceLineId({
+          orderId: o.id,
+          key: "opening_price_line_id",
+          value: priceLinePayload.id,
+        })
+      );
+
+      // 如果有止损
+      if (o.stop_price) {
+        priceLinePayload.id = generatePriceLineId(
+          o.stop_price,
+          PriceLineType.OpenOrderStopLoss
+        );
+        priceLinePayload.price = Number(o.stop_price);
+        priceLinePayload.type = PriceLineType.OpenOrderStopLoss;
+        addPriceLine(priceLinePayload);
+        dispatch(
+          setOpenOrdersPriceLineId({
+            orderId: o.id,
+            key: "stop_price_line_id",
+            value: priceLinePayload.id,
+          })
+        );
+      }
+
+      // 如果有止盈
+      if (o.limit_price) {
+        priceLinePayload.id = generatePriceLineId(
+          o.limit_price,
+          PriceLineType.OpenOrderTakeProfit
+        );
+        priceLinePayload.price = Number(o.limit_price);
+        priceLinePayload.type = PriceLineType.OpenOrderTakeProfit;
+        addPriceLine(priceLinePayload);
+        dispatch(
+          setOpenOrdersPriceLineId({
+            orderId: o.id,
+            key: "limit_price_line_id",
+            value: priceLinePayload.id,
+          })
+        );
+      }
+    });
+  }, [
+    addOrderMarker,
+    addPriceLine,
+    currentCandle,
+    dispatch,
+    openingOrders,
+    removeOpeningOrderPriceLines,
+    removeOrderMarkers,
+  ]);
+
   useEffect(() => {
     emittery?.on(OnApply.ResetMainSeriesData, resetDataHandler);
     emittery?.on(OnOrderMarker.add, addOrderMarker);
@@ -238,7 +327,6 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     emittery?.on(OnPriceLine.remove, removePriceLine);
     emittery?.on(OnPriceLine.update, updatePriceLine);
     emittery?.on(OnPriceLine.retrive, retrivePriceLine);
-    // emittery?.on(OnPriceLine.clear, clearPriceLine);
 
     return () => {
       emittery?.off(OnApply.ResetMainSeriesData, resetDataHandler);
@@ -248,10 +336,16 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
       emittery?.off(OnPriceLine.remove, removePriceLine);
       emittery?.off(OnPriceLine.update, updatePriceLine);
       emittery?.off(OnPriceLine.retrive, retrivePriceLine);
-
-      // emittery?.off(OnPriceLine.clear, clearPriceLine);
     };
   }, [series, emittery]);
+
+  useEffect(() => {
+    emittery?.on(OnPriceLine.refresh, refreshMarkerAndPriceLine);
+
+    return () => {
+      emittery?.off(OnPriceLine.refresh, refreshMarkerAndPriceLine);
+    };
+  }, [series, emittery, refreshMarkerAndPriceLine]);
 
   useEffect(() => {
     series?.applyOptions(customOptions);
@@ -342,83 +436,8 @@ const CandlestickSeries: React.FC<CandlestickSeriesProps> = ({
     openOrderLen.current = openingOrders.length;
 
     // Marker和PriceLine变动
-    removeOrderMarkers();
-    removeOpeningOrderPriceLines();
-    openingOrders.forEach((o) => {
-      if (o.time > currentCandle?.time) return;
-
-      const payload: CreateOrderMarkerPayload = {
-        opening_price: Number(o.opening_price),
-        side: o.side,
-        time: Number(o.time),
-        latestPrice: currentCandle?.close,
-      };
-
-      addOrderMarker(payload);
-
-      const priceLinePayload: AddPriceLinePayload = {
-        id: generatePriceLineId(
-          payload.opening_price,
-          PriceLineType.OpeningPrice
-        ),
-        price: payload.opening_price,
-        type: PriceLineType.OpeningPrice,
-        orderId: o.id,
-      };
-
-      addPriceLine(priceLinePayload);
-      dispatch(
-        setOpenOrdersPriceLineId({
-          orderId: o.id,
-          key: "opening_price_line_id",
-          value: priceLinePayload.id,
-        })
-      );
-
-      // 如果有止损
-      if (o.stop_price) {
-        priceLinePayload.id = generatePriceLineId(
-          o.stop_price,
-          PriceLineType.OpenOrderStopLoss
-        );
-        priceLinePayload.price = Number(o.stop_price);
-        priceLinePayload.type = PriceLineType.OpenOrderStopLoss;
-        addPriceLine(priceLinePayload);
-        dispatch(
-          setOpenOrdersPriceLineId({
-            orderId: o.id,
-            key: "stop_price_line_id",
-            value: priceLinePayload.id,
-          })
-        );
-      }
-
-      // 如果有止盈
-      if (o.limit_price) {
-        priceLinePayload.id = generatePriceLineId(
-          o.limit_price,
-          PriceLineType.OpenOrderTakeProfit
-        );
-        priceLinePayload.price = Number(o.limit_price);
-        priceLinePayload.type = PriceLineType.OpenOrderTakeProfit;
-        addPriceLine(priceLinePayload);
-        dispatch(
-          setOpenOrdersPriceLineId({
-            orderId: o.id,
-            key: "limit_price_line_id",
-            value: priceLinePayload.id,
-          })
-        );
-      }
-    });
-  }, [
-    addOrderMarker,
-    openingOrders,
-    removeOrderMarkers,
-    removeOpeningOrderPriceLines,
-    addPriceLine,
-    currentCandle,
-  ]);
+    refreshMarkerAndPriceLine();
+  }, [openingOrders, currentCandle, refreshMarkerAndPriceLine]);
 
   return null;
 };

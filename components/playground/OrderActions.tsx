@@ -37,23 +37,25 @@ const OrderActions = () => {
   const { emittery } = useContext(EmitteryContext);
 
   const onCancel = useCallback(() => {
+    emittery?.emit(OnPriceLine.refresh);
+
     // 还原priceLine为订单原来的止损止盈位置
-    priceLineIds.forEach((id) => {
-      const payload: UpdatePriceLinePayload = {
-        id,
-        options: {
-          price: id.includes(PriceLineType.OpenOrderStopLoss)
-            ? Number(currentOrder?.stop_price)
-            : id.includes(PriceLineType.OpenOrderTakeProfit)
-            ? Number(currentOrder?.limit_price)
-            : undefined,
-        },
-      };
-      emittery?.emit(OnPriceLine.update, payload);
-    });
+    // priceLineIds.forEach((id) => {
+    //   const payload: UpdatePriceLinePayload = {
+    //     id,
+    //     options: {
+    //       price: id.includes(PriceLineType.OpenOrderStopLoss)
+    //         ? Number(currentOrder?.stop_price)
+    //         : id.includes(PriceLineType.OpenOrderTakeProfit)
+    //         ? Number(currentOrder?.limit_price)
+    //         : undefined,
+    //     },
+    //   };
+    //   emittery?.emit(OnPriceLine.update, payload);
+    // });
 
     setDialogVisible(false);
-  }, [currentOrder, emittery, priceLineIds, setDialogVisible]);
+  }, [emittery, setDialogVisible]);
 
   useEffect(() => {
     if (!currentOrderId) return;
