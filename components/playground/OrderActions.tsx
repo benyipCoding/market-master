@@ -1,6 +1,6 @@
 import { retriveOrder } from "@/app/playground/actions/getOrders";
 import { AppDispatch, RootState } from "@/store";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Order } from "../interfaces/Playground";
 import {
@@ -9,7 +9,9 @@ import {
   setPreStopPrice,
   setPriceLineIds,
 } from "@/store/dialogSlice";
-import OrderActionItem from "../commonFormItem/OrderActionItem";
+import OrderActionItem, {
+  OrderActionItemRef,
+} from "../commonFormItem/OrderActionItem";
 import {
   Table,
   TableBody,
@@ -36,11 +38,20 @@ const OrderActions = () => {
   const { setDialogVisible } = useContext(DialogContext);
   const { emittery } = useContext(EmitteryContext);
 
+  const stopLossRef = useRef<OrderActionItemRef>(null);
+  const takeProfitRef = useRef<OrderActionItemRef>(null);
+
   const onCancel = useCallback(() => {
     emittery?.emit(OnPriceLine.refresh);
 
     setDialogVisible(false);
   }, [emittery, setDialogVisible]);
+
+  const onConfirm = () => {
+    console.log(currentOrder);
+    console.log(stopLossRef.current);
+    console.log(takeProfitRef.current);
+  };
 
   useEffect(() => {
     if (!currentOrderId) return;
@@ -94,6 +105,7 @@ const OrderActions = () => {
         id={PriceLineType.OpenOrderStopLoss}
         prop="stop_price"
         dynamicPrice={preStopPrice}
+        ref={stopLossRef}
       />
       <OrderActionItem
         label="Take Profit"
@@ -101,6 +113,7 @@ const OrderActions = () => {
         id={PriceLineType.OpenOrderTakeProfit}
         prop="limit_price"
         dynamicPrice={preLimitPrice}
+        ref={takeProfitRef}
       />
 
       <div className="flex items-center justify-end gap-4 mt-4">
@@ -115,7 +128,7 @@ const OrderActions = () => {
         >
           Cancel
         </Button>
-        <Button type="button" variant={"default"} size="sm">
+        <Button type="button" variant={"default"} size="sm" onClick={onConfirm}>
           Confirm
         </Button>
       </div>

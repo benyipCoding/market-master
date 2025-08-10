@@ -1,4 +1,11 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, {
+  forwardRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import {
@@ -33,13 +40,15 @@ interface OrderActionItemProps {
   dynamicPrice: number | undefined;
 }
 
-const OrderActionItem: React.FC<OrderActionItemProps> = ({
-  id,
-  label,
-  order,
-  prop,
-  dynamicPrice,
-}) => {
+export interface OrderActionItemRef {
+  active: CheckedState;
+  value: number;
+}
+
+const OrderActionItem: React.ForwardRefRenderFunction<
+  OrderActionItemRef,
+  OrderActionItemProps
+> = ({ id, label, order, prop, dynamicPrice }, ref) => {
   const {
     currentSymbol,
     avgAmplitude,
@@ -57,7 +66,7 @@ const OrderActionItem: React.FC<OrderActionItemProps> = ({
   );
   const { userProfile } = useContext(AuthContext);
   const { emittery } = useContext(EmitteryContext);
-  const dispatch = useDispatch<AppDispatch>();
+  // const dispatch = useDispatch<AppDispatch>();
 
   const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
     setDisplayValue((e.target as HTMLInputElement).value);
@@ -214,6 +223,11 @@ const OrderActionItem: React.FC<OrderActionItemProps> = ({
     valueType,
   ]);
 
+  useImperativeHandle(ref, () => ({
+    active,
+    value: actualValue,
+  }));
+
   return (
     <div className="form-item">
       <Label htmlFor={id} className="flex items-center gap-2 cursor-pointer">
@@ -253,4 +267,4 @@ const OrderActionItem: React.FC<OrderActionItemProps> = ({
   );
 };
 
-export default OrderActionItem;
+export default forwardRef(OrderActionItem);
