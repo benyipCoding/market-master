@@ -211,6 +211,7 @@ const OrdersPanel: React.FC<OrdersPanelProps> = ({ setDialogVisible }) => {
   ) => {
     dispatch(setDialogContent(DialogContentType.OrderActions));
     dispatch(setCurrentOrderId(order.id));
+
     if (payload) {
       payload.id.includes(PriceLineType.OpenOrderStopLoss) &&
         dispatch(setPreStopPrice(payload.options.price));
@@ -219,8 +220,6 @@ const OrdersPanel: React.FC<OrdersPanelProps> = ({ setDialogVisible }) => {
       dispatch(setPriceLineIds(payload.id));
     }
     setDialogVisible(true);
-
-    // console.log("@@@@@", order);
   };
 
   const dynamicDisplay = (order: Order, type: "stop" | "limit") => {
@@ -250,7 +249,6 @@ const OrdersPanel: React.FC<OrdersPanelProps> = ({ setDialogVisible }) => {
 
   const onDragEnd = useCallback(() => {
     emittery?.emit(OnPriceLine.retrive, dragingPriceLinePayload.current?.id);
-    // dragingPriceLinePayload.current = null;
   }, [emittery]);
 
   const onPriceLineResponse = useCallback(

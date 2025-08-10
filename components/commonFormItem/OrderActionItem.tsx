@@ -11,14 +11,19 @@ import {
 import { MiddleLabel } from "@/constants/tradingAside";
 import { OperationMode, Order } from "../interfaces/Playground";
 import { Checkbox } from "../ui/checkbox";
-import { RootState } from "@/store";
-import { useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
+import { useDispatch, useSelector } from "react-redux";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { MiddleSection } from "../interfaces/TradingAside";
 import Big from "big.js";
-import { OrderSide, PriceLineType } from "../interfaces/CandlestickSeries";
+import {
+  AddPriceLinePayload,
+  OrderSide,
+  PriceLineType,
+} from "../interfaces/CandlestickSeries";
 import { AuthContext } from "@/context/Auth";
 import { EmitteryContext, OnPriceLine } from "@/providers/EmitteryProvider";
+import { setOpenOrdersPriceLineId } from "@/store/fetchDataSlice";
 
 interface OrderActionItemProps {
   id: PriceLineType;
@@ -52,6 +57,7 @@ const OrderActionItem: React.FC<OrderActionItemProps> = ({
   );
   const { userProfile } = useContext(AuthContext);
   const { emittery } = useContext(EmitteryContext);
+  const dispatch = useDispatch<AppDispatch>();
 
   const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
     setDisplayValue((e.target as HTMLInputElement).value);
@@ -76,15 +82,22 @@ const OrderActionItem: React.FC<OrderActionItemProps> = ({
 
       if (checked) {
         // 激活时显示priceLine
-        // console.log(order.);
-        console.log(order[property], "activate");
+        const payload: AddPriceLinePayload = {
+          id: order[property] as string,
+          price: actualValue,
+          type:
+            prop === "stop_price"
+              ? PriceLineType.OpenOrderStopLoss
+              : PriceLineType.OpenOrderTakeProfit,
+          orderId: order.id,
+        };
+        emittery?.emit(OnPriceLine.add, payload);
       } else {
         // 灭活时隐藏priceLine
-        console.log(order[property], "demised");
         emittery?.emit(OnPriceLine.remove, order[property]);
       }
     },
-    [openingOrders, prop, currentOrderId, emittery]
+    [openingOrders, prop, currentOrderId, actualValue, emittery]
   );
 
   useEffect(() => {
