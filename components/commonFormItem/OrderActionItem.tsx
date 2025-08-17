@@ -76,6 +76,37 @@ const OrderActionItem: React.ForwardRefRenderFunction<
     setValueType(value);
   };
 
+  // TODO:根据displayValue改变actualValue
+  const displayValueToActualValue = (
+    displayValue: number,
+    valueType: MiddleSection
+  ): number | undefined => {
+    switch (valueType) {
+      case MiddleSection.Price:
+        return displayValue;
+      case MiddleSection.Ticks:
+        return displayValue;
+      case MiddleSection.Percentage:
+        return displayValue;
+      case MiddleSection.USD:
+        return displayValue;
+      default:
+        return undefined;
+    }
+  };
+
+  const handleBlur = useCallback(
+    (e: React.FocusEvent<HTMLInputElement, Element>) => {
+      if (!currentSymbol) return;
+      const disVal = Number(e.target.value).toFixed(currentSymbol?.precision);
+      setDisplayValue(disVal);
+      const actVal = displayValueToActualValue(Number(disVal), valueType);
+      if (!actVal) return;
+      setActualValue(actVal);
+    },
+    [currentSymbol, valueType]
+  );
+
   const onActiveChange = useCallback(
     (checked: boolean) => {
       setActive(checked);
@@ -167,10 +198,13 @@ const OrderActionItem: React.ForwardRefRenderFunction<
 
   // 根据actualValue改变displayValue
   useEffect(() => {
+    console.log("actualValue change");
+
     let diff, ticks, usd, percentage;
 
     switch (valueType) {
       case MiddleSection.Price:
+        console.log("setDisplayValue", actualValue);
         setDisplayValue(String(actualValue));
         break;
 
@@ -245,6 +279,7 @@ const OrderActionItem: React.ForwardRefRenderFunction<
           disabled={!active}
           value={displayValue}
           onInput={handleInput}
+          onBlur={handleBlur}
         />
         <Select
           disabled={!active}
