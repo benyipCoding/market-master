@@ -78,33 +78,49 @@ const OrderActionItem: React.ForwardRefRenderFunction<
 
   // TODO:根据displayValue改变actualValue
   const displayValueToActualValue = (
-    displayValue: number,
+    disVal: number,
     valueType: MiddleSection
   ): number | undefined => {
     switch (valueType) {
       case MiddleSection.Price:
-        return displayValue;
+        return disVal;
       case MiddleSection.Ticks:
-        return displayValue;
+        return disVal;
       case MiddleSection.Percentage:
-        return displayValue;
+        return disVal;
       case MiddleSection.USD:
-        return displayValue;
+        return disVal;
       default:
         return undefined;
     }
   };
+  // TODO: Blur的时候格式化displayValue
+  const formatDisValOnBlur = useCallback(
+    (value: string, valueType: MiddleSection): string => {
+      switch (valueType) {
+        case MiddleSection.Price:
+          return Number(value).toFixed(currentSymbol?.precision);
+        case MiddleSection.Ticks:
+          return value;
+        case MiddleSection.Percentage:
+          return value;
+        case MiddleSection.USD:
+          return value;
+      }
+    },
+    [currentSymbol]
+  );
 
   const handleBlur = useCallback(
     (e: React.FocusEvent<HTMLInputElement, Element>) => {
       if (!currentSymbol) return;
-      const disVal = Number(e.target.value).toFixed(currentSymbol?.precision);
+      const disVal = formatDisValOnBlur(e.target.value, valueType);
       setDisplayValue(disVal);
       const actVal = displayValueToActualValue(Number(disVal), valueType);
       if (!actVal) return;
       setActualValue(actVal);
     },
-    [currentSymbol, valueType]
+    [currentSymbol, formatDisValOnBlur, valueType]
   );
 
   const onActiveChange = useCallback(
@@ -198,13 +214,10 @@ const OrderActionItem: React.ForwardRefRenderFunction<
 
   // 根据actualValue改变displayValue
   useEffect(() => {
-    console.log("actualValue change");
-
     let diff, ticks, usd, percentage;
 
     switch (valueType) {
       case MiddleSection.Price:
-        console.log("setDisplayValue", actualValue);
         setDisplayValue(String(actualValue));
         break;
 
