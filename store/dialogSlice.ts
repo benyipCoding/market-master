@@ -49,9 +49,11 @@ const dialogSlice = createSlice({
       state.currentOrderId = action.payload;
     },
     setPreStopPrice(state, action: PayloadAction<number | undefined>) {
+      // console.log("### setPreStopPrice", action.payload);
       state.preStopPrice = action.payload;
     },
     setPreLimitPrice(state, action: PayloadAction<number | undefined>) {
+      // console.log("### setPreLimitPrice", action.payload);
       state.preLimitPrice = action.payload;
     },
     setPriceLineIds(state, action: PayloadAction<string | null>) {

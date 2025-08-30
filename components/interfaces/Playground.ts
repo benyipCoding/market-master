@@ -6,6 +6,7 @@ import {
 import { TChartRef } from "./TChart";
 import { TechnicalIndicatorLine } from "./TechnicalIndexForm";
 import { OrderSide, OrderType } from "./CandlestickSeries";
+import { CheckedState } from "@radix-ui/react-checkbox";
 
 export interface AsideProps {
   className?: string;
@@ -131,3 +132,10 @@ export enum ClosePosAction {
 export interface BottomPanelProps extends DialogController {}
 
 export interface OrdersPanelProps extends DialogController {}
+
+export interface UpdateOrderPayload {
+  stopLossActive?: CheckedState;
+  takeProfitActive?: CheckedState;
+  stopLossValue?: number;
+  takeProfitValue?: number;
+}

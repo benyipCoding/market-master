@@ -2,7 +2,7 @@ import { retriveOrder } from "@/app/playground/actions/getOrders";
 import { AppDispatch, RootState } from "@/store";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Order } from "../interfaces/Playground";
+import { Order, UpdateOrderPayload } from "../interfaces/Playground";
 import {
   setCurrentOrderId,
   setPreLimitPrice,
@@ -28,13 +28,19 @@ import {
 } from "../interfaces/CandlestickSeries";
 import { DialogContext } from "@/context/Dialog";
 import { EmitteryContext, OnPriceLine } from "@/providers/EmitteryProvider";
+import { updateOrder } from "@/app/playground/actions/updateOrder";
+import { Status } from "@/utils/apis/response";
+import { toast } from "sonner";
+import { fetchOpeningOrders } from "@/store/fetchDataSlice";
 
 const OrderActions = () => {
   const { currentOrderId, preStopPrice, preLimitPrice, priceLineIds } =
     useSelector((state: RootState) => state.dialog);
   const dispatch = useDispatch<AppDispatch>();
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
-  const { currentCandle } = useSelector((state: RootState) => state.fetchData);
+  const { currentCandle, backTestRecordKey, openingOrders } = useSelector(
+    (state: RootState) => state.fetchData
+  );
   const { setDialogVisible } = useContext(DialogContext);
   const { emittery } = useContext(EmitteryContext);
 
@@ -47,11 +53,28 @@ const OrderActions = () => {
     setDialogVisible(false);
   }, [emittery, setDialogVisible]);
 
-  const onConfirm = () => {
-    console.log(currentOrder);
-    console.log(stopLossRef.current);
-    console.log(takeProfitRef.current);
-  };
+  const onConfirm = useCallback(async () => {
+    if (
+      !currentOrder ||
+      !stopLossRef.current ||
+      !takeProfitRef.current ||
+      !backTestRecordKey
+    )
+      return;
+
+    const payload: UpdateOrderPayload = {
+      stopLossActive: stopLossRef.current?.active,
+      takeProfitActive: takeProfitRef.current?.active,
+      stopLossValue: stopLossRef.current?.value,
+      takeProfitValue: takeProfitRef.current?.value,
+    };
+
+    const res = await updateOrder(currentOrder.id, payload);
+    if (res.status !== Status.OK) return toast.error(res.msg);
+    await dispatch(fetchOpeningOrders(backTestRecordKey));
+    emittery?.emit(OnPriceLine.refresh);
+    setDialogVisible(false);
+  }, [backTestRecordKey, currentOrder, dispatch, emittery, setDialogVisible]);
 
   useEffect(() => {
     if (!currentOrderId) return;

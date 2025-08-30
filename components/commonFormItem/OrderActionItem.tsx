@@ -4,6 +4,7 @@ import React, {
   useContext,
   useEffect,
   useImperativeHandle,
+  useRef,
   useState,
 } from "react";
 import { Label } from "../ui/label";
@@ -18,8 +19,8 @@ import {
 import { MiddleLabel } from "@/constants/tradingAside";
 import { OperationMode, Order } from "../interfaces/Playground";
 import { Checkbox } from "../ui/checkbox";
-import { AppDispatch, RootState } from "@/store";
-import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { useSelector } from "react-redux";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { MiddleSection } from "../interfaces/TradingAside";
 import Big from "big.js";
@@ -31,6 +32,7 @@ import {
 import { AuthContext } from "@/context/Auth";
 import { EmitteryContext, OnPriceLine } from "@/providers/EmitteryProvider";
 import { setOpenOrdersPriceLineId } from "@/store/fetchDataSlice";
+import { generatePriceLineId } from "@/utils/helpers";
 
 interface OrderActionItemProps {
   id: PriceLineType;
@@ -67,6 +69,7 @@ const OrderActionItem: React.ForwardRefRenderFunction<
   const { userProfile } = useContext(AuthContext);
   const { emittery } = useContext(EmitteryContext);
   // const dispatch = useDispatch<AppDispatch>();
+  const tempPriceLineId = useRef<string>("");
 
   const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
     setDisplayValue((e.target as HTMLInputElement).value);
@@ -138,19 +141,28 @@ const OrderActionItem: React.ForwardRefRenderFunction<
 
       if (checked) {
         // 激活时显示priceLine
+        const type =
+          prop === "stop_price"
+            ? PriceLineType.OpenOrderStopLoss
+            : PriceLineType.OpenOrderTakeProfit;
+
+        if (!order[property]) {
+          tempPriceLineId.current = generatePriceLineId(actualValue, type);
+        }
+
         const payload: AddPriceLinePayload = {
-          id: order[property] as string,
+          id: (order[property] as string) || tempPriceLineId.current,
           price: actualValue,
-          type:
-            prop === "stop_price"
-              ? PriceLineType.OpenOrderStopLoss
-              : PriceLineType.OpenOrderTakeProfit,
+          type,
           orderId: order.id,
         };
         emittery?.emit(OnPriceLine.add, payload);
       } else {
         // 灭活时隐藏priceLine
-        emittery?.emit(OnPriceLine.remove, order[property]);
+        emittery?.emit(
+          OnPriceLine.remove,
+          order[property] || tempPriceLineId.current
+        );
       }
     },
     [openingOrders, prop, currentOrderId, actualValue, emittery]
@@ -158,7 +170,8 @@ const OrderActionItem: React.ForwardRefRenderFunction<
 
   useEffect(() => {
     if (!order || !currentCandle || !avgAmplitude) return;
-    if (order[prop]) {
+
+    if (order[prop] || dynamicPrice) {
       setActualValue(dynamicPrice || Number(order[prop]));
       setActive(true);
       return;

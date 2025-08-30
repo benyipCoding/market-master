@@ -89,7 +89,7 @@ export const LineWidthOptions = [1, 2, 3, 4] as const;
 export const LineStyleOptions = ["solid", "dashed", "dotted"];
 
 export const stopLossPriceLineOptions: Partial<PriceLineOptions> = {
-  lineStyle: LineStyle.Dashed,
+  lineStyle: LineStyle.LargeDashed,
   color: "#ff6c37",
   lineWidth: 1 as LineWidth,
   axisLabelVisible: true,
@@ -101,11 +101,11 @@ export const stopLossPriceLineOptions: Partial<PriceLineOptions> = {
 
 export const openOrderStopLoss: Partial<PriceLineOptions> = {
   ...stopLossPriceLineOptions,
-  lineStyle: LineStyle.LargeDashed,
+  lineStyle: LineStyle.Dashed,
 };
 
 export const takeProfitPriceLineOptions: Partial<PriceLineOptions> = {
-  lineStyle: LineStyle.Dashed,
+  lineStyle: LineStyle.LargeDashed,
   color: "#0ccf67",
   lineWidth: 1 as LineWidth,
   axisLabelVisible: true,
@@ -117,11 +117,11 @@ export const takeProfitPriceLineOptions: Partial<PriceLineOptions> = {
 
 export const openOrderTakeProfit: Partial<PriceLineOptions> = {
   ...takeProfitPriceLineOptions,
-  lineStyle: LineStyle.LargeDashed,
+  lineStyle: LineStyle.Dashed,
 };
 
 export const limitOrderPriceLineOptions: Partial<PriceLineOptions> = {
-  lineStyle: LineStyle.Dashed,
+  lineStyle: LineStyle.LargeDashed,
   color: "#48a2de",
   lineWidth: 1 as LineWidth,
   axisLabelVisible: true,
@@ -132,7 +132,7 @@ export const limitOrderPriceLineOptions: Partial<PriceLineOptions> = {
 };
 
 export const openingOrderPriceLineOptions: Partial<PriceLineOptions> = {
-  lineStyle: LineStyle.LargeDashed,
+  lineStyle: LineStyle.Dashed,
   color: "#cad2d9",
   lineWidth: 1 as LineWidth,
   axisLabelVisible: true,

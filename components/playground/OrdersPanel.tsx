@@ -211,7 +211,6 @@ const OrdersPanel: React.FC<OrdersPanelProps> = ({ setDialogVisible }) => {
   ) => {
     dispatch(setDialogContent(DialogContentType.OrderActions));
     dispatch(setCurrentOrderId(order.id));
-
     if (payload) {
       payload.id.includes(PriceLineType.OpenOrderStopLoss) &&
         dispatch(setPreStopPrice(payload.options.price));

@@ -98,7 +98,7 @@ export const fetchFavSymbols = createAsyncThunk("fetch/favSymbols", () => {
 
 export const fetchOpeningOrders = createAsyncThunk(
   "fetch/openingOrders",
-  (backtest_id: string) => {
+  async (backtest_id: string) => {
     return getOrders({
       orderStatus: OrderStatus.EXECUTED,
       backtest_id,
