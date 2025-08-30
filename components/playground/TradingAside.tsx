@@ -33,7 +33,7 @@ import { OperationMode } from "../interfaces/Playground";
 import { Status } from "@/utils/apis/response";
 import { toast } from "sonner";
 import { EmitteryContext, OnPriceLine } from "@/providers/EmitteryProvider";
-import { fetchOpeningOrders } from "@/store/fetchDataSlice";
+import { fetchLimitOrders, fetchOpeningOrders } from "@/store/fetchDataSlice";
 import { setCurrentOrderType } from "@/store/asideSlice";
 
 const TradingAside: React.FC = () => {
@@ -123,7 +123,10 @@ const TradingAside: React.FC = () => {
     }
   };
 
-  const createMarketOrder = useCallback(async () => {
+  const createOrderAction = useCallback(async () => {
+    if (!isBackTestMode) {
+      return toast.warning("Orders can be created only in BACK TEST mode");
+    }
     if (!backTestRecordKey) throw new Error("Back test key is Null");
 
     const payload: CreateOrderDto = {
@@ -131,7 +134,10 @@ const TradingAside: React.FC = () => {
       order_type: currentOrderType,
       side: currentSide,
       quantity: Number(unitValue),
-      opening_price: Number(orderPrice),
+      opening_price:
+        currentOrderType === OrderType.MARKET
+          ? Number(orderPrice)
+          : Number(preOrderPrice),
       operation_mode: OperationMode.PRACTISE,
       time: currentCandle?.time!,
       stop_price: lossAndProfitRef.current?.activeStop
@@ -152,7 +158,10 @@ const TradingAside: React.FC = () => {
     lossAndProfitRef.current?.setActiveStop(false);
 
     // 查询订单表
-    dispatch(fetchOpeningOrders(backTestRecordKey));
+    currentOrderType === OrderType.MARKET &&
+      dispatch(fetchOpeningOrders(backTestRecordKey));
+    currentOrderType === OrderType.LIMIT &&
+      dispatch(fetchLimitOrders(backTestRecordKey));
   }, [
     backTestRecordKey,
     currentCandle?.time,
@@ -160,19 +169,11 @@ const TradingAside: React.FC = () => {
     currentSide,
     currentSymbol?.id,
     dispatch,
+    isBackTestMode,
     orderPrice,
+    preOrderPrice,
     unitValue,
   ]);
-
-  const createLimitOrder = () => {};
-
-  const createOrderAction = async () => {
-    if (!isBackTestMode) {
-      return toast.warning("Orders can be created only in BACK TEST mode");
-    }
-    if (currentOrderType === OrderType.MARKET) createMarketOrder();
-    else createLimitOrder();
-  };
 
   const updatePreOrderPriceByDrag = (payload: UpdatePriceLinePayload) => {
     if (payload.id.includes(PriceLineType.LimitOrderPrice)) {
