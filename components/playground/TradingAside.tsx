@@ -35,6 +35,7 @@ import { toast } from "sonner";
 import { EmitteryContext, OnPriceLine } from "@/providers/EmitteryProvider";
 import { fetchLimitOrders, fetchOpeningOrders } from "@/store/fetchDataSlice";
 import { setCurrentOrderType } from "@/store/asideSlice";
+import { DialogContext } from "@/context/Dialog";
 
 const TradingAside: React.FC = () => {
   const { currentSymbol, backTestRecordKey } = useSelector(
@@ -42,6 +43,7 @@ const TradingAside: React.FC = () => {
   );
   const [currentSide, setCurrentSide] = useState<OrderSide>(OrderSide.SELL);
   const { currentOrderType } = useSelector((state: RootState) => state.aside);
+  const { dialogContent } = useSelector((state: RootState) => state.dialog);
   const [showCalculator, setShowCalculator] = useState(false);
   const unintInputRef = useRef<HTMLInputElement>(null);
   const [unitValue, setUnitValue] = useState<string>("100");
@@ -183,8 +185,8 @@ const TradingAside: React.FC = () => {
 
   const [subCanSubmit, setSubCanSubmit] = useState(false);
   const canSubmit = useMemo(
-    () => isBackTestMode && subCanSubmit,
-    [isBackTestMode, subCanSubmit]
+    () => isBackTestMode && subCanSubmit && !dialogContent,
+    [isBackTestMode, subCanSubmit, dialogContent]
   );
 
   const canSubmitChange = useCallback((canSubmit: boolean) => {

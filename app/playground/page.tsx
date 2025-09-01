@@ -401,7 +401,12 @@ const Playground = () => {
         modal={!isTechnicalIndex && !isSymbolSearch && !isOrderActions}
       >
         <DialogContext.Provider
-          value={{ setDialogVisible, tChartRef, setTechnicalIndicatorLines }}
+          value={{
+            setDialogVisible,
+            tChartRef,
+            setTechnicalIndicatorLines,
+            dialogVisible,
+          }}
         >
           {dialogVisible && (
             <CustomDialogContent

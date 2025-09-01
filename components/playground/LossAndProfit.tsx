@@ -206,6 +206,7 @@ const BracketControl: React.FC<{
     (state: RootState) => state.fetchData
   );
   const { userProfile } = useContext(AuthContext);
+  const { dialogContent } = useSelector((state: RootState) => state.dialog);
 
   const displaySectionData = useMemo<LossAndProfitDataType | null>(() => {
     if (!currentSymbol || !sectionPrice || !orderPrice) return null;
@@ -273,6 +274,7 @@ const BracketControl: React.FC<{
           className="border-secondary-foreground dark:data-[state=checked]:bg-white dark:data-[state=checked]:text-black"
           onCheckedChange={(state) => setChecked(state as boolean)}
           checked={checked}
+          disabled={!!dialogContent}
         />
         <span className="text-sm">{title}</span>
         <span className="sr-only">{title}</span>

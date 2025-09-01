@@ -71,9 +71,9 @@ const OrderActionItem: React.ForwardRefRenderFunction<
   // const dispatch = useDispatch<AppDispatch>();
   const tempPriceLineId = useRef<string>("");
 
-  const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
+  const handleInput = useCallback((e: React.FormEvent<HTMLInputElement>) => {
     setDisplayValue((e.target as HTMLInputElement).value);
-  };
+  }, []);
 
   const handleSelect = (value: MiddleSection) => {
     setValueType(value);
@@ -290,7 +290,10 @@ const OrderActionItem: React.ForwardRefRenderFunction<
 
   return (
     <div className="form-item">
-      <Label htmlFor={id} className="flex items-center gap-2 cursor-pointer">
+      <Label
+        htmlFor={id}
+        className="flex items-center gap-2 cursor-pointer w-fit"
+      >
         <Checkbox
           id={id}
           className="border-secondary-foreground dark:data-[state=checked]:bg-white dark:data-[state=checked]:text-black"

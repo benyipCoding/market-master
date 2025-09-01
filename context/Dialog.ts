@@ -8,9 +8,11 @@ interface IDialogContext {
   setTechnicalIndicatorLines: React.Dispatch<
     React.SetStateAction<TechnicalIndicatorLine[]>
   >;
+  dialogVisible: boolean;
 }
 
 export const DialogContext = createContext<IDialogContext>({
   setDialogVisible: () => {},
   setTechnicalIndicatorLines: () => {},
+  dialogVisible: false,
 });
