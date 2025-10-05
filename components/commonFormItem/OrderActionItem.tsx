@@ -28,6 +28,7 @@ import {
   AddPriceLinePayload,
   OrderSide,
   PriceLineType,
+  UpdatePriceLinePayload,
 } from "../interfaces/CandlestickSeries";
 import { AuthContext } from "@/context/Auth";
 import { EmitteryContext, OnPriceLine } from "@/providers/EmitteryProvider";
@@ -71,10 +72,6 @@ const OrderActionItem: React.ForwardRefRenderFunction<
   // const dispatch = useDispatch<AppDispatch>();
   const tempPriceLineId = useRef<string>("");
 
-  const handleInput = useCallback((e: React.FormEvent<HTMLInputElement>) => {
-    setDisplayValue((e.target as HTMLInputElement).value);
-  }, []);
-
   const handleSelect = (value: MiddleSection) => {
     setValueType(value);
   };
@@ -98,7 +95,7 @@ const OrderActionItem: React.ForwardRefRenderFunction<
     }
   };
   // TODO: Blur的时候格式化displayValue
-  const formatDisValOnBlur = useCallback(
+  const formatDisVal = useCallback(
     (value: string, valueType: MiddleSection): string => {
       switch (valueType) {
         case MiddleSection.Price:
@@ -114,16 +111,42 @@ const OrderActionItem: React.ForwardRefRenderFunction<
     [currentSymbol]
   );
 
+  const handleInput = useCallback(
+    (e: React.FormEvent<HTMLInputElement>) => {
+      const content = (e.target as HTMLInputElement).value;
+      setDisplayValue(content);
+
+      const disVal = formatDisVal(content, valueType);
+      const actVal = displayValueToActualValue(Number(disVal), valueType);
+      console.log(actVal);
+
+      // const currentOrder = openingOrders.find((o) => o.id === currentOrderId);
+      // const property: keyof Order =
+      //   prop === "stop_price" ? "stop_price_line_id" : "limit_price_line_id";
+      // if (!currentOrder) return;
+      // const priceLineId = currentOrder[property] || tempPriceLineId.current;
+
+      // emittery?.emit(OnPriceLine.update, {
+      //   id: priceLineId,
+      //   options: {
+      //     price: actualValue,
+      //   },
+      // } as UpdatePriceLinePayload);
+    },
+    [formatDisVal, valueType]
+  );
+
   const handleBlur = useCallback(
     (e: React.FocusEvent<HTMLInputElement, Element>) => {
       if (!currentSymbol) return;
-      const disVal = formatDisValOnBlur(e.target.value, valueType);
+      const content = (e.target as HTMLInputElement).value;
+      const disVal = formatDisVal(content, valueType);
       setDisplayValue(disVal);
-      const actVal = displayValueToActualValue(Number(disVal), valueType);
-      if (!actVal) return;
-      setActualValue(actVal);
+      // const actVal = displayValueToActualValue(Number(disVal), valueType);
+      // if (!actVal) return;
+      // setActualValue(actVal);
     },
-    [currentSymbol, formatDisValOnBlur, valueType]
+    [currentSymbol, formatDisVal, valueType]
   );
 
   const onActiveChange = useCallback(
