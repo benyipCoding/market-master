@@ -17,6 +17,8 @@ import {
   OrderSide,
   PriceLineType,
 } from "@/components/interfaces/CandlestickSeries";
+import Big from "big.js";
+import { Order } from "@/components/interfaces/Playground";
 
 export const calcMouseCoordinate = (
   mouseEvent: React.MouseEvent<HTMLDivElement, MouseEvent> | MouseEvent,
@@ -581,4 +583,41 @@ export const isMarker = (id: string) => {
 export function isInRange(value: number, range: number[]): boolean {
   const [min, max] = range;
   return value >= min && value <= max;
+}
+
+export function ticksToPrice(
+  ticks: number,
+  side: OrderSide,
+  opening_price: number,
+  price_per_tick: number,
+  prop: keyof Pick<Order, "stop_price" | "limit_price">
+): number {
+  const absTicks = Math.abs(ticks);
+  if (side === OrderSide.BUY) {
+    // 多单
+    if (prop === "stop_price") {
+      // 止损
+      return new Big(opening_price)
+        .minus(new Big(absTicks).times(price_per_tick!))
+        .toNumber();
+    } else {
+      // 止盈
+      return new Big(opening_price)
+        .plus(new Big(absTicks).times(price_per_tick!))
+        .toNumber();
+    }
+  } else {
+    // 空单
+    if (prop === "stop_price") {
+      // 止损
+      return new Big(opening_price)
+        .plus(new Big(absTicks).times(price_per_tick!))
+        .toNumber();
+    } else {
+      // 止盈
+      return new Big(opening_price)
+        .minus(new Big(absTicks).times(price_per_tick!))
+        .toNumber();
+    }
+  }
 }

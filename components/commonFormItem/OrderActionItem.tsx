@@ -33,13 +33,13 @@ import {
 import { AuthContext } from "@/context/Auth";
 import { EmitteryContext, OnPriceLine } from "@/providers/EmitteryProvider";
 import { setOpenOrdersPriceLineId } from "@/store/fetchDataSlice";
-import { generatePriceLineId } from "@/utils/helpers";
+import { generatePriceLineId, ticksToPrice } from "@/utils/helpers";
 
 interface OrderActionItemProps {
   id: PriceLineType;
   label: string;
   order: Order | null;
-  prop: keyof Order;
+  prop: keyof Pick<Order, "stop_price" | "limit_price">;
   dynamicPrice: number | undefined;
 }
 
@@ -81,11 +81,20 @@ const OrderActionItem: React.ForwardRefRenderFunction<
     disVal: number,
     valueType: MiddleSection
   ): number | undefined => {
+    const currentOrder = openingOrders.find((o) => o.id === currentOrderId);
+    if (!currentOrder) return;
+
     switch (valueType) {
       case MiddleSection.Price:
         return disVal;
       case MiddleSection.Ticks:
-        return disVal;
+        return ticksToPrice(
+          disVal,
+          currentOrder.side,
+          currentOrder.opening_price,
+          currentSymbol?.price_per_tick!,
+          prop
+        );
       case MiddleSection.Percentage:
         return disVal;
       case MiddleSection.USD:
@@ -118,7 +127,7 @@ const OrderActionItem: React.ForwardRefRenderFunction<
 
       const disVal = formatDisVal(content, valueType);
       const actVal = displayValueToActualValue(Number(disVal), valueType);
-      console.log(actVal);
+      console.log("This si handleInput", actVal);
 
       // const currentOrder = openingOrders.find((o) => o.id === currentOrderId);
       // const property: keyof Order =
@@ -142,9 +151,6 @@ const OrderActionItem: React.ForwardRefRenderFunction<
       const content = (e.target as HTMLInputElement).value;
       const disVal = formatDisVal(content, valueType);
       setDisplayValue(disVal);
-      // const actVal = displayValueToActualValue(Number(disVal), valueType);
-      // if (!actVal) return;
-      // setActualValue(actVal);
     },
     [currentSymbol, formatDisVal, valueType]
   );
